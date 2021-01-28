@@ -6,3 +6,29 @@ In order to place a `Character` in a particular `Town`, we will call a function 
 
 To determine whether a specified character can reach a designated town without running into any other characters, we will call a function `query()` in the `TownNetwork` class. We will traverse through the towns using the `adjMatrix` field with Dijkstra’s algorithm. We will include a modification to account for whether or not a particular town is empty. Specifically, during traversal, we will access the `isEmpty` field of each `Town` object in the path, and if it ever returns `false`, the `query()` function will return false. Otherwise, it will return true.
 
+The overall structure of the package will be the following:
+
+`class TownNetwork {
+      int[][] adjMatrix;
+      ArrayList<Edge> edges;
+      
+      boolean query();
+ }
+ 
+ class Edge {
+      Town source;
+      Town destination;
+ }
+ 
+ class Town {
+      String name;
+      boolean isEmpty;
+      Character character_assigned;
+      
+      void placeCharacter(Character c);
+ }
+ 
+ class Character {
+      String name;
+ }`
+
