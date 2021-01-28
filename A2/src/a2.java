@@ -1,37 +1,22 @@
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.*;
-import org.json.simple.parser.JSONParser;
-
-import java.io.BufferedReader;
+import org.json.JSONObject;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
-import java.util.HashMap;
 
-import static java.lang.System.exit;
-
-// ./a2 --sum < text.json
 
 public class a2 {
   private static JSONArray output_array = new JSONArray();
-  static boolean sum;
-  private static ArrayList<Integer> list_of_ints = new ArrayList<>();
-  static HashMap<Integer, ArrayList<Integer>> numjsons = new HashMap<Integer, ArrayList<Integer>>();
+  private static boolean sum;
+  private static String temp_json_object;
 
-  public static void main(String[] args) throws ParseException, IOException {
+  public static void main(String[] args) throws ParseException, IOException, JSONException {
 
-    //Scanner scan = new Scanner(System.in);
     //BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in, "UTF-8"));
     //StringBuilder stdout = new StringBuilder();
 
-    //while ((input = stdin.readLine()) != null) {
-    //  System.out.println(input);
-    //}
     if (args[0].equals("--sum")) {
       sum = true;
     }
@@ -52,66 +37,31 @@ public class a2 {
     System.out.println("INPUT AS STRING-BUILDER: " + input_as_string);
 
 
-
-      //System.out.println(i + ": " + c);
-    parse(input_as_string, 0);
-    //}
-
-
-    /*
-    while (true) {
-      try {
-        int c = stdin.read();
-        if (c != 4 || c != -1)  // ASCII 4 04 EOT (end of transmission) ctrl D, I may be wrong here
-          stdout.append (c);
-        else
-          break;
-      } catch (IOException e) {
-        System.err.println ("Error reading input");
-      }
-    }
-    */
-
-
-
-    //String tokens[] = scan.nextLine().split(" ");
-
-    //System.out.println(Arrays.asList(tokens));
-    //scan.close();
-
-    //while (scan.hasNext()) {
-    //  System.out.println();
-    //}
-    //String input = scan.nextLine();
-
-    //scan.close();
-
-    //System.out.println(input);
-    //parsing
-
-    //System.out.println(args[2]);
-    //System.out.println(parsed);
-
-    // ./a2 --sum "12 [4, "foo", 2] {cioargoirgeoierg}"
-
-    //if (args[1].equals("--sum")) {
-      //do the adding
-      //build output JSON
-    //}
-    //else if (args[1].equals("--product")) {
-      //do the multiplcation
-      //build output JSON
-    //}
+    parse(input_as_string.toString(), 0);
+    System.out.println("OUTPUT JSONARRAY:");
+    System.out.println(output_array);
   }
 
-  private static void parse(StringBuilder input, int index) throws ParseException {
-
-    for (int i=index; i<input.length(); i++) {
+  private static void parse(String input, int index) throws ParseException, JSONException {
+    int inc_value = 1;
+    for (int i=index; i<input.length(); i+=inc_value) {
       if (Character.isDigit(input.charAt(i))) {
-        parse_ints(input, i+1);
+        String whole_number = parse_ints(input, i).toString();
+        inc_value = whole_number.length();
+        System.out.println(whole_number);
+
+        compute(whole_number);
       }
       else if (Character.toString(input.charAt(i)).equals("[")) {
-        parse_array(input, i+1);
+        StringBuilder object2 = new StringBuilder();
+        object2.append(Character.toString(input.charAt(index)));
+
+        String array_numjson = parse_array(input, object2, i).toString().replaceAll("[\\n\\t ]", "");
+        inc_value = array_numjson.length();
+        System.out.println(array_numjson);
+        //parse_array(input, i+1);
+
+        compute(array_numjson);
       }
       else if (Character.toString(input.charAt(i)).equals("{")) {
         StringBuilder object = new StringBuilder();
@@ -120,34 +70,21 @@ public class a2 {
         System.out.println();
         System.out.println();
 
-        String json_object = parse_object(input, object, i).toString().replaceAll("[\\n\\t ]", "");
+        String json_object = parse_object(input, object, i).replaceAll("[\\n\\t ]", "");
+        inc_value = json_object.length();
         System.out.println(json_object);
+        //exit(0);
         //System.out.println(object.toString().replaceAll("[\\n\\t ]", ""));
 
-        parse_json(json_object);
-        //parse_json(object.toString().replaceAll("[\\n\\t ]", ""));
-        //parse_object(input, i+1);
+        compute(json_object);
+        //parse_json(json_object);
+
       }
     }
   }
 
-  private static void parse_json(String json_object) throws ParseException {
-    JSONParser parser = new JSONParser();
-    JSONObject parsed = (JSONObject) parser.parse(json_object);
 
-    try {
-      JSONObject payload = (JSONObject) parsed.get("payload");
-      System.out.println("PAYLOAD IS: " + payload);
-      exit(0);
-    }
-    catch (Exception e) {
-      //this should never happen, but still here just in case
-      e.printStackTrace();
-    }
-
-  }
-
-  private static StringBuilder parse_ints(StringBuilder input, int index) {
+  private static StringBuilder parse_ints(String input, int index) {
     StringBuilder build_int = new StringBuilder();
     for (int i=index; i<input.length(); i++) {
       char c = input.charAt(i);
@@ -155,66 +92,151 @@ public class a2 {
         build_int.append(c);
       }
       else {
-        break;
-        // do other stuff
+        return build_int;
       }
     }
 
-    System.out.println(build_int);
     return build_int;
+
+    //System.out.println(build_int);
+
     //compute(list_of_ints);
     //add_to_jsonarray(build_int);
   }
 
-  private static void parse_array(StringBuilder input, int index) throws ParseException {
-    StringBuilder build_int = new StringBuilder();
-    for (int i=index; i<input.length(); i++) {
+  private static String parse_array(String input, StringBuilder object, int index) throws ParseException, JSONException {
+    for (int i=index+1; i<input.length(); i++) {
       if (Character.toString(input.charAt(i)).equals("]")) {
-        break;
+        object.append(Character.toString(input.charAt(i)));
+        //add break here
+        // do what you do in parse_objects bug
+      }
+      else if (Character.toString(input.charAt(i)).equals("[")) {
+        object.append(Character.toString(input.charAt(i)));
+        parse_array(input, new StringBuilder(), i);
       }
       else {
-        parse(input, i+1);
+        object.append(Character.toString(input.charAt(i)));
+        //parse(input, i+1);
       }
     }
+
+    return object.toString();
   }
 
-  private static StringBuilder parse_object(StringBuilder input, StringBuilder object, int index) throws ParseException {
+  private static String parse_object(String input, StringBuilder object, int index) throws ParseException {
     for (int j=index+1; j<input.length(); j++) {
-      if (Character.toString(input.charAt(j)).equals("{")) {
-        parse_object(input, object, j);
-      }
       if (Character.toString(input.charAt(j)).equals("}")) {
-        System.out.println(input.charAt(j));
         object.append(Character.toString(input.charAt(j)));
         break;
+      }
+      else if (Character.toString(input.charAt(j)).equals("{")) {
+        System.out.println("IN ELSE IF FOR --{--");
+        System.out.println(Character.toString(input.charAt(j)));
+        object.append(Character.toString(input.charAt(j)));
+        parse_object(input, new StringBuilder(), j);
       }
       else {
         object.append(Character.toString(input.charAt(j)));
       }
     }
-    return object;
-//    StringBuilder build_int = new StringBuilder();
-//    for (int i=index; i<input.length(); i++) {
-//      if (Character.toString(input.charAt(i)).equals("}")) {
-//        break;
-//      }
-//      else {
-//        parse(input, i+1);
-//      }
+
+    //System.out.println(object.toString());
+    return object.toString();
+
+  }
+
+  private static void parse_json(String json_object) throws ParseException, JSONException {
+    temp_json_object = json_object;
+
+    JSONObject object = new JSONObject(json_object);
+    JSONObject payload = object.getJSONObject("payload");
+    //JSONArray jsonArray = object.getJSONArray("payload");
+
+    System.out.println("JSONARRAY: " + payload);
+    System.out.println();
+
+    parse(payload.toString(), 0);
+    //compute(payload.toString());
+    //exit(0);
+
+  }
+
+  // num_json = [294858, "food", [4, 5, 6, "hi"], 9]
+  // num_json = {"name":"SwDev","payload":[12,33],"other":{"payload":[4,7]}
+  // num_json = 12
+  // num_json = {"name":"SwDev","payload":{"payload":[4,7]}}
+  // num_json = ["foo", "fee", "faa"]
+  // {"name":"SwDev","payload":{"digit": 12,"payload":[12,33],"other":{"payload":[4,7]},"other":{"payload":[4,7]}
+
+  private static void compute(String num_json) throws JSONException {
+    ArrayList<Integer> output = new ArrayList<>();
+    int size_of_inc = 1;
+    int integer;
+
+//    if (Character.toString(num_json.charAt(0)).equals("{")) {
+//      JSONObject object = new JSONObject(num_json);
+//      JSONObject payload = object.getJSONObject("payload");
+//      String payload_string = payload.toString();
 //    }
+
+    for (int i=0; i<num_json.length(); i+=size_of_inc) {
+      char c = num_json.charAt(i);
+      if (Character.isDigit(c)) {
+        String result = parse_ints(num_json, i).toString();
+        size_of_inc = result.length();
+        integer = Integer.parseInt(result);
+        output.add(integer);
+      }
+    }
+
+    if (sum) {
+      int sum_total = 0;
+      for (int num : output) {
+        sum_total += num;
+      }
+      add_to_jsonarray(num_json, sum_total);
+    }
+    else {
+      int product_total = 1;
+      for (int num : output) {
+        product_total *= num;
+      }
+      add_to_jsonarray(num_json, product_total);
+    }
+
   }
 
-  private static void compute(ArrayList<Integer> list_of_ints) {
+  private static void add_to_jsonarray(String input, int total) throws JSONException {
+    JSONObject obj = new JSONObject();
 
-  }
+    //String first = Character.toString(input.charAt(0));
 
-  private static void add_to_jsonarray(StringBuilder input) {
+//    if (first.equals("[")) {
+//      // is array
+//      JSONArray input_new = (JSONArray) input;
+//      obj.put("object", input_new);
+//    }
+//    else if (first.equals("{")) {
+//      // is object
+//      JSONObject input_new =;
+//      obj.put("object", input_new);
+//    }
+//    else if (Character.isDigit(input.charAt(0))) {
+//      // is digit
+//      int input_new = Integer.getInteger(input.toString());
+//      obj.put("object", input_new);
+//    }
 
+    obj.put("object", input);
+    obj.put("total", total);
+
+    output_array.put(obj);
   }
 
   /*
   public static String output_json() throws JSONException {
-    JSONArray ja = new JSONArray();
+
 
     ja.put(Boolean.TRUE);
     ja.put("lorem ipsum");
