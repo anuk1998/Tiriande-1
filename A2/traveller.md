@@ -8,27 +8,29 @@ To determine whether a specified character can reach a designated town without r
 
 The overall structure of the package will be the following:
 
-`class TownNetwork {
-      int[][] adjMatrix;
-      ArrayList<Edge> edges;
+```
+class TownNetwork {
+     int[][] adjMatrix;
+     ArrayList<Edge> edges;
       
-      boolean query();
- }
+     boolean query();
+}
  
- class Edge {
-      Town source;
-      Town destination;
- }
+class Edge {
+     Town source;
+     Town destination;
+}
  
- class Town {
-      String name;
-      boolean isEmpty;
-      Character character_assigned;
+class Town {
+     String name;
+     boolean isEmpty;
+     Character character_assigned;
       
-      void placeCharacter(Character c);
- }
+     void placeCharacter(Character c);
+}
  
- class Character {
-      String name;
- }`
+class Character {
+     String name;
+}
+```
 
