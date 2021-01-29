@@ -70,7 +70,7 @@ public class a2 {
         list_of_njsons.add(str);
         total = compute(str);
         add_to_jsonarray(str, total);
-        break;
+        //break;
       }
     }
 
