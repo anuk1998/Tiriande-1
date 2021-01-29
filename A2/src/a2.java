@@ -1,7 +1,10 @@
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -26,18 +29,22 @@ public class a2 {
 
     StringBuilder input_as_string = new StringBuilder();
     String text;
-    Scanner scanner = new Scanner( System.in );
-    while( scanner.hasNextLine() )
-    {
-      text = scanner.nextLine();
-      input_as_string.append( text );
-    }
-    scanner.close();
+//    Scanner scanner = new Scanner( System.in );
+//    while( scanner.hasNextLine() )
+//    {
+//     text = scanner.nextLine();
+//      input_as_string.append( text );
+//    }
+//    scanner.close();
     System.out.println();
     System.out.println("INPUT AS STRING-BUILDER: " + input_as_string);
 
 
-    parse(input_as_string.toString(), 0);
+    //parse(input_as_string.toString(), 0);
+    String mock_input = "12 { \"name\" : \"SwDev\", \"payload\" : \n" +
+            "  [12, 33]     , \n" +
+            "        \"other\" : { \"payload\" : [ 4, 7 ] } }";
+    parse(mock_input, 0);
     System.out.println("OUTPUT JSONARRAY:");
     System.out.println(output_array);
   }
@@ -45,6 +52,8 @@ public class a2 {
   private static void parse(String input, int index) throws ParseException, JSONException {
     int inc_value = 1;
     for (int i=index; i<input.length(); i+=inc_value) {
+      inc_value = 1;
+      char current_character = input.charAt(i);
       if (Character.isDigit(input.charAt(i))) {
         String whole_number = parse_ints(input, i).toString();
         inc_value = whole_number.length();
@@ -65,7 +74,7 @@ public class a2 {
       }
       else if (Character.toString(input.charAt(i)).equals("{")) {
         StringBuilder object = new StringBuilder();
-        object.append(Character.toString(input.charAt(index)));
+        object.append(Character.toString(input.charAt(i)));
 
         System.out.println();
         System.out.println();
@@ -76,8 +85,9 @@ public class a2 {
         //exit(0);
         //System.out.println(object.toString().replaceAll("[\\n\\t ]", ""));
 
+        //compute(json_object);
+        parse_json(json_object);
         compute(json_object);
-        //parse_json(json_object);
 
       }
     }
@@ -125,16 +135,18 @@ public class a2 {
   }
 
   private static String parse_object(String input, StringBuilder object, int index) throws ParseException {
-    for (int j=index+1; j<input.length(); j++) {
+    int inc_value = 1;
+    for (int j=index+1; j<input.length(); j+=inc_value) {
+      inc_value = 1;
       if (Character.toString(input.charAt(j)).equals("}")) {
         object.append(Character.toString(input.charAt(j)));
         break;
       }
       else if (Character.toString(input.charAt(j)).equals("{")) {
-        System.out.println("IN ELSE IF FOR --{--");
-        System.out.println(Character.toString(input.charAt(j)));
         object.append(Character.toString(input.charAt(j)));
-        parse_object(input, new StringBuilder(), j);
+        String recur = parse_object(input, new StringBuilder(), j);
+        object.append(recur);
+        inc_value = recur.length();
       }
       else {
         object.append(Character.toString(input.charAt(j)));
@@ -167,7 +179,7 @@ public class a2 {
   // num_json = 12
   // num_json = {"name":"SwDev","payload":{"payload":[4,7]}}
   // num_json = ["foo", "fee", "faa"]
-  // {"name":"SwDev","payload":{"digit": 12,"payload":[12,33],"other":{"payload":[4,7]},"other":{"payload":[4,7]}
+  // {"name":"SwDev","payload":{"digit": 12,"payload":[12,33]},"other":{"payload":[4,7]},"other":{"payload":[4,7]}
 
   private static void compute(String num_json) throws JSONException {
     ArrayList<Integer> output = new ArrayList<>();
