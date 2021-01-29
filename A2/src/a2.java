@@ -12,10 +12,10 @@ public class a2 {
   private static ArrayList<String> list_of_njsons = new ArrayList<>();
 
   public static void main(String[] args) throws ParseException, JSONException {
-    if (args[0].equals("--sum")) {
+    if (args[1].equals("--sum")) {
       sum = true;
     }
-    else if (args[0].equals("--product")) {
+    else if (args[1].equals("--product")) {
       sum = false;
     }
 
