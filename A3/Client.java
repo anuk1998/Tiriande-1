@@ -28,11 +28,16 @@ public class Client {
             this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
 
             while(this.clientSocket.isConnected()) {
-                String message = this.input.readLine();
-                System.out.println(message);
+                //String message = this.input.readLine();
+                //System.out.println(message);
+
+                //client to server communication
                 String reply = this.s.nextLine();
                 this.output.println("client: " + reply);
+                this.output.flush();
             }
+
+            clientSocket.close();
         } catch (Exception var3) {
             var3.printStackTrace();
         }
