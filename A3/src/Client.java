@@ -1,14 +1,11 @@
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
     private Socket clientSocket;
     private BufferedReader input;
-    private PrintStream output;
+    private OutputStream output;
     private Scanner s;
 
     public Client() {
@@ -23,18 +20,25 @@ public class Client {
     public void run() {
         try {
             this.clientSocket = new Socket("localhost", 8000);
-            this.output = new PrintStream(this.clientSocket.getOutputStream());
-            this.output.println("client to server output");
+            this.output = this.clientSocket.getOutputStream();
+            PrintWriter writer = new PrintWriter(this.output, true);
+            //this.output.println("client to server output");
             this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
 
-            while(this.clientSocket.isConnected()) {
-                //String message = this.input.readLine();
-                //System.out.println(message);
+
+            while(true) {
+
 
                 //client to server communication
                 String reply = this.s.nextLine();
-                this.output.println("client: " + reply);
-                this.output.flush();
+                writer.println(reply);
+                writer.flush();
+                if(reply.equals("END")){
+                    String message = this.input.readLine();
+                    System.out.println(message);
+                    break;
+                }
+
             }
 
             clientSocket.close();
