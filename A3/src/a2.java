@@ -9,17 +9,17 @@ import java.util.Scanner;
 
 public class a2 {
     private static JSONArray output_array = new JSONArray();
-    private static boolean sum;
+    private static boolean sum = true;
     private static String temp_json_object;
     private static ArrayList<String> list_of_njsons = new ArrayList<>();
 
     public static void main(String[] args) throws ParseException, JSONException {
-        if (args[0].equals("--sum")) {
-            sum = true;
-        }
-        else if (args[0].equals("--product")) {
-            sum = false;
-        }
+//        if (args[0].equals("--sum")) {
+//            sum = true;
+//        }
+//        else if (args[0].equals("--product")) {
+//            sum = false;
+//        }
 
         StringBuilder input_as_string = new StringBuilder();
         String text;
