@@ -24,8 +24,6 @@ public class Server {
     public static void main(String[] args) throws ParseException, JSONException {
         Server server = new Server();
         server.run();
-
-
     }
 
     public void run() throws ParseException, JSONException {
@@ -39,32 +37,24 @@ public class Server {
             String message = input.readLine();
 
             while(!message.equals("END")) {
-            //while(this.acceptSocket.isConnected()) {
                 //reading in from client
                 message = this.input.readLine();
-                //System.out.println(message);
-
-                //replying back to client
-                //String reply = this.s.nextLine();
-                //this.output.println("server: " + reply);
 
                 //compiling input from client into StringBuilder
                 clientInput.append(message);
-
-                System.out.println("testing");
-
             }
 
-            System.out.println("made it out of while loop");
 
             //parsing input from client StringBuilder
             a2 hi = new a2();
-            JSONArray messageToClient = hi.parse(clientInput.toString(), 1);
-
+            JSONArray messageToClient = hi.parse(clientInput.toString(), 0);
+            System.out.println(messageToClient);
             //send message back to client
             this.output.println(messageToClient);
+            this.output.flush();
 
             //close socket
+            acceptSocket.close();
             serverSocket.close();
         } catch (IOException var3) {
             System.out.println(var3);
@@ -72,3 +62,4 @@ public class Server {
 
     }
 }
+
