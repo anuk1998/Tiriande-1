@@ -9,6 +9,7 @@ import java.util.Set;
 public class World {
     private Set<Town> towns;
     private Set<Character> characters;
+    private List<List<Town>> routesToDest = new ArrayList<List<Town>>();
 
     public World(Set<Town> t, Set<Character> c) {
         this.towns = t;
@@ -28,8 +29,8 @@ public class World {
         if(getOpenRoute(traveller,destination).size() == 0) {
             return false;
         }
-            //if it is not empty, there is an open route
-            return true;
+        //if it is not empty, there is an open route
+        return true;
     }
 
     /**
@@ -38,36 +39,57 @@ public class World {
      residents
      */
     public List<Town> getOpenRoute(Character traveller, Town destination) {
-        //List<Town> openRoute = new ArrayList<>();
-        List<List<Town>> routesToDest = new ArrayList<List<Town>>();
+        List<List<Town>> allValidRoutes = new ArrayList<List<Town>>();
         Town startTown = traveller.getTown();
 
-        for(Town t: startTown.getNeighbors()) {
+        // finds all potential routes to the destination town from the start town
+        for (Town t: startTown.getNeighbors()) {
             List<Town> visited = new ArrayList<Town>();
-            routesToDest.add(findAllRoutes(destination, t, visited));
+            findARoute(destination, t, visited);
         }
 
+        // checks if any paths to the destination town are valid (i.e. can be reached without running into residents)
         for (List<Town> route : routesToDest) {
+            boolean isValidRoute = true;
+
             for (Town town : route) {
                 if (town.hasResidents()) {
-                    break;
+                    isValidRoute = false;
                 }
+            }
+
+            if (isValidRoute) {
+                allValidRoutes.add(route);
             }
         }
 
-        return openRoute;
+        // determines the shortest valid path of all valid paths to destination town
+        int minRoute = allValidRoutes.get(0).size();
+        int shortestRoute = 0;
+        for (int i=0; i<allValidRoutes.size(); i++) {
+            if (allValidRoutes.get(i).size() < minRoute) {
+                minRoute = allValidRoutes.get(i).size();
+                shortestRoute = i;
+            }
+        }
+        return allValidRoutes.get(shortestRoute);
     }
 
-    public List<Town> findAllRoutes(Town goalTown, Town currentTown, List<Town> visited) {
-        if (currentTown.getName().equals(goalTown.getName())) {
-            visited.add(currentTown);
-            return visited;
-        }
+    /**
+     * Recursively finds a route to the goal destination by hopping to neighboring towns until the goal
+     * destination is reached, then adding it to a list of all valid routes.
+     */
+    public void findARoute(Town goalTown, Town currentTown, List<Town> visited) {
         visited.add(currentTown);
-        for (Town t : currentTown.getNeighbors()) {
-            findAllRoutes(goalTown, t, visited);
+        if (currentTown.getName().equals(goalTown.getName())) {
+            routesToDest.add(visited);
         }
-        return null;
+
+        for (Town t : currentTown.getNeighbors()) {
+            if (!visited.contains(t)) {
+                findARoute(goalTown, t, visited);
+            }
+        }
     }
 
     /**
