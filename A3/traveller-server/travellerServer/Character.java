@@ -1,4 +1,5 @@
-package travellerServer.java;
+package travellerServer;
+import travellerServer.Town;
 
 public class Character {
     private String name;

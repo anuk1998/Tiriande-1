@@ -12,6 +12,19 @@ The overall structure of the package will be the following:
 class TownNetwork {
      int[][] adjMatrix;
      ArrayList<Edge> edges;
+     HashMap<String, String> charactersAndTowns;
+
+     void addEdge(Edge e) {
+        this.edges.add(e);
+     }
+
+    ArrayList<Edge> getEdges() {
+        return this.edges;
+    }
+
+    void addCharacterAndTown(String c, String t) {
+        this.charactersAndTowns.put(c, t);
+     }
       
      boolean query();
 }
@@ -19,18 +32,56 @@ class TownNetwork {
 class Edge {
      Town source;
      Town destination;
-}
+
+     Town getSource() {
+        return this.source;
+    }
+
+     Town getDest() {
+        return this.destination;
+    }
+
+
  
 class Town {
      String name;
      boolean isEmpty;
      Character character_assigned;
+
+     String getName() {
+        return this.name;
+     }
+
+     String getIsEmpty() {
+        return this.isEmpty;
+     }
       
-     void placeCharacter(Character c);
+     void setCharacter(Character c) {
+        this.character_assigned = c;
+     }
+
+     Character getCharacter() {
+        return this.character_assigned;
+     }
 }
  
 class Character {
      String name;
+     boolean isAssigned;
+     
+     String getName() {
+        return this.name;
+     }
+
+     boolean getIsAssigned() {
+        return this.isAssigned;
+     }
+
+     void setIsAssigned(boolean assign) {
+        this.isAssigned = assign;
+     }
+
+     
 }
 ```
 

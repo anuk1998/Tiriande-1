@@ -1,4 +1,6 @@
 package travellerServer;
+import travellerServer.Town;
+import travellerServer.Character;
 
 import java.util.ArrayList;
 import java.util.List;

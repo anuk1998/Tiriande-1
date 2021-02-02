@@ -1,4 +1,5 @@
- package travellerServer;
+package travellerServer;
+import travellerServer.Character;
 
  import java.util.Set;
 
