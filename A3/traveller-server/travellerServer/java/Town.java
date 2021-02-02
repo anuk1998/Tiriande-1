@@ -1,7 +1,6 @@
- package World;
-import World.Character;
+ package travellerServer.java;
 
-import java.util.Set;
+ import java.util.Set;
 
 public class Town {
     private String name;

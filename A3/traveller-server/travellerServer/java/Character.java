@@ -1,5 +1,4 @@
-package World;
-import World.Town;
+package travellerServer.java;
 
 public class Character {
     private String name;

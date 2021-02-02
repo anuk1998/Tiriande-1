@@ -1,6 +1,4 @@
-package World;
-import World.Town;
-import World.Character;
+package travellerServer.java;
 
 import java.util.ArrayList;
 import java.util.List;
