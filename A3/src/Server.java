@@ -6,7 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.text.ParseException;
 import java.util.Scanner;
-import a2.a2;
+
+import a23.a23;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -34,7 +35,8 @@ public class Server {
             this.acceptSocket = this.serverSocket.accept();
             this.output = new PrintStream(this.acceptSocket.getOutputStream());
             this.input = new BufferedReader(new InputStreamReader(this.acceptSocket.getInputStream()));
-            String message = input.readLine();
+            //String message = input.readLine();
+            String message = "";
 
             while(!message.equals("END")) {
                 //reading in from client
@@ -46,8 +48,8 @@ public class Server {
 
 
             //parsing input from client StringBuilder
-            a2 numJSONparser = new a2();
-            JSONArray messageToClient = numJSONparser.parse(clientInput.toString(), 0);
+            a23 inputParser = new a23();
+            JSONArray messageToClient = inputParser.parse(clientInput.toString(), 0);
             System.out.println(messageToClient);
             //send message back to client
             this.output.println(messageToClient);
