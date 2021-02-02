@@ -17,27 +17,34 @@ public class traveller {
         }
         scanner.close();
 
-        if (args[1].equals("roads")) {
-            //create network
+        parse_json(input_as_string.toString().replaceAll("[\\n\\t]", ""));
+
+    }
+
+    private static void parse_json(String json_object) throws JSONException {
+        temp_json_object = json_object;
+        JSONObject object = new JSONObject(json_object);
+
+        try {
+            JSONObject command = object.getJSONObject("command");
+
+            if(command.toString().equals("roads")) {
+
+            }
+            else if(command.toString().equals("place")) {
+
+            }
+            else if (command.toString().equals("passage-safe?")){
+
+            }
+
+
         }
-        else if (args[1].equals("people")) {
-            //place character
-        }
-        else (args[1].equals("passage-safe?")) {
-            //query()
+        catch (Exception e) {
+            //compute(json_object);
         }
 
     }
 
-    public void createNetworkHelper() {
 
-    }
-
-    public void placeCharacterHelper() {
-
-    }
-
-    public void queryHelper() {
-
-    }
 }
