@@ -46,8 +46,8 @@ public class Server {
 
 
             //parsing input from client StringBuilder
-            a2 hi = new a2();
-            JSONArray messageToClient = hi.parse(clientInput.toString(), 0);
+            a2 numJSONparser = new a2();
+            JSONArray messageToClient = numJSONparser.parse(clientInput.toString(), 0);
             System.out.println(messageToClient);
             //send message back to client
             this.output.println(messageToClient);
