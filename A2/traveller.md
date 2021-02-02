@@ -12,7 +12,7 @@ The overall structure of the package will be the following:
 class TownNetwork {
      int[][] adjMatrix;
      ArrayList<Edge> edges;
-     HashMap<String, String> charactersAndTowns;
+     HashMap<String, Town> charactersAndTowns;
 
      void addEdge(Edge e) {
         this.edges.add(e);
@@ -22,11 +22,17 @@ class TownNetwork {
         return this.edges;
     }
 
-    void addCharacterAndTown(String c, String t) {
+    void addCharacterAndTown(String c, Town t) {
         this.charactersAndTowns.put(c, t);
      }
+
+    HashMap<String, Town> getCharacterAndTown() {
+        return this.charactersAndTowns;
+    }
       
-     boolean query();
+     boolean query(Town startTown, Town destTown ) {
+        
+    }
 }
  
 class Edge {
