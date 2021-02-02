@@ -9,7 +9,8 @@ public class traveller {
 
         StringBuilder input_as_string = new StringBuilder();
         String text;
-        Scanner scanner = new Scanner( System.in );
+        Scanner scanner = new Scanner(System.in);
+
         while( scanner.hasNextLine() )
         {
             text = scanner.nextLine();
@@ -32,6 +33,8 @@ public class traveller {
 
             }
             else if(command.toString().equals("place")) {
+                Server serv = new Server();
+                serv.query(...place);
 
             }
             else if (command.toString().equals("passage-safe?")){
@@ -41,7 +44,7 @@ public class traveller {
 
         }
         catch (Exception e) {
-            //compute(json_object);
+            exit(0);
         }
 
     }
