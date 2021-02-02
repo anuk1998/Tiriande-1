@@ -1,4 +1,4 @@
-package travellerServer.java;
+package travellerServer;
 
 import java.util.ArrayList;
 import java.util.List;

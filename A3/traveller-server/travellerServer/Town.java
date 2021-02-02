@@ -1,4 +1,4 @@
- package travellerServer.java;
+ package travellerServer;
 
  import java.util.Set;
 
