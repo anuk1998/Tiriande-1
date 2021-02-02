@@ -156,7 +156,7 @@ public class a2 {
         for (String njson : list_of_njsons) {
             if (Character.toString(njson.charAt(0)).equals("{")) {
                 String new_njson = njson.replaceAll("[\\n\\t ]\" \"", "");
-                System.out.println(new_njson);
+                //System.out.println(new_njson);
                 JSONObject object = new JSONObject(new_njson);
                 try {
                     String payload = object.get("payload").toString();
