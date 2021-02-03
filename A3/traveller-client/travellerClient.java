@@ -1,4 +1,3 @@
-/*
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,27 +21,32 @@ public class travellerClient {
         }
         scanner.close();
 
-        parse_json(input_as_string.toString().replaceAll("[\\n\\t]", ""));
+        parseInput(input_as_string);
+
 
     }
 
-    private static void parse_json(String json_object) throws org.json.JSONException {
+    private static void parseInput(StringBuilder stdnInput) throws JSONException {
+        String input = stdnInput.toString().replaceAll("[\\n\\t\\s]", "");
+        String[] parsedObjects = input.replaceAll("}\\{", "}#{").split("#");
+        //{"command": "roads"
+        if (!(parsedObjects[0].substring(13,18).equals("roads"))) {
+            exit(0);
+        }
+
+        for (String object : parsedObjects) {
+            parseJson(object);
+        }
+
+    }
+
+    private static void parseJson(String json_object) throws org.json.JSONException {
 
         JSONObject object = new JSONObject(json_object);
-
-        // json_object = "{'command': ..., 'params': [{.....}, {....}, {....}] }{'command': ..., 'params': ...}]
-        //                        {'command': ..., 'params': ..} {'bad': ..., 'params': ..} {.....}"
-
-        // {command .... "params": {..}}, {command....}
-        // " ...... " => JSONArray = [{;command......}, {command,....}, ......]
-
-
 
         try {
             JSONObject command = object.getJSONObject("command");
             JSONObject params = object.getJSONObject("params");
-
-            // start for loop here
 
             if(command.toString().equals("roads")) {
                 // assuming "roads" is valid and is the first JSON object given.. **check for that**
@@ -126,4 +130,3 @@ public class travellerClient {
 
 }
 
- */
