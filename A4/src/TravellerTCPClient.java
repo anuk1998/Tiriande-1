@@ -2,6 +2,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 import static java.lang.System.exit;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class TravellerTCPClient {
   private static Socket clientSocket;
