@@ -19,33 +19,37 @@ public class TravellerTCPClient {
   }
 
   public static void main(String[] args) throws IOException {
+    String host = "localhost";
+    int port = 8000;
     signUpName = "Glorifrir Flintshoulder";
-    clientSocket = new Socket("localhost", 8000);
 
     if (args.length == 1) {
-      clientSocket = new Socket(args[0], 8000);
+      host = args[0];
     }
     else if (args.length == 2) {
-      clientSocket = new Socket(args[0], Integer.parseInt(args[1]));
+      host = args[0];
+      port = Integer.parseInt(args[1]);
     }
     else if (args.length == 3) {
-      clientSocket = new Socket(args[0], Integer.parseInt(args[1]));
+      host = args[0];
+      port = Integer.parseInt(args[1]);
       signUpName = args[2];
     }
 
+    clientSocket = new Socket(host, port);
     TravellerTCPClient client = new TravellerTCPClient();
     client.run();
   }
 
+  // Begins collecting user-input from STDIN (until Ctrl+D) and sends input to
+  // be parsed.
   public void run() {
     try {
       output = clientSocket.getOutputStream();
       writer = new PrintWriter(output, true);
       input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-      //send out signup name to server
       writer.println(signUpName);
-      //get session ID from server
       String sessionId = input.readLine();
       String serverWillCallMe = "[\"the server will call me\", " + signUpName + "]";
       System.out.println(serverWillCallMe);
@@ -53,10 +57,7 @@ public class TravellerTCPClient {
 
       while(s.hasNextLine()) {
         String reply = s.nextLine();
-        String response = parseInput(reply, commandCounter);
-        if (response != null) {
-          System.out.println(response);
-        }
+        parseInput(reply, commandCounter);
         commandCounter++;
       }
       clientSocket.close();
@@ -66,16 +67,16 @@ public class TravellerTCPClient {
     }
   }
 
-  public String parseInput(String command, int commandCounter) throws org.json.JSONException, IOException {
-    String serverResponse = null;
-    // only checking that the FIRST given command is a proper roads creation command
+  // Determines if user input is a roads creation command, place character command,
+  // or query command, and acts accordingly.
+  public void parseInput(String command, int commandCounter) throws org.json.JSONException, IOException {
+    String serverResponse;
+    // checking that the FIRST given command is a proper roads creation command
     if (commandCounter == 1) {
       checkRoadsCommand(command);
       JSONObject serverRoadsJSON = rebuildRoadsJSON(command);
       if (serverRoadsJSON != null) {
         writer.println(serverRoadsJSON);
-        serverResponse = input.readLine();
-
       }
     }
     else { // check if batch command
@@ -85,23 +86,48 @@ public class TravellerTCPClient {
           batchRequests.put(object);
         }
       }
-      if (isQueryCommand(command)) {
+      else if (isQueryCommand(command)) {
         JSONObject object = getCommandAsJSON(command);
         if (object != null) {
           batchRequests.put(object);
-          writer.println(rebuildBatchJSON(batchRequests));
-          batchRequests = new JSONArray();
+          JSONObject batchRequest = rebuildBatchJSON(batchRequests);
+          writer.println(batchRequest);
           serverResponse = input.readLine();
+          parseServerResponse(serverResponse);
+          batchRequests = new JSONArray();
         }
       }
     }
-    return serverResponse;
   }
 
+  // Parses the JSON reponse that the server sends back to client after a batch request
+  private void parseServerResponse(String serverResponse) {
+    try {
+      JSONObject serverResponseJSON = new JSONObject(serverResponse);
+      JSONArray invalidArray = serverResponseJSON.getJSONArray("invalid");
+      if (invalidArray.length() != 0) {
+        for (int i=0; i<invalidArray.length(); i++) {
+          String invalidMessage = "[\"invalid placement\", " + invalidArray.getJSONObject(i).toString() + "]";
+          System.out.println(invalidMessage);
+        }
+      }
+      JSONObject mostRecentQueryRequest = batchRequests.getJSONObject(batchRequests.length() - 1);
+      boolean queryAnswer = serverResponseJSON.getBoolean("response");
+      String queryResponse = "[\"the response for\", " + mostRecentQueryRequest + " , \"is\", " + queryAnswer + "]";
+      System.out.println(queryResponse);
+    }
+    catch (Exception e) {
+      System.out.println("Invalid response from server.");
+    }
+  }
+
+  // Checks to see if the given command is a roads creation command. If it isn't,
+  // the client will give the user an error message and close the connection.
+  // If it is a valid roads creation command, the program will do nothing.
   public void checkRoadsCommand(String command) throws org.json.JSONException, IOException {
     try {
       JSONObject roadsObject = new JSONObject(command);
-      JSONObject commandValue = roadsObject.getJSONObject("command");
+      String commandValue = roadsObject.getString("command");
       if (!(commandValue.equals("roads"))) {
         clientSocket.close();
         String errorMessage = "{ \"error\" : \"not a roads creation command\", \"object\" : " + command + "}";
@@ -116,10 +142,12 @@ public class TravellerTCPClient {
     }
   }
 
+  // Checks to see if given command is a place character command.
+  // Returns true if it is, false if it isn't.
   public boolean isCharacterCommand(String command) throws org.json.JSONException {
     try {
       JSONObject characterObject = new JSONObject(command);
-      JSONObject commandValue = characterObject.getJSONObject("command");
+      String commandValue = characterObject.getString("command");
       if (!(commandValue.equals("place"))) {
         return false;
       }
@@ -130,12 +158,17 @@ public class TravellerTCPClient {
     }
   }
 
+  // Checks to see if the given command is a query command.
+  // Returns true if it is, false if it isn't.
+  // If it isn't, it is determined that it is not a valid request at all (since
+  // this is the last function a user input goes through to check for validity)
+  // and the function also throws an error (does not terminate, though).
   public boolean isQueryCommand(String command) throws org.json.JSONException {
     try {
       JSONObject queryObject = new JSONObject(command);
-      JSONObject commandValue = queryObject.getJSONObject("command");
+      String commandValue = queryObject.getString("command");
       if (!(commandValue.equals("passage-safe?"))) {
-        String errorMessage = "{ \"error\" : \"not a valid passage-safe? command\", \"object\" : " + queryObject + "}";
+        String errorMessage = "{ \"error\" : \"not a valid request\", \"object\" : " + queryObject + "}";
         System.out.println(errorMessage);
         return false;
       }
@@ -146,16 +179,18 @@ public class TravellerTCPClient {
     }
   }
 
+  // Returns a string command as a JSONObject
   public JSONObject getCommandAsJSON(String command) throws org.json.JSONException {
     try {
-      JSONObject queryOrCharacterCommand = new JSONObject(command);
-      return queryOrCharacterCommand;
+      return new JSONObject(command);
     }
     catch (Exception e) {
       return null;
     }
   }
 
+  // Builds the JSONObject that the client will send to the server representing
+  // the roads creation command the user gives to the client via STDIN.
   public JSONObject rebuildRoadsJSON(String command) throws org.json.JSONException {
     JSONObject sendToServer = new JSONObject();
     JSONArray towns = new JSONArray();
@@ -163,8 +198,7 @@ public class TravellerTCPClient {
 
     try {
       JSONObject commandAsObject = new JSONObject(command);
-      JSONObject params = commandAsObject.getJSONObject("params");
-      JSONArray paramsArray = new JSONArray(params);
+      JSONArray paramsArray = commandAsObject.getJSONArray("params");
 
       for (int i = 0; i < paramsArray.length(); i++) {
         getTownsInObject(paramsArray.getJSONObject(i), towns);
@@ -178,6 +212,7 @@ public class TravellerTCPClient {
 
     }
     catch (Exception e) {
+      System.out.println(e);
       String errorMessage = "{ \"error\" : \"malformed create roads request\", \"object\" : " + command + "}";
       JSONObject error = new JSONObject(errorMessage);
       System.out.println(error);
@@ -186,6 +221,8 @@ public class TravellerTCPClient {
 
   }
 
+  // Adds towns that appear in JSONObjects inputted by the user
+  // to a list of towns (that will eventually be sent to the server)
   public void getTownsInObject(JSONObject object, JSONArray towns) throws org.json.JSONException {
     try {
       String fromTown = object.getString("from");
@@ -199,6 +236,8 @@ public class TravellerTCPClient {
     }
   }
 
+  // Rebuilds a batch request from server format to user format using rebuildQuery
+  // & rebuildCharacterPlacement helper functions
   public JSONObject rebuildBatchJSON(JSONArray listOfCommands) throws org.json.JSONException {
     JSONObject sendToServer = new JSONObject();
     JSONArray characters = new JSONArray();
@@ -207,13 +246,13 @@ public class TravellerTCPClient {
     try {
       for (int i=0; i<listOfCommands.length(); i++) {
         tempObject = listOfCommands.getJSONObject(i);
-        if (i == listOfCommands.length() - 1 && isQueryCommand(listOfCommands.getJSONObject(i).toString())) {
+        if (i == listOfCommands.length() - 1 && isQueryCommand(tempObject.toString())) {
           sendToServer.put("characters", characters);
-          rebuildQuery(listOfCommands.getJSONObject(i), sendToServer);
+          rebuildQuery(tempObject, sendToServer);
           return sendToServer;
         }
         else {
-          rebuildCharacterPlacement(listOfCommands.getJSONObject(i), characters);
+          rebuildCharacterPlacement(tempObject, characters);
         }
       }
     }
@@ -224,6 +263,7 @@ public class TravellerTCPClient {
     return null;
   }
 
+  // Rebuilds a place character command from user format to server format
   public void rebuildCharacterPlacement(JSONObject placeCharacter, JSONArray characters) throws org.json.JSONException {
     try {
       JSONObject characterObject = new JSONObject();
@@ -243,6 +283,7 @@ public class TravellerTCPClient {
     }
   }
 
+  // Rebuilds a query command from user format to server format
   public void rebuildQuery(JSONObject query, JSONObject sendToServer) throws org.json.JSONException {
     try {
       JSONObject getParams = query.getJSONObject("params");
@@ -259,7 +300,6 @@ public class TravellerTCPClient {
       String errorMessage = "{ \"error\" : \"invalid passage-safe? command\", \"object\" : " + query + "}";
       System.out.println(errorMessage);
     }
-  }
   }
 
 }
