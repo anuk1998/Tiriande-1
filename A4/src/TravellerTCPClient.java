@@ -24,10 +24,10 @@ public class TravellerTCPClient {
       clientSocket = new Socket(args[0], 8000);
     }
     else if (args.length == 2) {
-      clientSocket = new Socket(args[0], Integer.parseInt(args[1]);
+      clientSocket = new Socket(args[0], Integer.parseInt(args[1]));
     }
     else if (args.length == 3) {
-      clientSocket = new Socket(args[0], Integer.parseInt(args[1]);
+      clientSocket = new Socket(args[0], Integer.parseInt(args[1]));
       signUpName = args[2];
     }
 
@@ -45,13 +45,13 @@ public class TravellerTCPClient {
       writer.println(signUpName);
       //get session ID from server
       String sessionId = input.readLine();
-      String serverWillCallMe = "[\"the server will call me\", " + sessionId + "]";
+      String serverWillCallMe = "[\"the server will call me\", " + signUpName + "]";
       System.out.println(serverWillCallMe);
       int commandCounter = 1;
 
       while(s.hasNextLine()) {
         String reply = s.nextLine();
-        JSONObject response = parseInput(reply, commandCounter);
+        String response = parseInput(reply, commandCounter);
         if (response != null) {
           System.out.println(response);
         }
@@ -64,8 +64,8 @@ public class TravellerTCPClient {
     }
   }
 
-  public JSONObject parseInput(String command, int commandCounter) throws org.json.JSONException, IOException {
-    JSONObject serverResponse = null;
+  public String parseInput(String command, int commandCounter) throws org.json.JSONException, IOException {
+    String serverResponse = null;
     // only checking that the FIRST given command is a proper roads creation command
     if (commandCounter == 1) {
       checkRoadsCommand(command);
@@ -78,7 +78,7 @@ public class TravellerTCPClient {
     }
     else { // check if batch command
       if (isCharacterCommand(command)) {
-        JSONObject object = getCommandAsJSON(command)
+        JSONObject object = getCommandAsJSON(command);
         if (object != null) {
           batchRequests.put(object);
         }
@@ -102,7 +102,7 @@ public class TravellerTCPClient {
       JSONObject commandValue = roadsObject.getJSONObject("command");
       if (!(commandValue.equals("roads"))) {
         clientSocket.close();
-        String errorMessage = "{ \"error\" : \"not a request\", \"object\" : " + command + "}";
+        String errorMessage = "{ \"error\" : \"not a roads creation command\", \"object\" : " + command + "}";
         System.out.println(errorMessage);
         exit(0);
       }
@@ -133,7 +133,7 @@ public class TravellerTCPClient {
       JSONObject queryObject = new JSONObject(command);
       JSONObject commandValue = queryObject.getJSONObject("command");
       if (!(commandValue.equals("passage-safe?"))) {
-        String errorMessage = "{ \"error\" : \"not a request\", \"object\" : " + queryObject + "}";
+        String errorMessage = "{ \"error\" : \"not a valid passage-safe? command\", \"object\" : " + queryObject + "}";
         System.out.println(errorMessage);
         return false;
       }
@@ -176,7 +176,7 @@ public class TravellerTCPClient {
 
     }
     catch (Exception e) {
-      String errorMessage = "{ \"error\" : \"not a request\", \"object\" : " + command + "}";
+      String errorMessage = "{ \"error\" : \"malformed create roads request\", \"object\" : " + command + "}";
       JSONObject error = new JSONObject(errorMessage);
       System.out.println(error);
       return null;
@@ -184,7 +184,7 @@ public class TravellerTCPClient {
 
   }
 
-  public void getTownsInObject(JSONObject object, JSONArray towns) {
+  public void getTownsInObject(JSONObject object, JSONArray towns) throws org.json.JSONException {
     try {
       String fromTown = object.getString("from");
       String toTown = object.getString("to");
@@ -192,87 +192,72 @@ public class TravellerTCPClient {
       towns.put(toTown);
     }
     catch (Exception e) {
-      String errorMessage = "{ \"error\" : \"not a request\", \"object\" : " + object + "}";
+      String errorMessage = "{ \"error\" : \"malformed create roads to-from object\", \"object\" : " + object + "}";
       System.out.println(errorMessage);
     }
   }
 
   public JSONObject rebuildBatchJSON(JSONArray listOfCommands) throws org.json.JSONException {
+    JSONObject sendToServer = new JSONObject();
+    JSONArray characters = new JSONArray();
+    JSONObject tempObject = new JSONObject();
 
-  }
-
-}
-
-/*
-Task 3 example input:
-{ "command" : "roads",
-  "params" : [ {"from" : String, "to" : String }, ...] }
-
-Task 4 example input:
-{ "towns" : [ String, String, ...],
-  "roads" : [ {"from" : String, "to" : String }, ... ] }
-
-*/
-
-/*
-Task 3 example input:
-{ "command" : "place",
-  "params" : { "character" : String, "town" : String } }
-{ "command" : "passage-safe?",
-  "params" : { "character" : String, "town" : String } }
-
-
-Task 4 example input:
-{ "characters" : [ { "name" : String, "town" : String }, ... ],
-  "query" : { "character" : String, "destination" : String } }
-
-*/
-
-
-////////////////////////////////////////////////////////////////////////////////
-//////////////////  CODE HERE FOR REFERENCE, DELETE LATER //////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-private static void add_to_jsonarray(String input, int total) throws JSONException {
-  JSONObject obj = new JSONObject();
-  String first = Character.toString(input.charAt(0));
-
-  if (first.equals("{")) {
-    obj.put("object", temp_json_object);
-  }
-  else {
-    obj.put("object", input);
-  }
-  obj.put("total", total);
-
-  output_array.put(obj);
-}
-
-private static void parseJson(String json_object) throws org.json.JSONException {
-
-  JSONObject object = new JSONObject(json_object);
-
-  try {
-    JSONObject command = object.getJSONObject("command");
-    JSONObject params = object.getJSONObject("params");
-    // {"command": ........}
-
-    if(command.toString().equals("roads")) {
-      // assuming "roads" is valid and is the first JSON object given.. **check for that**
-      roads(params);
-
+    try {
+      for (int i=0; i<listOfCommands.length(); i++) {
+        tempObject = listOfCommands.getJSONObject(i);
+        if (i == listOfCommands.length() - 1 && isQueryCommand(listOfCommands.getJSONObject(i).toString())) {
+          sendToServer.put("characters", characters);
+          rebuildQuery(listOfCommands.getJSONObject(i), sendToServer);
+          return sendToServer;
+        }
+        else {
+          rebuildCharacterPlacement(listOfCommands.getJSONObject(i), characters);
+        }
+      }
     }
-    else if(command.toString().equals("place")) {
-      //define object to be something else, change it
-      place(params);
+    catch (Exception e) {
+      String errorMessage = "{ \"error\" : \"invalid batch request\", \"object\" : " + tempObject.toString() + "}";
+      System.out.println(errorMessage);
     }
-    else if (command.toString().equals("passage-safe?")){
-      //define object to be something else, change it
-      passageSafe(params);
+    return null;
+  }
+
+  public void rebuildCharacterPlacement(JSONObject placeCharacter, JSONArray characters) throws org.json.JSONException {
+    try {
+      JSONObject characterObject = new JSONObject();
+
+      JSONObject getParams = placeCharacter.getJSONObject("params");
+      String character = getParams.getString("character");
+      String town = getParams.getString("town");
+
+      characterObject.put("name", character);
+      characterObject.put("town", town);
+
+      characters.put(characterObject);
+    }
+    catch (Exception e) {
+      String errorMessage = "{ \"error\" : \"invalid character placement request\", \"object\" : " + placeCharacter + "}";
+      System.out.println(errorMessage);
     }
   }
-  catch (Exception e) {
-    exit(0);
+
+  public void rebuildQuery(JSONObject query, JSONObject sendToServer) throws org.json.JSONException {
+    try {
+      JSONObject getParams = query.getJSONObject("params");
+      String character = getParams.getString("character");
+      String town = getParams.getString("town");
+
+      JSONObject queryToServer = new JSONObject();
+      queryToServer.put("character", character);
+      queryToServer.put("destination", town);
+
+      sendToServer.put("query", queryToServer);
+    }
+    catch (Exception e){
+      String errorMessage = "{ \"error\" : \"invalid passage-safe? command\", \"object\" : " + query + "}";
+      System.out.println(errorMessage);
+    }
+  }
   }
 
 }
