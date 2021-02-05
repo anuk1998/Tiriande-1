@@ -1,4 +1,8 @@
 **Task 2 Memo**
+To: Our Manager
+From: Giselle Briand and Anu Kandasamy
+Date: 02/05/2021
+Subject: Feedback on Road Network Implementation
 
 The other team implemented our specification very well. They did follow it truthfully, and what they did change was justified and they gave reasoning. For the most part, they only added a few getter methods to access private fields and additional parameters/fields where they were not provided, like in the `query()` method. They did not use Dijkstra’s algorithm, but justified this because Dijkstra’s algorithm traverses on a weighted graph, while in our case, the graph is unweighted.
 
