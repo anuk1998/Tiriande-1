@@ -67,7 +67,7 @@ The game software will also include `Level`, `Room`, `Hallway` classes and `Tile
 
 * The `Tile` interface fields will include:
     * `Set<Tile> adjacentTiles` -- a set containing all tiles adjacent to that tile
-    *`int tileID` -- a unique identifier for each tile, allowing us to differentiate
+    * `int tileID` -- a unique identifier for each tile, allowing us to differentiate
 * The `Tile` interface methods will include:
     * Getters and setters
 
