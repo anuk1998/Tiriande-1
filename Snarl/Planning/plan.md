@@ -1,75 +1,58 @@
 ## Project Analysis -- Design Task
 
-As identifiable components of our software system, the following is how our Snarl game will be constructed. There will be a `Character` interface that represents all active participants of the game (i.e. players and adversaries). This interface will include the following fields and methods:
-
-* Fields:
+As identifiable components of our software system, the following is how our Snarl game will be constructed. There will be a `Character` interface that represents all active participants of the game (i.e. players and adversaries).
+* This interface will include the following fields and methods:
     * `Tile characterLocation` -- the tile the character is currently standing on
     * `Room currentRoom` -- the room the character is currently in
     * `Level currentLevel` -- the level the character is currently playing
     * `int characterID` -- unique identifier for each `Character`
-* Methods :
     * `void moveCharacter(Tile moveLocation)` -- moves a character to the given Tile location
-    * In addition, getters and setters will also be included for the object fields
-    
+    * Getters and setters
+
 There will be a `Player` class that implements the `Character` interface. It will contain all the same `Character` interface fields and methods, in addition to unique ones specified below, pertaining to player attributes:
     * `boolean isExpelled` -- indicates whether or not the player has been expelled
-* The class methods will include: 
     * `void expelPlayer(boolean expel)` -- formally expels player by evaluating its field to expelled
-    * Getters and setters will be included
-    
-Even though code for the adversaries will be supplied to us in a tournament, we must be able to provide a framework for supporting these adversaries. There will be an `Adversary` interface that extends the `Character` interface. There can be different types of adversary classes such as zombies or ghosts that implement this interface. The interface fields will include all the fields from the `Character` interface. It will also include getters and setters. 
 
-The game software will consist of tiles, rooms, and levels, all part of a 2D dungeon crawler. That can be represented by the following structure using a `DungeonCrawler` class.
-* The `DungeonCrawler` class fields include:
+There will be an `Adversary` interface that extends the `Character` interface. There can be different types of adversary classes such as zombies or ghosts that implement this interface. The interface fields will include all the fields and methods from the `Character` interface. The game software will consist of tiles, rooms, and levels, all part of a 2D dungeon crawler that can be represented by a `DungeonCrawler` class.
+* The `DungeonCrawler` class fields and methods include:
     * `Set<Level> allLevels` -- a set of all the levels in that game
     * `Set<Player> players` -- a set of all the players (up to four in size) playing in that game
     * `Set<Adversary> adversaries` -- a set of the adversaries in the game
     * `boolean isOver` -- indicates if the game is over
     * `boolean playerWon` -- indicates if the players are the ones who won the game (if not, the adversaries won)
-* The class methods will include:
     * `void placeCharacter(Tile placeLocation)` -- places a new character to the given Tile location
-    * `void removePlayer(Player p) -- removes the given player from the game if they are expelled by an adversary
+    * `void removePlayer(Player p)` -- removes the given player from the game if they are expelled by an adversary
     * `void endGame()` -- will end the game once the game is won by checking `isOver` value
-    * Getters and setters
-    
-The game software will also include `Level`, `Room` classes and a `Tile` interface. We will add a `Hallway` class once we receive more information on what they are. Those will be defined/structure by the following:
-* The `Level` class fields will include:
+
+The game software will also include `Level`, `Room` classes and a `Tile` interface. We will add a `Hallway` class once we receive more information on what a hallway is. Those will be defined/structure by the following:
+* The `Level` class fields and methods will include:
     * `Set<Room> allRooms` -- a set of all the rooms in the level
     * `boolean isKeyFound` -- indicates if the key for that level has been found
     * `Set<Player> players` -- a set of all the players participating in that level
     * `Set<Adversary> adversaries` -- a set of all the adversaries participating in that level
     * `boolean playersWon` -- indicates if the level has been won (i.e. if a player has reached the exit)
-* The `Level` class methods will include:
     * `void removePlayer(Player p)` -- removes the given player from that level
     * Getters and setters
-    
-* The `Room` class fields will include:
+
+* The `Room` class fields and methods will include:
     * `Set<Tile> allTiles` -- a set of all the tiles in that room
     * `Set<Tile> occupiedTiles` -- a list of all the occupied tiles in the room (tiles with characters)
     * `Set<Player> playersInRoom` -- a set of all the players in that room
     * `Set<Adversary> adversariesInRoom` -- a set of all the adversaries in the room
-* The `Room` class methods will include:
     * `void removePlayer(Player p)` -- removes the given player from that room
     * Getters and setters
-    
-* The `Tile` interface fields will include:
+
+* The `Tile` interface fields and methods will include:
     * `Set<Tile> adjacentTiles` -- a set containing all tiles adjacent to that tile
     * `int tileID` -- a unique identifier for each tile, allowing us to differentiate
-* The `Tile` interface methods will include: Getters and setters
+    * Getters and setters
 
-The `WallTile` class implements the `Tile` interface and will include all the fields from that interface. This class represents the grey tiles in a room (i.e. tiles that cannot be traversed or accessed because they are “walls”) The `WallTile` fields and methods will include the same methods in the `Tile` interface.
+Three classes will implement `Tile` interface: `GreyTile` (un-traversable tiles), `WhiteTile` (traversable tiles), and `ExitTile` (tile with the exit). All will inherit `Tile` class fields and methods. Additional, class-specific fields include:
+* `boolean isAvailable` -- indicates if it is an open tile in `WhiteTile` class
+* `boolean containsKey` -- indicates if that tile holds the exit key in `WhiteTile` class
+* `boolean isUnlocked` -- indicates if the exit has been unlocked or not (i.e. has the key been found) in `ExitTile` class
 
-The `WhiteTile` class represents the white tiles in a room that are open to the characters and can be traversed. The `WhiteTile` class implements the `Tile` interface. 
-* This class will include all the fields from `Tile` interface along with the following:
-    * `boolean isAvailable` -- indicates if it is an open tile
-    * `boolean containsKey` -- indicates if that tile holds the exit key
-* The `WhiteTile` class methods will include the same methods in the `Tile` interface along with these additional methods: Getters and setters
-    
-The `ExitTile` class represents a tile in a room in a level that is the exit to that level. This class implements the `Tile` interface and will include all the fields from that interface along with the following:
-    * `boolean isUnlocked` -- indicates if the exit has been unlocked or not (i.e. has the key been found)
-* The class methods will include the same methods in the `Tile` interface along with this additional method:`boolean setUnlocked` -- sets `boolean isUnlocked` to true
-    
-All the classes, interfaces, and methods listed above would constitute the server side of the game. This is because it contains all the fundamental knowledge and functionality that makes up the game. The client, on the other hand, would be the side that interacts with the users seeking to play the game, acting as a middle-man between the players and the server. The client only needs to know the user’s desires and what decisions they would like to make. Those instructions will be passed into the client, who will ensure they are appropriate, and if so, they will then be sent over to the server for the server to follow those instructions. In terms of common knowledge, the server and the client will communicate through mutual TCP/IP socket connections. The main "knowledge" they will share in addition to their network communication, is what the user "wants", i.e., whichever move or play the user asks for. A diagram of this communication topology can be found in the `local.md` file. 
+All the classes, interfaces, and methods listed above would constitute the server side of the game. This is because it contains all the fundamental knowledge and functionality that makes up the game. The client, on the other hand, would be the side that interacts with the users seeking to play the game, acting as a middle-man between the players and the server. The client only needs to know the user’s desires and what decisions they would like to make. Those instructions will be passed into the client, who will ensure they are appropriate, and if so, they will then be sent over to the server for the server to follow those instructions. In terms of common knowledge, the server and the client will communicate through mutual TCP/IP socket connections. The main "knowledge" they will share in addition to their network communication, is what the user "wants", i.e., whichever move or play the user asks for. A diagram of this communication topology can be found in the `local.md` file.
 
 The following is what we feel to be appropriate milestones for implementing what we discuss in Part 1:
 1. Implement the skeleton for our server that we outlined in Part 1.
@@ -77,6 +60,3 @@ The following is what we feel to be appropriate milestones for implementing what
 3. Set up TCP/IP connection/communication between the client and server.
 4. Implement testing of basic methods belonging to the server and the client, in addition to making sure communication between the two work.
 5. All the above would result in a working demo-- debug/clean-up before showing potential client, then ask for feedback on improvements.
-
-
-
