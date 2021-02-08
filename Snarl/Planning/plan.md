@@ -26,8 +26,7 @@ Even though code for the adversaries will be supplied to us in a tournament, we 
 
 The game software will consist of tiles, rooms, hallways, and levels, all part of a 2D dungeon crawler. That can be represented by the following structure using a `DungeonCrawler` class.
 * The `DungeonCrawler` class fields include:
-
-    *` Set<Level> allLevels` -- a set of all the levels in that game
+    * `Set<Level> allLevels` -- a set of all the levels in that game
     * `Set<Player> players` -- a set of all the players (up to four in size) playing in that game
     * `Set<Adversary> adversaries` -- a set of the adversaries in the game
     * `boolean isOver` -- indicates if the game is over
