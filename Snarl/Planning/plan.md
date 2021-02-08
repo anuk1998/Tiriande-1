@@ -11,19 +11,15 @@ As identifiable components of our software system, the following is how our Snar
     * `void moveCharacter(Tile moveLocation)` -- moves a character to the given Tile location
     * In addition, getters and setters will also be included for the object fields
     
-There will be a `Player` class that implements the `Character` interface. 
-
-* It will contain all the same `Character` interface fields and methods, in addition to unique ones specified below, pertaining to player attributes:
+There will be a `Player` class that implements the `Character` interface. It will contain all the same `Character` interface fields and methods, in addition to unique ones specified below, pertaining to player attributes:
     * `boolean isExpelled` -- indicates whether or not the player has been expelled
 * The class methods will include: 
     * `void expelPlayer(boolean expel)` -- formally expels player by evaluating its field to expelled
     * Getters and setters will be included
     
-Even though code for the adversaries will be supplied to us in a tournament, we must be able to provide a framework for supporting these adversaries. There will be an `Adversary` interface that extends the `Character` interface. There can be different types of adversary classes such as zombies or ghosts that implement this interface.
-* The interface fields will include all the fields from the `Character` interface.
-* The interface methods will include: Getters and setters will be included
+Even though code for the adversaries will be supplied to us in a tournament, we must be able to provide a framework for supporting these adversaries. There will be an `Adversary` interface that extends the `Character` interface. There can be different types of adversary classes such as zombies or ghosts that implement this interface. The interface fields will include all the fields from the `Character` interface. It will also include getters and setters. 
 
-The game software will consist of tiles, rooms, hallways, and levels, all part of a 2D dungeon crawler. That can be represented by the following structure using a `DungeonCrawler` class.
+The game software will consist of tiles, rooms, and levels, all part of a 2D dungeon crawler. That can be represented by the following structure using a `DungeonCrawler` class.
 * The `DungeonCrawler` class fields include:
     * `Set<Level> allLevels` -- a set of all the levels in that game
     * `Set<Player> players` -- a set of all the players (up to four in size) playing in that game
@@ -36,9 +32,8 @@ The game software will consist of tiles, rooms, hallways, and levels, all part o
     * `void endGame()` -- will end the game once the game is won by checking `isOver` value
     * Getters and setters
     
-The game software will also include `Level`, `Room`, `Hallway` classes and `Tile` interface. Those will be defined/structure by the following:
+The game software will also include `Level`, `Room` classes and a `Tile` interface. We will add a `Hallway` class once we receive more information on what they are. Those will be defined/structure by the following:
 * The `Level` class fields will include:
-    * `Set<Hallway> allHallways` -- a set of all hallways in that level
     * `Set<Room> allRooms` -- a set of all the rooms in the level
     * `boolean isKeyFound` -- indicates if the key for that level has been found
     * `Set<Player> players` -- a set of all the players participating in that level
@@ -57,12 +52,6 @@ The game software will also include `Level`, `Room`, `Hallway` classes and `Tile
     * `void removePlayer(Player p)` -- removes the given player from that room
     * Getters and setters
     
-* The `Hallway` class fields will include:
-    * `Room fromRoom` -- indicates the starting room of the hallway
-    * `Room toRoom` -- indicates the ending room of the hallway
-    * `Set<Character> charsTravelling` -- indicates whether players are travelling through the hallway
-* The `Hallway` class methods will include: Getters and setters
-
 * The `Tile` interface fields will include:
     * `Set<Tile> adjacentTiles` -- a set containing all tiles adjacent to that tile
     * `int tileID` -- a unique identifier for each tile, allowing us to differentiate
