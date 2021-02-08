@@ -21,8 +21,7 @@ There will be a `Player` class that implements the `Character` interface.
     
 Even though code for the adversaries will be supplied to us in a tournament, we must be able to provide a framework for supporting these adversaries. There will be an `Adversary` interface that extends the `Character` interface. There can be different types of adversary classes such as zombies or ghosts that implement this interface.
 * The interface fields will include all the fields from the `Character` interface.
-* The interface methods will include:
-    * Getters and setters will be included
+* The interface methods will include: Getters and setters will be included
 
 The game software will consist of tiles, rooms, hallways, and levels, all part of a 2D dungeon crawler. That can be represented by the following structure using a `DungeonCrawler` class.
 * The `DungeonCrawler` class fields include:
@@ -62,14 +61,12 @@ The game software will also include `Level`, `Room`, `Hallway` classes and `Tile
     * `Room fromRoom` -- indicates the starting room of the hallway
     * `Room toRoom` -- indicates the ending room of the hallway
     * `Set<Character> charsTravelling` -- indicates whether players are travelling through the hallway
-* The `Hallway` class methods will include:
-    * Getters and setters
+* The `Hallway` class methods will include: Getters and setters
 
 * The `Tile` interface fields will include:
     * `Set<Tile> adjacentTiles` -- a set containing all tiles adjacent to that tile
     * `int tileID` -- a unique identifier for each tile, allowing us to differentiate
-* The `Tile` interface methods will include:
-    * Getters and setters
+* The `Tile` interface methods will include: Getters and setters
 
 The `WallTile` class implements the `Tile` interface and will include all the fields from that interface. This class represents the grey tiles in a room (i.e. tiles that cannot be traversed or accessed because they are “walls”) The `WallTile` fields and methods will include the same methods in the `Tile` interface.
 
@@ -77,13 +74,11 @@ The `WhiteTile` class represents the white tiles in a room that are open to the 
 * This class will include all the fields from `Tile` interface along with the following:
     * `boolean isAvailable` -- indicates if it is an open tile
     * `boolean containsKey` -- indicates if that tile holds the exit key
-* The `WhiteTile` class methods will include the same methods in the `Tile` interface along with these additional methods:
-    * Getters and setters
+* The `WhiteTile` class methods will include the same methods in the `Tile` interface along with these additional methods: Getters and setters
     
 The `ExitTile` class represents a tile in a room in a level that is the exit to that level. This class implements the `Tile` interface and will include all the fields from that interface along with the following:
     * `boolean isUnlocked` -- indicates if the exit has been unlocked or not (i.e. has the key been found)
-* The class methods will include the same methods in the `Tile` interface along with these additional methods:
-    * `boolean setUnlocked` -- sets `boolean isUnlocked` to true
+* The class methods will include the same methods in the `Tile` interface along with this additional method:`boolean setUnlocked` -- sets `boolean isUnlocked` to true
     
 All the classes, interfaces, and methods listed above would constitute the server side of the game. This is because it contains all the fundamental knowledge and functionality that makes up the game. The client, on the other hand, would be the side that interacts with the users seeking to play the game, acting as a middle-man between the players and the server. The client only needs to know the user’s desires and what decisions they would like to make. Those instructions will be passed into the client, who will ensure they are appropriate, and if so, they will then be sent over to the server for the server to follow those instructions. In terms of common knowledge, the server and the client will communicate through mutual TCP/IP socket connections. The main "knowledge" they will share in addition to their network communication, is what the user "wants", i.e., whichever move or play the user asks for. A diagram of this communication topology can be found in the `local.md` file. 
 
