@@ -1,14 +1,16 @@
-Project Analysis -- Design Task
-As identifiable components of our software system, the following is how our Snarl game will be constructed.
-There will be a `Character` interface that represents all active participants of the game (i.e. players and adversaries). This interface will include the following fields and methods:
-Fields:
-`Tile characterLocation` -- the tile the character is currently standing on
-`Room currentRoom` -- the room the character is currently in
-`Level currentLevel` -- the level the character is currently playing
-`int characterID` -- unique identifier for each `Character`
-Methods 
-`void moveCharacter(Tile moveLocation)` -- moves a character to the given Tile location
-In addition, getters and setters will also be included for the object fields
+## Project Analysis -- Design Task
+
+As identifiable components of our software system, the following is how our Snarl game will be constructed. There will be a `Character` interface that represents all active participants of the game (i.e. players and adversaries). This interface will include the following fields and methods:
+
+* Fields:
+    * `Tile characterLocation` -- the tile the character is currently standing on
+    * `Room currentRoom` -- the room the character is currently in
+    * `Level currentLevel` -- the level the character is currently playing
+    * `int characterID` -- unique identifier for each `Character`
+* Methods :
+    * `void moveCharacter(Tile moveLocation)` -- moves a character to the given Tile location
+    * In addition, getters and setters will also be included for the object fields
+    
 There will be a `Player` class that implements the `Character` interface. It will contain all the same `Character` interface fields and methods, in addition to unique ones specified below, pertaining to player attributes:
 `boolean isExpelled` -- indicates whether or not the player has been expelled
 The class methods will include: 
