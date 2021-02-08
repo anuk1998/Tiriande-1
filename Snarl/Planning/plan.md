@@ -74,8 +74,8 @@ The game software will also include `Level`, `Room`, `Hallway` classes and `Tile
 The `WallTile` class implements the `Tile` interface and will include all the fields from that interface. This class represents the grey tiles in a room (i.e. tiles that cannot be traversed or accessed because they are “walls”) The `WallTile` fields and methods will include the same methods in the `Tile` interface.
 
 The `WhiteTile` class represents the white tiles in a room that are open to the characters and can be traversed. The `WhiteTile` class implements the `Tile` interface and will include all the fields from that interface along with the following:
-    * `boolean isAvailable` -- indicates if it is an open tile
-    * `boolean containsKey` -- indicates if that tile holds the exit key
+    *  `boolean isAvailable` -- indicates if it is an open tile
+    *  `boolean containsKey` -- indicates if that tile holds the exit key
 * The `WhiteTile` class methods will include the same methods in the `Tile` interface along with these additional methods:
     * Getters and setters
     
