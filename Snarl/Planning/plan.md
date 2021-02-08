@@ -92,6 +92,7 @@ The following is what we feel to be appropriate milestones for implementing what
 2. Implement basic client structure that will communicate with users..
 3. Set up TCP/IP connection/communication between the client and server.
 4. Implement testing of basic methods belonging to the server and the client, in addition to making sure communication between the two work.
+5. All the above would result in a working demo-- debug/clean-up before showing potential client, then ask for feedback on improvements.
 
 
 
