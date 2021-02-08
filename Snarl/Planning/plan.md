@@ -10,8 +10,8 @@ As identifiable components of our software system, the following is how our Snar
     * Getters and setters
 
 There will be a `Player` class that implements the `Character` interface. It will contain all the same `Character` interface fields and methods, in addition to unique ones specified below, pertaining to player attributes:
-    * `boolean isExpelled` -- indicates whether or not the player has been expelled
-    * `void expelPlayer(boolean expel)` -- formally expels player by evaluating its field to expelled
+* `boolean isExpelled` -- indicates whether or not the player has been expelled
+* `void expelPlayer(boolean expel)` -- formally expels player by evaluating its field to expelled
 
 There will be an `Adversary` interface that extends the `Character` interface. There can be different types of adversary classes such as zombies or ghosts that implement this interface. The interface fields will include all the fields and methods from the `Character` interface. The game software will consist of tiles, rooms, and levels, all part of a 2D dungeon crawler that can be represented by a `DungeonCrawler` class.
 * The `DungeonCrawler` class fields and methods include:
