@@ -1,9 +1,14 @@
- class Hallway {
-  Position [] waypoints;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Random;
+import java.util.Set;
+
+class Hallway {
+  Position[] waypoints;
 
 }
 
- class Position {
+class Position {
   int x_pos;
   int y_pos;
 
@@ -30,13 +35,15 @@
 
 }
 
-interface Character() {
+interface Character {
+  /*
   Position characterPosition;
   Room currentRoom;
   Level currentLevel;
   int characterID;
+   */
 
-  void moveCharacter(Position movePosition) {}
+  void moveCharacter(Position movePosition);
 }
 
 class Player implements Character{
@@ -45,119 +52,155 @@ class Player implements Character{
   public Player() {
 
   }
-}
 
-class Adversary implements Character{
-
-}
-
-  void expelPlayer(boolean expel) {
+  @Override
+  public void moveCharacter(Position movePosition) {
 
   }
 }
 
- class Room {
-  int[][] room;
+class Adversary implements Character{
+
+  void expelPlayer(boolean expel) {
+
+  }
+
+  @Override
+  public void moveCharacter(Position movePosition) {
+
+  }
+}
+
+
+class Room {
+  String[][] room;
   Position roomPositionInLevel;
   int roomHorizontalLength;
   int roomVerticalLength;
   Set<Player> playersInRoom;
   Set<Adversary> adversariesInRoom;
 
-  public Room(Position roomPos, int horiz, int vertic, int[][] room, Set<Player> players, Set<Adversary> adversaries) {
-     this.roomPositionInLevel = roomPos;
-     this.roomHorizontalLength = horiz;
-     this.roomVerticalLength = vertic;
-     this.room = makeRoom(this.roomHorizontalLength, this.roomVerticalLength);
-     this.playersInRoom = players;
-     this.adversariesInRoom = adversaries;
+  public Room(Position roomPos, int horiz, int vertic, Set<Player> players, Set<Adversary> adversaries) {
+    this.roomPositionInLevel = roomPos;
+    this.roomHorizontalLength = horiz;
+    this.roomVerticalLength = vertic;
+    this.room = makeRoom();
+    this.playersInRoom = players;
+    this.adversariesInRoom = adversaries;
   }
-
 
   //removes the given player from that room
   public void removePlayer(Player p) {
-
   }
 
   //checks whether the given movement is valid
- public boolean isValidMove(Position from, Position to){
+  public boolean isValidMove(Position from, Position to){
+    return true;
+  }
 
- }
+  public int getHorizontalLength() {
+    return this.roomHorizontalLength;
+  }
 
- public int getHorizontalLength() {
-   return this.roomHorizontalLength;
- }
+  public int getVerticalLength() {
+    return this.roomVerticalLength;
+  }
 
- public int getVerticalLength() {
-   return this.roomVerticalLength;
- }
+  public Position getRoomPositionInLevel() {
 
- public Position getRoomPositionInLevel() {
-   return this.getRoomPositionInLevel;
- }
+    return this.roomPositionInLevel;
+  }
 
- public void makeRoom() {
-   for(int i = 0; i < this.roomHorizontalLength; i++) {
-     for(int j = 0; j < this.roomVerticalLength; j++) {
-       room[i][j] = "■";
-     }
-   }
-   chooseDoors();
-   // send to a function that chooses the doors (randomly on edge(s) (2-4))
-   // send to function
- }
+  public String[][] makeRoom() {
+    for(int i = 0; i < this.roomHorizontalLength; i++) {
+      for(int j = 0; j < this.roomVerticalLength; j++) {
+        this.room[i][j] = "■";
+      }
+    }
+    chooseDoors();
+    return this.room;
+  }
 
- public void chooseDoors() {
-   Random rand = new Random();
-   int numberOfDoors = (int) ((Math.random() * (4 - 2)) + 2);
-   System.out.println(numberOfDoors);
-   ArrayList<Position> listOfEdgePositions = new ArrayList<Position>();
+  public void chooseDoors() {
+    Random rand = new Random();
+    int numberOfDoors = (int) ((Math.random() * (4 - 2)) + 2);
+    System.out.println(numberOfDoors);
+    ArrayList<Position> listOfEdgePositions = new ArrayList<Position>();
 
-   for (int i=0; i<this.roomHorizontalLength; i++) {
-     Position tempPosX = new Position(i, 0);
-     Position tempPosY = new Position(i, this.roomVerticalLength - 1);
-     listOfEdgePositions.add(tempPosX);
-     listOfEdgePositions.add(tempPosY);
-   }
+    // puts all edge positions in a list
+    for (int i=0; i<this.roomHorizontalLength; i++) {
+      Position tempPosX = new Position(i, 0);
+      Position tempPosY = new Position(i, this.roomVerticalLength - 1);
+      listOfEdgePositions.add(tempPosX);
+      listOfEdgePositions.add(tempPosY);
+    }
+    for (int i=0; i<this.roomVerticalLength; i++) {
+      Position tempPosX = new Position(0, i);
+      Position tempPosY = new Position(this.roomHorizontalLength - 1, i);
 
-   for (int i=0; i<this.roomVerticalLength; i++) {
-     Position tempPosX = new Position(0, i);
-     Position tempPosY = new Position(this.roomHorizontalLength - 1, i);
+      if (i != 0 && i != this.roomVerticalLength - 1) {
+        listOfEdgePositions.add(tempPosX);
+        listOfEdgePositions.add(tempPosY);
+      }
 
-     if (i != )
-     listOfEdgePositions.add(tempPosX);
-     listOfEdgePositions.add(tempPosY);
-   }
+    }
 
-   for (int i=0; i<numberOfDoors; i++) {
-     int randomXPos = (int) ((Math.random() * (4 - 2)) + 2);
-     int randomYPos = (int) ((Math.random() * (4 - 2)) + 2);
-   }
+    // assigns edge positions to the number of doors randomly chosen
+    for (int i=0; i<numberOfDoors; i++) {
+      int randomIndex = rand.nextInt(listOfEdgePositions.size());
+      Position randomPos = listOfEdgePositions.get(randomIndex);
+      this.room[randomPos.getX()][randomPos.getY()] = "|";
+      listOfEdgePositions.remove(randomIndex);
+    }
 
-   // potential x coordinates for doors: 0 - this.roomHorizontalLength
-   // potention y coordinates for doors: 0 - this.roomVerticalLength
-   // (0-this.roomHorizontalLength, 0)
-   // (0, 0-this.roomVerticalLength)
-   // (0-this.roo)
-   // (this.roomHorizontalLength - 1, 0 - this.roomVerticalLength)
-
- }
+  }
 
 }
 
- class Level {
-  int[][] levelPlane;
+class Level {
+  String[][] levelPlane;
+  int levelWidth;
+  int levelHeight;
   LinkedHashSet<Room> allRooms;
   boolean isKeyFound;
-  //Set<Player> players;
-  //Set<Player> activePlayers;
-  //Set<Adversary> adversaries;
-  //indicates if the level has been won (i.e. if a player has reached the exit)
+  Set<Player> players;
+  Set<Player> activePlayers;
+  Set<Adversary> adversaries;
   boolean playersWon;
-  //places a new character to the given position
-  void placeCharacter(Position placeLocation){};
-  //marks the given player as expelled
-  //void removePlayer(Player p){};
+
+  public Level(int width, int height, LinkedHashSet<Room> rooms, boolean keyFound,
+               Set<Player> players, Set<Player> activePlayers, Set<Adversary>
+                       adversaries, boolean playersWon) {
+    this.levelWidth = width;
+    this.levelHeight = height;
+    this.levelPlane = makeLevel();
+    this.allRooms = rooms;
+    this.isKeyFound = keyFound;
+    this.players = players;
+    this.activePlayers = activePlayers;
+    this.adversaries = adversaries;
+    this.playersWon = playersWon;
+  }
+
+  /*
+    ADD GETTERS AND SETTERS!!!!!!!
+  */
+
+  public String[][] makeLevel() {
+    for(int i = 0; i < this.levelWidth; i++) {
+      for(int j = 0; j < this.levelHeight; j++) {
+        this.levelPlane[i][j] = "X";
+      }
+    }
+    return this.levelPlane;
+  }
+
+  public void placeCharacter(Position placeLocation){
+
+  }
+  public void expelPlayer(Player p) {
+    this.activePlayers.remove(p);
+  }
 
 }
 
