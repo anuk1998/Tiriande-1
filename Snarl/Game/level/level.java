@@ -1,4 +1,6 @@
 package level;
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -88,6 +90,7 @@ class Room {
     this.roomPositionInLevel = roomPos;
     this.roomHorizontalLength = horiz;
     this.roomVerticalLength = vertic;
+    room = new String[roomHorizontalLength][roomVerticalLength];
     makeRoom();
   }
 
@@ -199,27 +202,27 @@ class Room {
 }
 
 class Level {
-  String[][] levelPlane;
   int levelWidth;
   int levelHeight;
-  LinkedHashSet<Room> allRooms;
+  String[][] levelPlane;
+  LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
   boolean isKeyFound = false;
   //players and adversaries are set to null for this milestone
   Set<Player> players = null;
   Set<Player> activePlayers = null;
   Set<Adversary> adversaries;
   boolean playersWon;
-  ArrayList<Position> listOfAllLevelPositions;
+  ArrayList<Position> listOfAllLevelPositions = new ArrayList<Position>();
 
   public Level() {
-    this.levelWidth = 200;
-    this.levelHeight = 200;
+    levelWidth = 200;
+    levelHeight = 200;
+    levelPlane = new String[levelWidth][levelHeight];
     makeLevel();
     addRooms();
     placeLevelKeyInRandomRoom();
     placeLevelExitInRandomRoom();
     // *TODO* call a `addHallways()` function here once it's made in level.Hallway class
-    renderLevel();
   }
 
   public int getLevelWidth() {
@@ -300,6 +303,8 @@ class Level {
     int numRooms = rand.nextInt(10 - 5) + 5;
 
     for (int i=0; i<numRooms; i++) {
+      System.out.println("CURRENTLY ON ROOM: " + i);
+
       // generate random room width
       int randWidth = rand.nextInt(20 - 5) + 5;
       // generate random room height
@@ -326,10 +331,24 @@ class Level {
     int startPosX = room.getRoomPositionInLevel().getX();
     int startPosY = room.getRoomPositionInLevel().getY();
 
-    for (int i=startPosX; i<startPosX+roomWidth; i++) {
+    System.out.println("Level width: " + levelWidth);
+    System.out.println("Level height: " + levelHeight);
+    System.out.println("Room startPosX: " + startPosX);
+    System.out.println("Room startPosY: " + startPosY);
+    System.out.println("Room width: " + roomWidth);
+    System.out.println("Room height: " + roomHeight);
+    int roomWidthIndex = 0;
+    for (int i=startPosX; i<startPosX+roomWidth ; i++) {
+      int roomHeightIndex = 0;
+      System.out.println("roomWidthIndex: " + roomWidthIndex);
       for (int j=startPosY; j<startPosY+roomHeight; j++) {
-        levelPlane[i][j] = room.getRoomLayout()[i][j];
+        System.out.println("roomHeightIndex: " + roomHeightIndex);
+        System.out.println("Current position is: (" + i + ", " + j + ")");
+        levelPlane[i][j] = room.room[roomWidthIndex][roomHeightIndex];
+        //levelPlane[i][j] = room.getRoomLayout()[roomWidthIndex][roomHeightIndex];
+        roomHeightIndex++;
       }
+      roomWidthIndex++;
     }
   }
 
@@ -379,19 +398,22 @@ class Level {
     levelPlane[exitPosition.getX()][exitPosition.getY()] = "O";
   }
 
-  public void renderLevel() {
-    // *TODO* make this function
+  public String renderLevel() {
+    StringBuilder levelASCII = new StringBuilder();
     // Do the levelPlane[][] parsing and System.out.print each item for graphical rendering
     for (int i=0; i<levelWidth; i++) {
       for (int j=0; j<levelHeight; j++) {
         if (j == levelHeight- 1) {
-          System.out.print(levelPlane[i][j] + "\n");
+          levelASCII.append(levelPlane[i][j] + "\n");
+          //System.out.print(levelPlane[i][j] + "\n");
         }
         else {
-          System.out.print(levelPlane[i][j] + " ");
+          levelASCII.append(levelPlane[i][j] + " ");
+          //System.out.print(levelPlane[i][j] + " ");
         }
       }
     }
+    return levelASCII.toString();
   }
 
 }
@@ -433,3 +455,16 @@ class Level {
 // O O O O O O O O O
 // O O O O O O O O O
 // O O O O O O O O O
+
+class LevelTesting {
+  static Level level1 = new Level();
+  public static void main(String[] args) {
+  testLevel();
+  }
+
+
+  @Test
+  public static void testLevel() {
+    assertEquals(" ", level1.renderLevel());
+  }
+}
