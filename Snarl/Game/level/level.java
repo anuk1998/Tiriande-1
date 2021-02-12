@@ -1,3 +1,5 @@
+package level;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Random;
@@ -50,6 +52,7 @@ class Player {
   }
 
   public void movePlayer(Position movePosition) {
+    this.playerPosition = movePosition;
 
   }
 
@@ -200,26 +203,23 @@ class Level {
   int levelWidth;
   int levelHeight;
   LinkedHashSet<Room> allRooms;
-  boolean isKeyFound;
-  Set<Player> players;
-  Set<Player> activePlayers;
+  boolean isKeyFound = false;
+  //players and adversaries are set to null for this milestone
+  Set<Player> players = null;
+  Set<Player> activePlayers = null;
   Set<Adversary> adversaries;
   boolean playersWon;
   ArrayList<Position> listOfAllLevelPositions;
 
-  public Level(boolean keyFound, Set<Player> players, Set<Player> activePlayers, Set<Adversary> adversaries, boolean playersWon) {
+  public Level() {
     this.levelWidth = 200;
     this.levelHeight = 200;
-    this.isKeyFound = keyFound;
-    this.players = players;
-    this.activePlayers = activePlayers;
-    this.adversaries = adversaries;
-    this.playersWon = playersWon;
     makeLevel();
     addRooms();
     placeLevelKeyInRandomRoom();
     placeLevelExitInRandomRoom();
-    // *TODO* call a `addHallways()` function here once it's made in Hallway class
+    // *TODO* call a `addHallways()` function here once it's made in level.Hallway class
+    renderLevel();
   }
 
   public int getLevelWidth() {
@@ -319,7 +319,7 @@ class Level {
     }
   }
 
-  // adds the new room layout to the Level plane (ASCII)
+  // adds the new room layout to the level.Level plane (ASCII)
   public void addRoomToPlane(Room room) {
     int roomWidth = room.getHorizontalLength();
     int roomHeight = room.getHorizontalLength();
@@ -333,7 +333,7 @@ class Level {
     }
   }
 
-  // checks if the new randomly-generated Room is valid/a realistic Room
+  // checks if the new randomly-generated level.Room is valid/a realistic level.Room
   public boolean isRoomValid(Room newRoom) {
     int roomWidth = newRoom.getHorizontalLength();
     int roomHeight = newRoom.getHorizontalLength();
@@ -382,6 +382,16 @@ class Level {
   public void renderLevel() {
     // *TODO* make this function
     // Do the levelPlane[][] parsing and System.out.print each item for graphical rendering
+    for (int i=0; i<levelWidth; i++) {
+      for (int j=0; j<levelHeight; j++) {
+        if (j == levelHeight- 1) {
+          System.out.print(levelPlane[i][j] + "\n");
+        }
+        else {
+          System.out.print(levelPlane[i][j] + " ");
+        }
+      }
+    }
   }
 
 }
@@ -404,9 +414,9 @@ class Level {
 //   }
 // }
 
-//ROOM 1 Room(below[][], (0,0), 8, 6, List(...), List(...));
-//ROOM 2 Room(below[][], (12,2), 9, 6, List(...), List(...));
-//ROOM 3 Room(below[][], (27,1), List(...), List(...));
+//ROOM 1 level.Room(below[][], (0,0), 8, 6, List(...), List(...));
+//ROOM 2 level.Room(below[][], (12,2), 9, 6, List(...), List(...));
+//ROOM 3 level.Room(below[][], (27,1), List(...), List(...));
 // O O O O O O O O
 // O O O O O O O O                                       O O O O O R
 // O O O O O O O O         O O O O O O O O O             O O O O O O
