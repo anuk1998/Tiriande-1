@@ -35,40 +35,37 @@ class Position {
 
 }
 
-interface Character {
-  /*
-  Position characterPosition;
+class Player {
+  Position playerPosition;
   Room currentRoom;
   Level currentLevel;
-  int characterID;
-   */
-
-  void moveCharacter(Position movePosition);
-}
-
-class Player implements Character{
+  int playerID;
   boolean isExpelled;
 
   public Player() {
 
   }
 
-  @Override
-  public void moveCharacter(Position movePosition) {
+  public void movePlayer(Position movePosition) {
 
   }
+
 }
 
-class Adversary implements Character{
+class Adversary {
+  Position advPosition;
+  Room currentRoom;
+  int adversaryID;
+  boolean isExpelled;
+
+  public Adversary() {
+
+  }
 
   void expelPlayer(boolean expel) {
 
   }
 
-  @Override
-  public void moveCharacter(Position movePosition) {
-
-  }
 }
 
 
@@ -79,14 +76,13 @@ class Room {
   int roomVerticalLength;
   Set<Player> playersInRoom;
   Set<Adversary> adversariesInRoom;
+  ArrayList<Position> listOfAllPositions = new ArrayList<Position>();
 
-  public Room(Position roomPos, int horiz, int vertic, Set<Player> players, Set<Adversary> adversaries) {
+  public Room(Position roomPos, int horiz, int vertic) {
     this.roomPositionInLevel = roomPos;
     this.roomHorizontalLength = horiz;
     this.roomVerticalLength = vertic;
     this.room = makeRoom();
-    this.playersInRoom = players;
-    this.adversariesInRoom = adversaries;
   }
 
   //removes the given player from that room
@@ -138,6 +134,7 @@ class Room {
       Position tempPosX = new Position(0, i);
       Position tempPosY = new Position(this.roomHorizontalLength - 1, i);
 
+      // to prevent adding corner squares twice
       if (i != 0 && i != this.roomVerticalLength - 1) {
         listOfEdgePositions.add(tempPosX);
         listOfEdgePositions.add(tempPosY);
@@ -155,24 +152,50 @@ class Room {
 
   }
 
+  public void placeKey() {
+    Random rand = new Random();
+    for (int i=0; i<this.roomHorizontalLength; i++) {
+      for (int j=0; j<this.roomVerticalLength; i=j++) {
+      Position tempPos = new Position(i, j);
+      listOfAllPositions.add(tempPos);
+      }
+    }
+    int randomIndex = rand.nextInt(listOfAllPositions.size());
+    Position randomPos = listOfAllPositions.get(randomIndex);
+    this.room[randomPos.getX()][randomPos.getY()] = "*";
+  }
+
+  public void placeLevelExit() {
+    Random rand = new Random();
+    int randomIndex = rand.nextInt(listOfAllPositions.size());
+    Position randomPos = listOfAllPositions.get(randomIndex);
+    if (!this.room[randomPos.getX()][randomPos.getY()].equals("*")) {
+      this.room[randomPos.getX()][randomPos.getY()] = "O";
+    }
+    else {
+      placeLevelExit();
+    }
+  }
+
 }
 
 class Level {
   String[][] levelPlane;
-  int levelWidth;
-  int levelHeight;
+  int levelWidth = 100;
+  int levelHeight = 100;
   LinkedHashSet<Room> allRooms;
   boolean isKeyFound;
   Set<Player> players;
   Set<Player> activePlayers;
   Set<Adversary> adversaries;
   boolean playersWon;
+  ArrayList<Position> listOfAllLevelPositions;
 
   public Level(int width, int height, LinkedHashSet<Room> rooms, boolean keyFound,
                Set<Player> players, Set<Player> activePlayers, Set<Adversary>
                        adversaries, boolean playersWon) {
-    this.levelWidth = width;
-    this.levelHeight = height;
+    this.levelWidth = 200;
+    this.levelHeight = 200;
     this.levelPlane = makeLevel();
     this.allRooms = rooms;
     this.isKeyFound = keyFound;
@@ -182,14 +205,65 @@ class Level {
     this.playersWon = playersWon;
   }
 
-  /*
-    ADD GETTERS AND SETTERS!!!!!!!
-  */
+  public int getLevelWidth() {
+    return this.levelWidth;
+  }
+
+  public int getLevelHeight() {
+    return this.levelHeight;
+  }
+
+  public boolean getIsKeyFound() {
+    return this.isKeyFound;
+  }
+
+  public LinkedHashSet<Room> getAllRooms() {
+    return this.allRooms;
+  }
+
+  public Set<Player> getPlayers() {
+    return this.players;
+  }
+
+  public Set<Player> getActivePlayers() {
+    return this.activePlayers;
+  }
+
+  public Set<Adversary> getAdversaries() {
+    return this.adversaries;
+  }
+
+  public boolean getPlayersWon() {
+    return this.playersWon;
+  }
+
+   public void setLevelWidth(int newWidth) {
+    this.levelWidth = newWidth;
+  }
+
+  public void setLevelHeight(int newHeight) {
+    this.levelHeight = newHeight;
+  }
+
+  public void setIsKeyFound(boolean keyFound) {
+    this.isKeyFound = keyFound;
+  }
+
+  public void addPlayer(Player p) {
+    this.players.add(p);
+    this.activePlayers.add(p);
+  }
+
+  public void setPlayersWon(boolean won) {
+    this.playersWon = won;
+  }
 
   public String[][] makeLevel() {
     for(int i = 0; i < this.levelWidth; i++) {
       for(int j = 0; j < this.levelHeight; j++) {
         this.levelPlane[i][j] = "X";
+        Position tempPos = new Position(i, j);
+        listOfAllLevelPositions.add(tempPos);
       }
     }
     return this.levelPlane;
@@ -200,6 +274,75 @@ class Level {
   }
   public void expelPlayer(Player p) {
     this.activePlayers.remove(p);
+  }
+
+  public void addRooms() {
+    //generate random number of rooms to add
+    Random rand = new Random();
+    int numRooms = rand.nextInt(10 - 5) + 5;
+
+    for (int i=0; i<numRooms; i++) {
+      // generate random room width
+      int randWidth = rand.nextInt(20 - 5) + 5;
+      // generate random room height
+      int randHeight = rand.nextInt(20 - 5) + 5;
+      //generate random position
+      int randomPositionIndex = rand.nextInt(listOfAllLevelPositions.size());
+      Position randPosition = listOfAllLevelPositions.get(randomPositionIndex);
+      Room newRoom = new Room(randPosition, randWidth, randHeight);
+
+      if (isRoomValid(newRoom)) {
+        this.allRooms.add(newRoom);
+      }
+      else {
+        i = i - 1; // if room isn't valid, repeat this iteration
+      }
+    }
+
+  }
+
+  public boolean isRoomValid(Room newRoom) {
+    boolean isValid = true;
+    //int roomWithBufferWidth = width + 2;
+    //int roomWithBufferHeight = height + 2;
+
+
+
+
+    // X X X X X X X X X X X X X X X
+    // X X X X X X X X X X X X X X X
+    // X X X ■ ■ ■ ■ ■ ■ X X X X X X
+    // X X X ■ ■ ■ ■ ■ | X X X X X X
+    // X X X ■ ■ | ■ ■ ■ X X X X X X
+    // X X X X X X ■ ■ ■ ■ ■ | ■ ■ X
+    // X X X X X X | ■ ■ ■ ■ ■ ■ ■ X
+
+
+
+
+
+
+
+      return isValid;
+  }
+
+  public void randomRoomForKey() {
+    Random rand = new Random();
+    int randomIndex = rand.nextInt(allRooms.size());
+
+    ArrayList<Room> allRoomsList = new ArrayList(allRooms);
+    Room randomRoom = allRoomsList.get(randomIndex);
+    randomRoom.placeKey();
+
+  }
+
+  public void randomRoomForExit() {
+    Random rand = new Random();
+    int randomIndex = rand.nextInt(allRooms.size());
+
+    ArrayList<Room> allRoomsList = new ArrayList(allRooms);
+    Room randomRoom = allRoomsList.get(randomIndex);
+    randomRoom.placeLevelExit();
   }
 
 }
