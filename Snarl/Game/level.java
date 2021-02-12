@@ -3,9 +3,12 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
+// *TODO* Add a test directory in Game directory and put level.java in source directory
+
 class Hallway {
   Position[] waypoints;
 
+  //*TODO* Add fields here and way of making hallways/adding them to rooms once all rooms are made
 }
 
 class Position {
@@ -82,7 +85,7 @@ class Room {
     this.roomPositionInLevel = roomPos;
     this.roomHorizontalLength = horiz;
     this.roomVerticalLength = vertic;
-    this.room = makeRoom();
+    makeRoom();
   }
 
   //removes the given player from that room
@@ -92,6 +95,10 @@ class Room {
   //checks whether the given movement is valid
   public boolean isValidMove(Position from, Position to){
     return true;
+  }
+
+  public String[][] getRoomLayout() {
+    return room;
   }
 
   public int getHorizontalLength() {
@@ -107,14 +114,13 @@ class Room {
     return this.roomPositionInLevel;
   }
 
-  public String[][] makeRoom() {
+  public void makeRoom() {
     for(int i = 0; i < this.roomHorizontalLength; i++) {
       for(int j = 0; j < this.roomVerticalLength; j++) {
         this.room[i][j] = "■";
       }
     }
     chooseDoors();
-    return this.room;
   }
 
   public void chooseDoors() {
@@ -152,7 +158,7 @@ class Room {
 
   }
 
-  public void placeKey() {
+  public Position placeKey() {
     Random rand = new Random();
     for (int i=0; i<this.roomHorizontalLength; i++) {
       for (int j=0; j<this.roomVerticalLength; i=j++) {
@@ -162,27 +168,37 @@ class Room {
     }
     int randomIndex = rand.nextInt(listOfAllPositions.size());
     Position randomPos = listOfAllPositions.get(randomIndex);
-    this.room[randomPos.getX()][randomPos.getY()] = "*";
+    if (!this.room[randomPos.getX()][randomPos.getY()].equals("|")) {
+      this.room[randomPos.getX()][randomPos.getY()] = "*";
+      return new Position(randomPos.getX(), randomPos.getY());
+    }
+    else {
+      placeKey();
+    }
+    return null;
   }
 
-  public void placeLevelExit() {
+  public Position placeLevelExit() {
     Random rand = new Random();
     int randomIndex = rand.nextInt(listOfAllPositions.size());
     Position randomPos = listOfAllPositions.get(randomIndex);
-    if (!this.room[randomPos.getX()][randomPos.getY()].equals("*")) {
+    if (!(this.room[randomPos.getX()][randomPos.getY()].equals("*") ||
+            this.room[randomPos.getX()][randomPos.getY()].equals("|"))) {
       this.room[randomPos.getX()][randomPos.getY()] = "O";
+      return new Position(randomPos.getX(), randomPos.getY());
     }
     else {
       placeLevelExit();
     }
+    return null;
   }
 
 }
 
 class Level {
   String[][] levelPlane;
-  int levelWidth = 100;
-  int levelHeight = 100;
+  int levelWidth;
+  int levelHeight;
   LinkedHashSet<Room> allRooms;
   boolean isKeyFound;
   Set<Player> players;
@@ -191,18 +207,19 @@ class Level {
   boolean playersWon;
   ArrayList<Position> listOfAllLevelPositions;
 
-  public Level(int width, int height, LinkedHashSet<Room> rooms, boolean keyFound,
-               Set<Player> players, Set<Player> activePlayers, Set<Adversary>
-                       adversaries, boolean playersWon) {
+  public Level(boolean keyFound, Set<Player> players, Set<Player> activePlayers, Set<Adversary> adversaries, boolean playersWon) {
     this.levelWidth = 200;
     this.levelHeight = 200;
-    this.levelPlane = makeLevel();
-    this.allRooms = rooms;
     this.isKeyFound = keyFound;
     this.players = players;
     this.activePlayers = activePlayers;
     this.adversaries = adversaries;
     this.playersWon = playersWon;
+    makeLevel();
+    addRooms();
+    placeLevelKeyInRandomRoom();
+    placeLevelExitInRandomRoom();
+    // *TODO* call a `addHallways()` function here once it's made in Hallway class
   }
 
   public int getLevelWidth() {
@@ -258,7 +275,7 @@ class Level {
     this.playersWon = won;
   }
 
-  public String[][] makeLevel() {
+  public void makeLevel() {
     for(int i = 0; i < this.levelWidth; i++) {
       for(int j = 0; j < this.levelHeight; j++) {
         this.levelPlane[i][j] = "X";
@@ -266,14 +283,15 @@ class Level {
         listOfAllLevelPositions.add(tempPos);
       }
     }
-    return this.levelPlane;
   }
 
-  public void placeCharacter(Position placeLocation){
+  public void placeCharacter(Position placeLocation) {
 
   }
+
   public void expelPlayer(Player p) {
     this.activePlayers.remove(p);
+    // *TODO* change p isExpelled status to true
   }
 
   public void addRooms() {
@@ -293,59 +311,88 @@ class Level {
 
       if (isRoomValid(newRoom)) {
         this.allRooms.add(newRoom);
+        addRoomToPlane(newRoom);
       }
       else {
         i = i - 1; // if room isn't valid, repeat this iteration
       }
     }
-
   }
 
+  // adds the new room layout to the Level plane (ASCII)
+  public void addRoomToPlane(Room room) {
+    int roomWidth = room.getHorizontalLength();
+    int roomHeight = room.getHorizontalLength();
+    int startPosX = room.getRoomPositionInLevel().getX();
+    int startPosY = room.getRoomPositionInLevel().getY();
+
+    for (int i=startPosX; i<startPosX+roomWidth; i++) {
+      for (int j=startPosY; j<startPosY+roomHeight; j++) {
+        levelPlane[i][j] = room.getRoomLayout()[i][j];
+      }
+    }
+  }
+
+  // checks if the new randomly-generated Room is valid/a realistic Room
   public boolean isRoomValid(Room newRoom) {
-    boolean isValid = true;
-    //int roomWithBufferWidth = width + 2;
-    //int roomWithBufferHeight = height + 2;
+    int roomWidth = newRoom.getHorizontalLength();
+    int roomHeight = newRoom.getHorizontalLength();
+    int startPosX = newRoom.getRoomPositionInLevel().getX();
+    int startPosY = newRoom.getRoomPositionInLevel().getY();
 
+    // check if new room dimensions go beyond level plane boundaries
+    if ((startPosX + roomWidth > levelWidth) || (startPosY + roomHeight > levelHeight)) {
+      return false;
+    }
 
-
-
-    // X X X X X X X X X X X X X X X
-    // X X X X X X X X X X X X X X X
-    // X X X ■ ■ ■ ■ ■ ■ X X X X X X
-    // X X X ■ ■ ■ ■ ■ | X X X X X X
-    // X X X ■ ■ | ■ ■ ■ X X X X X X
-    // X X X X X X ■ ■ ■ ■ ■ | ■ ■ X
-    // X X X X X X | ■ ■ ■ ■ ■ ■ ■ X
-
-
-
-
-
-
-
-      return isValid;
+    // check if the new room overlaps with any existing rooms/doors/key/exit/hallway in level plane
+    for (int i=startPosX; i<startPosX+roomWidth; i++) {
+      for (int j=startPosY; j<startPosY+roomHeight; j++) {
+        if (levelPlane[i][j].equals("■") || levelPlane[i][j].equals("|") || levelPlane[i][j].equals("*") ||
+                levelPlane[i][j].equals("O") || levelPlane[i][j].equals(".")) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
-  public void randomRoomForKey() {
+  public void placeLevelKeyInRandomRoom() {
     Random rand = new Random();
     int randomIndex = rand.nextInt(allRooms.size());
 
-    ArrayList<Room> allRoomsList = new ArrayList(allRooms);
+    ArrayList<Room> allRoomsList = new ArrayList<>(allRooms);
     Room randomRoom = allRoomsList.get(randomIndex);
-    randomRoom.placeKey();
+    Position keyPosition = randomRoom.placeKey();
 
+    levelPlane[keyPosition.getX()][keyPosition.getY()] = "*";
   }
 
-  public void randomRoomForExit() {
+  public void placeLevelExitInRandomRoom() {
     Random rand = new Random();
     int randomIndex = rand.nextInt(allRooms.size());
 
-    ArrayList<Room> allRoomsList = new ArrayList(allRooms);
+    ArrayList<Room> allRoomsList = new ArrayList<>(allRooms);
     Room randomRoom = allRoomsList.get(randomIndex);
-    randomRoom.placeLevelExit();
+    Position exitPosition = randomRoom.placeLevelExit();
+
+    levelPlane[exitPosition.getX()][exitPosition.getY()] = "O";
+  }
+
+  public void renderLevel() {
+    // *TODO* make this function
+    // Do the levelPlane[][] parsing and System.out.print each item for graphical rendering
   }
 
 }
+
+// X X X X X X X X X X X X X X X
+// X X X X X X X X X X X X X X X
+// X X X ■ ■ ■ ■ ■ ■ X X X X X X
+// X X X ■ ■ ■ ■ ■ | X X X X X X
+// X X X ■ ■ | ■ ■ ■ X X X X X X
+// X X X X X X ■ ■ ■ ■ ■ | ■ ■ X
+// X X X X X X | ■ ■ ■ ■ ■ ■ ■ X
 
 // int roomwidth = randomnumber(1, 20)
 // int roomlength = randomnumebr(1,20)
