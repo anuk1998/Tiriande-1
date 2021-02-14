@@ -39,33 +39,51 @@ class Hallway {
 
   public void connectHallwayWaypoints() {
     ArrayList<Position> waypointsAndDoors = new ArrayList<Position>();
-    //waypo
-    this.waypoints.add(this.startPosition);
-    this.waypoints.add(this.endPosition);
+    waypointsAndDoors.add(this.startPosition);
+    for (Position wp : this.waypoints) {
+      waypointsAndDoors.add(wp);
+    }
+    waypointsAndDoors.add(this.endPosition);
+    System.out.println("About to print waypointsAndDoors");
+    for (Position p : waypointsAndDoors) {
+      System.out.println("(" + p.getX() + ", " + p.getY() + ")");
+    }
 
-    for (int i=0; i<this.waypoints.size()-1; i++) {
-      int tempX1 = this.waypoints.get(i).getX();
-      int tempY1 = this.waypoints.get(i).getY();
+    for (int i=1; i<waypointsAndDoors.size(); i++) {
+      int tempX1 = waypointsAndDoors.get(i).getX();
+      int tempY1 = waypointsAndDoors.get(i).getY();
 
-      int tempX2 = this.waypoints.get(i+1).getX();
-      int tempY2 = this.waypoints.get(i+1).getY();
+      int tempX2 = waypointsAndDoors.get(i-1).getX();
+      int tempY2 = waypointsAndDoors.get(i-1).getY();
 
       if (tempX1 == tempX2) {
         int min = (tempY1 <= tempY2) ? tempY1 : tempY2;
         int max = (tempY1 >= tempY2) ? tempY1 : tempY2;
         for (int j=min; j<max; j++) {
-          this.allHallwayPositions.add(new Position(tempX1, j));
+          if (j == this.startPosition.getY() && tempX1 == this.startPosition.getX()) {
+            continue;
+          }
+          this.allHallwayPositions.add(new Position(j, tempX1));
         }
       }
       else if (tempY1 == tempY2) {
         int min = (tempX1 <= tempX2) ? tempX1 : tempX2;
         int max = (tempX1 >= tempX2) ? tempX1 : tempX2;
         for (int j=min; j<max; j++) {
-          this.allHallwayPositions.add(new Position(j, tempY1));
+          System.out.println("j is: " + j + ", tempY1 is: " + tempY1);
+          System.out.println("start pos: (" + this.startPosition.getY() + ", " + this.startPosition.getX() + ")");
+          if (j == this.startPosition.getX() && tempY1 == this.startPosition.getY()) {
+            System.out.println("in");
+            continue;
+          }
+          this.allHallwayPositions.add(new Position(tempY1, j));
         }
       }
     }
 
+    for (Position p : allHallwayPositions) {
+      System.out.println("(" + p.getX() + ", " + p.getY() + ")");
+    }
 
   }
 
@@ -492,6 +510,7 @@ class Position {
       Level level1 = new Level();
       Room room1 = new Room(new Position(0,0), 10, 8);
       room1.addDoor(new Position(9, 2));
+      room1.addDoor(new Position(6, 7));
       level1.addRoom(room1);
       room1.addKey(new Position(4,4));
 
@@ -505,6 +524,18 @@ class Position {
       Room room3 = new Room(new Position(17,4),6,4);
       room3.addDoor(new Position(3,0));
       level1.addRoom(room3);
+
+      Hallway h1 = new Hallway(new Position(9, 2), new Position(20, 4));
+      Hallway h2 = new Hallway(new Position(6, 7), new Position(15, 15));
+      h1.addAWaypoint(new Position(20, 2));
+      h1.connectHallwayWaypoints();
+      h2.addAWaypoint(new Position(6, 11));
+      h2.addAWaypoint(new Position(15, 11));
+      System.out.println(h2.getWaypoints());
+      h2.connectHallwayWaypoints();
+      System.out.println(h2.getAllHallwayPositions());
+      level1.addHallway(h1);
+      level1.addHallway(h2);
       System.out.print(level1.renderLevel());
 
 

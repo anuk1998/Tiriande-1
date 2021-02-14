@@ -1,2 +1,2 @@
 #!/bin/bash
-java -jar a2.jar $*
+java -jar ./A2.jar $1
