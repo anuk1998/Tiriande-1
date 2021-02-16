@@ -9,6 +9,10 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 import java.util.Set;
 
+/*
+This class if not for Milestone 2
+ */
+
 // *TODO* Add a test directory in Game directory and put levelGenerated.java in source directory
 
 class HallwayGenerated {

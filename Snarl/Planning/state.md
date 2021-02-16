@@ -9,11 +9,19 @@ Snarl game states will be constructed and represented by a collection of classes
     * `void moveCharacter(Position movePosition)` -- moves a character to the given position
     * Getters and setters
 
-There will be a `Player` class that implements the `Character` interface. It will contain all the same `Character` interface fields and methods, in addition to unique ones specified below, pertaining to player attributes:
-* `boolean isExpelled` -- indicates whether or not the player has been expelled
-* `void expelPlayer(boolean expel)` -- formally expels player by evaluating its field to expelled
+There will be a `Player` class and an `Adversary` interface. The `Player` class will contain these fields and methods:
+* `boolean isExpelled` -- indicates whether or not the player has been expelled.
 
-There will be an `Adversary` interface that extends the `Character` interface. There can be different types of adversary classes such as zombies or ghosts that implement this interface. The interface fields will include all the fields and methods from the `Character` interface. The game software will consist of rooms and levels, all part of a 2D dungeon crawler that can be represented by a `GameManager` class, which holds all information about the current game state and will perform operations needed to update the game state (or delegate those actions to other classes).
+There will be an `Adversary` interface will contain this method:
+* `void expelPlayer(boolean expel)` -- formally expels player by evaluating its field to expelled
+There can be different types of adversary classes such as zombies or ghosts that implement this interface. For simplicity of this milestone, we have left `Adversary` to be a class. 
+
+The game software will consist of rooms and levels, all part of a 2D dungeon crawler that can be represented by a `GameManager` class, which holds all information about the current game state and will perform operations needed to update the game state (or delegate those actions to other classes).
+The `Game Manager` will only have access to an overview of the higher level elements of the game, such as all of 
+the levels, the current level being played, a list of the players, etc. It will not have access to lower level elements, such as 
+a specific door in a room. Conversely, players and adversaries will be able to view rooms and position availability, but will not have a full level view. Different roles (Game Manager, Player, Adversary) 
+have different levels of access to the game state since they have different responsibilities.
+
 * The `GameManager` class fields and methods include:
     * `LinkedHashSet<Level> allLevels` -- a set of all the levels in that game
     * `int levelsWon` -- keeps track of levels played and won
@@ -23,9 +31,9 @@ There will be an `Adversary` interface that extends the `Character` interface. T
     * `boolean isOver` -- returns true if the players have lost the currentLevel or if they have won the last level
     * `void endGame()` -- will end the game once the game is won by checking `isOver` value
 
-The game software will also include `Level`, `Room`, and `Hallway` classes. Those will be defined/structure by the following:
+The game software will also include `Level`, `Room`, `Position`, and `Hallway` classes. Those will be defined/structure by the following:
 * The `Level` class fields and methods will include:
-    * `LinkedHashSet<Room> allRooms` -- a set of all the rooms in the level
+    * `String[][] levelPlane` -- a 2D string array representing the entire level plane (with rooms, hallways, etc.)
     * `boolean isKeyFound` -- indicates if the key for that level has been found
     * `Set<Player> players` -- a set of all the players participating in that level
     * `Set<Player> activePlayers` -- a set of all active (i.e. non-expelled) players
@@ -36,17 +44,26 @@ The game software will also include `Level`, `Room`, and `Hallway` classes. Thos
     * Getters and setters
 
 * The `Room` class fields and methods will include:
+    * `String[][] room` -- a 2D array representing the room tiles
+    * `Position roomPositionInLevel` -- a Position (x and y coordinate) of where in the level plane that room begins (the upper most top left square)
+    * `int roomWidth` -- how many 'tiles' wide the room is
+    * `int roomHeight` -- how many 'tiles' long the room is
+    * `ArrayList<Position> listOfAllPositions` -- a list of all coordinates in that room
     * `Set<Player> playersInRoom` -- a set of all the players in that room
     * `Set<Adversary> adversariesInRoom` -- a set of all the adversaries in the room
-    * `void removePlayer(Player p)` -- removes the given player from that room
+    * `void removePlayer(lPlayer p)` -- removes the given player from that room
     * `boolean isValidMove(Position from, Position to)` -- checks whether the given movement is valid
     * Getters and setters
+    
+* The `Position` class fields and methods will include: 
+    * int `x_pos` -- This will represent the x position of a Position object.
+    * int `y_pos` -- This will represent the y position of a Position object.
+    * getter methods for the `x_pos` and `y_pos` fields.
 
 * The `Hallway` class fields and methods will include:
   * `List<Position> waypoints` -- a list of waypoints that indicate changes in direction in the hallway
-
-An implementation of Snarl demands a data representation for game states. A Snarl state should contain information necessary to check validity of moves and progress the game. The full state will be private to the Game Manager, while other components (players, AIs) might be provided a restricted view of the state.
-
-Add a description of an interface with operations that other components may need to perform on the game state, or to interact with it. This might look like a wishlist with function signatures and purpose statements.
-
-Scope: The purpose of this task is to think about what information is relevant for the game manager to discharge its responsibilities of running a dungeon, managing actors and progressing the game; and how this information should be represented. We are looking for a careful analysis of the information available to you (including any clarifications), not a perfect spec set in stone.
+  * `List<Position> allPositions` -- a list of all the positions on the plane of that hallway 
+  * `void connectHallwayPositions()` -- a method that will create a list of all the hallway poisitons by using the list of waypoints to construct it
+  
+  
+  
