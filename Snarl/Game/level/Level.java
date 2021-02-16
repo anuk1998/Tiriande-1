@@ -3,7 +3,6 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 import java.util.*;
 
-// *TODO* Add a test directory in Game directory and put levelGenerated.java in source directory
 
   public class Level {
     int levelWidth;
@@ -191,23 +190,22 @@ import java.util.*;
 
     public static void main(String[] args) throws Exception {
       createLevelsAndRoomsAndHallways();
-      //testGetKeyPosition();
-      //testGetDoorPosition();
-      //testGetExitPosition();
-      //testGetKeyPositionInLevel();
-      //testGetExitPositionInLevel();
-      //testGetStartPositionHallway();
-      //testGetEndPositionHallway();
-      //testGetHallwayWaypoints();
-      //invalidRoom();
-      //invalidDoorPlacement();
-      //testGetXPosition();
-      //testGetYPosition();
-      //testGetDoorPositions();
-      //testGetTileInRoom();
-      //testgetAllRoomsInLevel();
-      //testgetLevelHeight();
-      //testgetLevelWidth();
+      testGetKeyPosition();
+      testGetDoorPositions();
+      testGetExitPosition();
+      testGetKeyPositionInLevel();
+      testGetExitPositionInLevel();
+      testGetStartPositionHallway();
+      testGetEndPositionHallway();
+      testGetHallwayWaypoints();
+      invalidRoom();
+      testGetXPosition();
+      testGetYPosition();
+      testGetDoorPositions();
+      testGetTileInRoom();
+      testgetAllRoomsInLevel();
+      testgetLevelHeight();
+      testgetLevelWidth();
       testRoomGetHorizontalLength();
       testRoomGetVerticalLength();
       testGetRoomStartPositionInLevel();
@@ -285,11 +283,6 @@ import java.util.*;
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
-    public static void  invalidDoorPlacement() throws Exception{
-      Position pos = new Position(100,100);
-      room4.addDoor(pos);
-    }
 
     @Test
     public static void testGetXPosition() {

@@ -76,13 +76,13 @@ public class Room {
                 listOfEdgePositions.add(tempPosY);
             }
         }
-
-        for (Position edge : this.listOfEdgePositions) {
-            System.out.println("(" + edge.getY() + ", " + edge.getX() + ")");
-        }
+        //DEBUG PURPOSES ONLY
+//        for (Position edge : this.listOfEdgePositions) {
+//            System.out.println("(" + edge.getY() + ", " + edge.getX() + ")");
+//        }
     }
 
-    public void addKey(Position p) throws IllegalArgumentException {
+    public void addKey(Position p) throws ArrayIndexOutOfBoundsException {
         try {
             room[p.getX()][p.getY()] = "*";
         }
@@ -92,7 +92,7 @@ public class Room {
 
     }
 
-    public void addExit(Position p) throws IllegalArgumentException{
+    public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
         try{
             room[p.getX()][p.getY()] = "O";
         }
@@ -116,8 +116,6 @@ public class Room {
         for (int i = 0; i < this.roomVerticalLength; i++) {
             for (int j = 0; j < this.roomHorizontalLength; j++) {
                 if (room[i][j].equals("*")) {
-                    System.out.println("Got into if statement");
-                    System.out.println("i: " + i + " j: " + j);
                     return new Position(j, i);
 
                 }
