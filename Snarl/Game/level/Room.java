@@ -94,7 +94,7 @@ public class Room {
 
     public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
         try{
-            room[p.getX()][p.getY()] = "O";
+            room[p.getX()][p.getY()] = "●";
         }
         catch (ArrayIndexOutOfBoundsException e) {
             throw new ArrayIndexOutOfBoundsException("Given coordinate for exit is beyond bounds of the room.");
@@ -146,7 +146,7 @@ public class Room {
     public Position getExitPosition() {
         for (int i = 0; i < this.roomVerticalLength; i++) {
             for (int j = 0; j < this.roomHorizontalLength; j++) {
-                if (room[i][j].equals("O")) {
+                if (room[i][j].equals("O") || room[i][j].equals("●")) {
                     return new Position(j, i);
 
                 }

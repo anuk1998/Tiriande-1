@@ -6,13 +6,17 @@ public class Adversary {
     int adversaryID;
     boolean isExpelled;
 
-    public Adversary() {
-
+    public Adversary(int id) {
+        this.isExpelled = false;
     }
 
     // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
     void expelPlayer(boolean expel) {
 
+    }
+    
+    void setAdversaryPosition(Position p) {
+        this.advPosition = p;
     }
 
 }

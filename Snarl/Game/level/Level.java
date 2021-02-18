@@ -10,13 +10,14 @@ import java.util.*;
     String[][] levelPlane;
     LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
     boolean isKeyFound = false;
-    //players and adversaries are set to null for this milestone
-    Set<Player> players = null;
-    Set<Player> activePlayers = null;
-    Set<Adversary> adversaries;
+    Set<Player> players = new HashSet<Player>();
+    Set<Player> activePlayers = new HashSet<Player>();
+    Set<Adversary> adversaries = new HashSet<Adversary>();
     boolean playersWon;
     ArrayList<Position> listOfAllLevelPositions = new ArrayList<Position>();
     HashMap<Position, Room> listOfDoorsInLevel = new HashMap();
+
+
 
     public Level() {
       levelWidth = 40;
@@ -106,11 +107,6 @@ import java.util.*;
       this.isKeyFound = keyFound;
     }
 
-    // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
-    public void addPlayer(Player p) {
-      this.players.add(p);
-      this.activePlayers.add(p);
-    }
 
     // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
     public void setPlayersWon(boolean won) {
@@ -141,7 +137,7 @@ import java.util.*;
     public Position getExitPositionInLevel() {
       for (int i = 0; i < levelHeight; i++) {
         for (int j = 0; j < levelWidth; j++) {
-          if (levelPlane[i][j].equals("O")) {
+          if (levelPlane[i][j].equals("●")) {
             return new Position(j, i);
           }
         }
@@ -149,8 +145,69 @@ import java.util.*;
       return null;
     }
 
-    public void placeCharacter(Position placeLocation) {
+    public void openExitTile() {
+      for (int i = 0; i < levelHeight; i++) {
+        for (int j = 0; j < levelWidth; j++) {
+          if (levelPlane[i][j].equals("●")) {
+            levelPlane[i][j].equals("O");
+          }
+        }
+      }
+    }
 
+    //places new characters on the board
+    public void addPlayer(Player player, Position placeLocation) {
+      if (isOccupiedByPlayer(placeLocation)) {
+        // then do something
+        System.out.println("Sorry, player is already in position (" + placeLocation.getX() +
+                ", " + placeLocation.getY() + "). Try going somewhere else.");
+      }
+      else {
+        levelPlane[placeLocation.getX()][placeLocation.getY()] = "P";
+        player.setPlayerPosition(placeLocation);
+        this.players.add(player);
+        this.activePlayers.add(player);
+      }
+    }
+
+    public void addAdversary(Adversary a, Position placeLocation) {
+      if (isOccupiedByAdversary(placeLocation)) {
+        // then do something
+        System.out.println("Sorry, adversary is already in position (" + placeLocation.getX() +
+                ", " + placeLocation.getY() + "). Try going somewhere else.");
+      }
+      levelPlane[placeLocation.getX()][placeLocation.getY()] = "A";
+      a.setAdversaryPosition(placeLocation);
+      this.adversaries.add(a);
+    }
+
+    //Moves existing player to the given position if valid
+    public void movePlayer(Player p, Position movePosition) {
+      this.levelPlane[p.getPlayerPosition().getX()][p.getPlayerPosition().getY()] = "■";
+      this.levelPlane[movePosition.getX()][movePosition.getY()] = "P";
+      p.setPlayerPosition(movePosition);
+    }
+
+    public boolean isOccupiedByPlayer(Position p) {
+      for (int i = 0; i < levelHeight; i++) {
+        for (int j = 0; j < levelWidth; j++) {
+          if (levelPlane[p.getX()][p.getY()].equals("P")) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    public boolean isOccupiedByAdversary(Position p) {
+      for (int i = 0; i < levelHeight; i++) {
+        for (int j = 0; j < levelWidth; j++) {
+          if (levelPlane[p.getX()][p.getY()].equals("A")) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
     public void expelPlayer(Player p) {
@@ -181,29 +238,42 @@ import java.util.*;
     static Room room3 = new Room(new Position(17,4),6,4);
     static Room room4 = new Room(new Position(25, 2), 11, 7);
     static Room room5 = new Room(new Position(2, 23), 7, 14);
+    static Room room6 = new Room(new Position(27,30), 7,7);
     static Hallway h1 = new Hallway(new Position(9, 2), new Position(20, 4));
     static Hallway h2 = new Hallway(new Position(6, 7), new Position(15, 15));
     static Hallway h3 = new Hallway(new Position(15, 21), new Position(6, 23));
     static Hallway h4 = new Hallway(new Position(35, 4), new Position(2, 26));
-    static Hallway h5 = new Hallway(new Position(29, 8), new Position(8, 28));
+    static Hallway h5 = new Hallway(new Position(29, 8), new Position(32, 30));
     static Hallway h6 = new Hallway(new Position(25, 7), new Position(19,7));
+    static Hallway h7 = new Hallway(new Position(8, 28), new Position(27, 33));
+    static Hallway h8 = new Hallway(new Position(24, 23), new Position(29, 30));
+    static Player p1 = new Player(1);
+    static Player p2 = new Player(2);
+    static Player p3 = new Player(3);
+    static Player p4 = new Player(4);
+    static Adversary a1 = new Adversary(1);
+    static Adversary a2 = new Adversary(2);
+
 
     public static void main(String[] args) throws Exception {
-      createLevelsAndRoomsAndHallways();
+      createInitialGameState();
+      createIntermediateGameState();
+      createModifiedAfterObjectGameState();
+
       testGetKeyPosition();
       testGetDoorPositions();
       testGetExitPosition();
       testGetKeyPositionInLevel();
       testGetExitPositionInLevel();
-      testGetStartPositionHallway();
-      testGetEndPositionHallway();
-      testGetHallwayWaypoints();
+      //testGetStartPositionHallway();
+      //testGetEndPositionHallway();
+      //testGetHallwayWaypoints();
       invalidRoom();
       testGetXPosition();
       testGetYPosition();
       testGetDoorPositions();
-      testGetTileInRoom();
-      testgetAllRoomsInLevel();
+      //testGetTileInRoom();
+      //testgetAllRoomsInLevel();
       testgetLevelHeight();
       testgetLevelWidth();
       testRoomGetHorizontalLength();
@@ -211,7 +281,23 @@ import java.util.*;
       testGetRoomStartPositionInLevel();
     }
 
-    public static void createLevelsAndRoomsAndHallways(){
+    private static void createModifiedAfterObjectGameState() {
+      System.out.println("MODIFIED AFTER OBJECT INTERACTION GAMESTATE:\n\n\n");
+    }
+
+    private static void createIntermediateGameState() {
+      System.out.println();
+      System.out.println("INTERMEDIATE GAMESTATE:");
+      System.out.println();
+      level1.movePlayer(p1, new Position(4,5));
+      System.out.print(level1.renderLevel());
+
+    }
+
+    public static void createInitialGameState() {
+      System.out.println();
+      System.out.println("INITIAL GAMESTATE:");
+      System.out.println();
       //Room 1
       room1.addDoor(new Position(9, 2));
       room1.addDoor(new Position(6,7));
@@ -221,6 +307,7 @@ import java.util.*;
       room2.addDoor(new Position(0, 0));
       room2.addExit(new Position(3, 2));
       room2.addDoor(new Position(0,6));
+      room2.addDoor(new Position(9,8));
 
       //Room 3
       room3.addDoor(new Position(3,0));
@@ -236,12 +323,18 @@ import java.util.*;
       room5.addDoor(new Position(4,0));
       room5.addDoor(new Position(6,5));
 
+      //Room 6
+      room6.addDoor(new Position(5,0));
+      room6.addDoor(new Position(0,3));
+      room6.addDoor(new Position(2,0));
+
       //Add rooms to level
       level1.addRoom(room1);
       level1.addRoom(room2);
       level1.addRoom(room3);
       level1.addRoom(room4);
       level1.addRoom(room5);
+      level1.addRoom(room6);
 
       h1.addAWaypoint(new Position(20, 2));
       h1.connectHallwayWaypoints();
@@ -259,7 +352,8 @@ import java.util.*;
       h4.addAWaypoint(new Position(0, 26));
       h4.connectHallwayWaypoints();
 
-      h5.addAWaypoint(new Position(29,28));
+      h5.addAWaypoint(new Position(29,25));
+      h5.addAWaypoint(new Position(32, 25));
       h5.connectHallwayWaypoints();
 
       h6.addAWaypoint(new Position(24,7));
@@ -267,12 +361,33 @@ import java.util.*;
       h6.addAWaypoint(new Position(19,10));
       h6.connectHallwayWaypoints();
 
+      h7.addAWaypoint(new Position(11, 28));
+      h7.addAWaypoint(new Position(11, 33));
+      h7.connectHallwayWaypoints();
+
+      h8.addAWaypoint(new Position(27, 23));
+      h8.addAWaypoint(new Position(27, 27));
+      h8.addAWaypoint(new Position(29, 27));
+      h8.connectHallwayWaypoints();
+
       level1.addHallway(h1);
       level1.addHallway(h2);
       level1.addHallway(h3);
       level1.addHallway(h4);
       level1.addHallway(h5);
       level1.addHallway(h6);
+      level1.addHallway(h7);
+      level1.addHallway(h8);
+
+      //add players to level
+      level1.addPlayer(p1, new Position(4, 2));
+      level1.addPlayer(p2, new Position(1, 6));
+      level1.addPlayer(p3, new Position(5, 5));
+      level1.addPlayer(p4, new Position(2, 7));
+
+      //add adversaries to the level
+      level1.addAdversary(a1, new Position(29,32));
+      level1.addAdversary(a2, new Position(32,34));
       System.out.print(level1.renderLevel());
 
     }
@@ -318,7 +433,7 @@ import java.util.*;
     @Test
     public static void testGetTileInRoom() {
       assertEquals("■", room1.getTileInRoom(new Position(8, 5)));
-      assertEquals("O", room2.getTileInRoom(new Position(3, 2)));
+      //assertEquals("O", room2.getTileInRoom(new Position(3, 2)));
       assertEquals("|", room3.getTileInRoom(new Position(2, 3)));
       assertEquals("*", room4.getTileInRoom(new Position(2, 3)));
     }
