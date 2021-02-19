@@ -1,4 +1,4 @@
-The Rule Checker needs to validate the movements and interactions from players and adversaries as well as determine the end of a level versus the end of the game. 
+The Rule Checker needs to validate the movements and interactions from players and adversaries as well as determine the end of a Game versus the end of the game. 
 It should also know when to reject invalid game states. 
 Other functionality might be added later in the project if needed.
 
@@ -12,7 +12,7 @@ The player can interact with keys and objects and adversaries (for self-eliminat
 
 When the player moves, they interact with the object on the tile they choose and no other tile.
 
-For details on the end of a level versus end of a game, refer to the Snarl Overview.
+For details on the end of a Game versus end of a game, refer to the Snarl Overview.
 
 Your task is to design the rule checker’s interface.
 
@@ -28,8 +28,8 @@ This interface will contain the methods and fields:
 * `boolean isValidMove(Position destPoint)` -- determines if the given destination point is a reachable and valid move for the character.
 * `void setMaxTilesPossible(int max)` -- sets how many tiles a player or adversary can move. This could be a different amount for players and adversaries.
 * `void keyTileIsLandedOn()` -- determines a set of actions if the key tile has been landed on by a player or adversary.
-* `void exitTileIsLandedOn()` -- determines a set of actions if the level exit tile has been landed on by a player or adversary.
-    * `boolean isExitUnlocked()` -- helper for `exitTileIsLandedOn()` to check if the exit has been unlocked by checking if the level key has been found.
+* `void exitTileIsLandedOn()` -- determines a set of actions if the Game exit tile has been landed on by a player or adversary.
+    * `boolean isExitUnlocked()` -- helper for `exitTileIsLandedOn()` to check if the exit has been unlocked by checking if the Game key has been found.
 * `void seesAPlayer()` -- determines a response if a player or adversary sees another player
 * `void seesAnAdversary()` -- determines a response if a player or adversary sees another adversary
 

@@ -1,6 +1,4 @@
-package level;
-import static org.junit.Assert.*;
-import org.junit.Test;
+package Game;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -410,7 +408,7 @@ class LevelGenerated {
     }
   }
 
-  // adds the new room layout to the level.Level plane (ASCII)
+  // adds the new room layout to the level.Game.Level plane (ASCII)
   public void addRoomToPlane(RoomGenerated room) {
     int roomWidth = room.getHorizontalLength();
     int roomHeight = room.getVerticalLength();

@@ -1,4 +1,4 @@
-package level;
+package Game;
 
 public class Position {
     int x_pos;

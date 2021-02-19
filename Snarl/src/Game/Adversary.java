@@ -1,4 +1,4 @@
-package level;
+package Game;
 
 public class Adversary {
     Position advPosition;
@@ -17,6 +17,10 @@ public class Adversary {
     
     void setAdversaryPosition(Position p) {
         this.advPosition = p;
+    }
+    
+    public Position getAdversaryPosition() {
+        return this.advPosition;
     }
 
 }

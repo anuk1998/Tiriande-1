@@ -1,4 +1,4 @@
-package level;
+package Game;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -107,6 +107,7 @@ public class Room {
             room[p.getX()][p.getY()] = "|";
             this.listOfDoorsInRoom.add(p);
         }
+        
         else {
             throw new IllegalArgumentException("Given coordinate for a door is not a room coordinate on the room's boundary.");
         }

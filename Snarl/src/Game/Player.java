@@ -1,4 +1,4 @@
-package level;
+package Game;
 
 public class Player {
     Position playerPosition;
@@ -19,6 +19,14 @@ public class Player {
 
     public Position getPlayerPosition() {
         return this.playerPosition;
+    }
+
+    public void setIsExpelled(boolean expel) {
+        this.isExpelled = expel;
+    }
+
+    public boolean getIsExpelled() {
+        return this.isExpelled;
     }
 
 
