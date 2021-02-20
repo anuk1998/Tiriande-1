@@ -1,5 +1,8 @@
 package Game;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -54,6 +57,14 @@ public class Room {
                 Position tempPos = new Position(i, j);
                 this.room[i][j] = "■";
                 listOfAllPositions.add(tempPos);
+            }
+        }
+    }
+
+    public void createRoomFromJSON(JSONArray inputArray) throws JSONException {
+        for (int i=0; i<inputArray.length(); i++) {
+            for (int j=0; j<inputArray.getJSONArray(i).length(); j++) {
+                
             }
         }
     }
