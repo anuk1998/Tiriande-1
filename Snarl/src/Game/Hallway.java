@@ -50,34 +50,34 @@ public class Hallway {
         //////////////////////
 
         for (int i=1; i<waypointsAndDoors.size(); i++) {
-            int tempX1 = waypointsAndDoors.get(i).getX();
-            int tempY1 = waypointsAndDoors.get(i).getY();
+            int tempRow1 = waypointsAndDoors.get(i).getRow();
+            int tempCol1 = waypointsAndDoors.get(i).getCol();
 
-            int tempX2 = waypointsAndDoors.get(i-1).getX();
-            int tempY2 = waypointsAndDoors.get(i-1).getY();
+            int tempRow2 = waypointsAndDoors.get(i-1).getRow();
+            int tempCol2 = waypointsAndDoors.get(i-1).getCol();
 
-            if (tempX1 == tempX2) {
-                int min = (tempY1 <= tempY2) ? tempY1 : tempY2;
-                int max = (tempY1 >= tempY2) ? tempY1 : tempY2;
+            if (tempRow1 == tempRow2) {
+                int min = (tempCol1 <= tempCol2) ? tempCol1 : tempCol2;
+                int max = (tempCol1 >= tempCol2) ? tempCol1 : tempCol2;
                 for (int j=min; j<max+1; j++) {
-                    if ((j == this.startPosition.getY() && tempX1 == this.startPosition.getX()) ||
-                            (j == this.endPosition.getY() && tempX2 == this.endPosition.getX())) {
+                    if ((j == this.startPosition.getCol() && tempRow1 == this.startPosition.getRow()) ||
+                            (j == this.endPosition.getCol() && tempRow2 == this.endPosition.getRow())) {
                         continue;
                     }
-                    this.allHallwayPositions.add(new Position(j, tempX1));
+                    this.allHallwayPositions.add(new Position(tempRow1, j));
                 }
             }
-            else if (tempY1 == tempY2) {
-                int min = (tempX1 <= tempX2) ? tempX1 : tempX2;
-                int max = (tempX1 >= tempX2) ? tempX1 : tempX2;
+            else if (tempCol1 == tempCol2) {
+                int min = (tempRow1 <= tempRow2) ? tempRow1 : tempRow2;
+                int max = (tempRow1 >= tempRow2) ? tempRow1 : tempRow2;
                 for (int j=min; j<max; j++) {
-                    if (j == this.startPosition.getX() && tempY1 == this.startPosition.getY() || 
-                            j == this.endPosition.getX() && tempY2 == this.endPosition.getY()) {
+                    if (j == this.startPosition.getRow() && tempCol1 == this.startPosition.getCol() ||
+                            j == this.endPosition.getRow() && tempCol2 == this.endPosition.getCol()) {
 
                         continue;
                     }
 
-                    this.allHallwayPositions.add(new Position(tempY1, j));
+                    this.allHallwayPositions.add(new Position(j, tempCol1));
                 }
             }
         }

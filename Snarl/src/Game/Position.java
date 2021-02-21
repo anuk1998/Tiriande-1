@@ -1,27 +1,27 @@
 package Game;
 
 public class Position {
-    int x_pos;
-    int y_pos;
+    int row;
+    int col;
 
-    public Position(int x_pos, int y_pos) {
-        this.x_pos = x_pos;
-        this.y_pos = y_pos;
+    public Position(int row, int col) {
+        this.row = row;
+        this.col = col;
     }
 
-    public int getX() {
-        return this.y_pos;
+    public int getRow() {
+        return this.row;
     }
 
-    public int getY() {
-        return this.x_pos;
+    public int getCol() {
+        return this.col;
     }
     
     @Override
     public boolean equals(Object other) {
         if (other instanceof Position) {
             Position pos = (Position) other;
-            if (this.getX() == pos.getX() && this.getY() == pos.getY()) {
+            if (this.getRow() == pos.getRow() && this.getCol() == pos.getCol()) {
                 return true;
             }
         }
@@ -30,7 +30,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return (this.getX() + "," + this.getY());
+        return (this.getRow() + "," + this.getCol());
     }
 
 }
