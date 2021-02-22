@@ -1,0 +1,19 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="testRoom:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/testRoom_jar</output-path>
+    <root id="archive" name="Tiriande.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/Snarl/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="traveller-client" />
+      <element id="module-output" name="Tiriande-1" />
+      <element id="module-output" name="A2" />
+      <element id="module-output" name="A3" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/A2/src/jar/java-json.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/junit/junit/4.12/junit-4.12.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/A2/src/A2.jar" path-in-jar="/" />
+      <element id="library" level="project" name="java-json" />
+    </root>
+  </artifact>
+</component>
