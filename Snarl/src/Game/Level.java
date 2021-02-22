@@ -67,10 +67,10 @@ import java.util.*;
       }
 
       Position[] adjacentsToCheck = {
-              new Position(row + 1, col),
               new Position(row - 1, col),
+              new Position(row, col - 1),
               new Position(row, col + 1),
-              new Position(row, col - 1)};
+              new Position(row + 1, col)};
 
       for (Position adjacentTile : adjacentsToCheck) {
         try {

@@ -26,16 +26,21 @@ public class testRoom {
         }
         scanner.close();
 
-        JSONArray jsonArrayInput = new JSONArray(input_as_string.toString());
-        JSONObject roomObject = jsonArrayInput.getJSONObject(0);
-        JSONArray pointObject = jsonArrayInput.getJSONArray(1);
+        try {
+            JSONArray jsonArrayInput = new JSONArray(input_as_string.toString());
+            JSONObject roomObject = jsonArrayInput.getJSONObject(0);
+            JSONArray pointObject = jsonArrayInput.getJSONArray(1);
 
-        String type = roomObject.getString("type");
-        if (type.equals("room")) {
-            output = typeIsRoom(roomObject, pointObject);
+            String type = roomObject.getString("type");
+            if (type.equals("room")) {
+                output = typeIsRoom(roomObject, pointObject);
+            }
+
+            System.out.println(output);
         }
-
-        System.out.println(output);
+        catch (JSONException e) {
+            System.out.println("Invalid input rendered: []");
+        }
 
     }
 
