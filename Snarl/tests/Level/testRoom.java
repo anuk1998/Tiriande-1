@@ -1,4 +1,4 @@
-package Game;
+package Level;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -6,6 +6,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import Game.Level;
+import Game.Position;
+import Game.Room;
 
 
 public class testRoom {
