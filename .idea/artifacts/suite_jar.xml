@@ -1,9 +1,9 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="testRoom:jar">
-    <output-path>$PROJECT_DIR$/Snarl/tests/Level</output-path>
-    <root id="archive" name="testRoom.jar">
+  <artifact type="jar" name="suite:jar">
+    <output-path>$PROJECT_DIR$/Snarl/foo</output-path>
+    <root id="archive" name="suite.jar">
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/Snarl/tests/Level/META-INF/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/Snarl/MANIFEST.MF" />
       </element>
       <element id="module-output" name="traveller-client" />
       <element id="module-output" name="A2" />

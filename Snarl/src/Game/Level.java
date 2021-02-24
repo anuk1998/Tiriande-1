@@ -12,7 +12,7 @@ import java.util.*;
     Set<Adversary> adversaries = new HashSet<Adversary>();
     boolean playersWon;
     ArrayList<Position> listOfAllLevelPositions = new ArrayList<Position>();
-    HashMap<Position, Room> listOfDoorsInLevel = new HashMap();
+    HashMap<Position, Room> listOfDoorsInLevel = new HashMap<Position, Room>();
 
     public Level() {
       levelNumOfRows = 40;

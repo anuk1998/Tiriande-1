@@ -44,7 +44,7 @@ public class TestingSuite {
     }
 
     public static JSONArray typeIsRoom(JSONObject roomToMake, JSONArray JSONpoint) throws JSONException {
-        Level level = new Level();
+        Game.Level level = new Level();
 
         Position point = new Position(JSONpoint.getInt(0), JSONpoint.getInt(1));
         JSONArray origin = roomToMake.getJSONArray("origin");

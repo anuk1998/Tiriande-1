@@ -28,8 +28,6 @@ have different levels of access to the game state since they have different resp
     * `Level currentLevel` -- determines which level the players are currently on
     * `Set<Player> allPlayers` -- a set of all the players (up to four in size) playing in that game
     * `Set<Adversary> adversaries` -- a set of the adversaries in the game
-    * `boolean isOver` -- returns true if the players have lost the currentLevel or if they have won the last level
-    * `void endGame()` -- will end the game once the game is won by checking `isOver` value
 
 The game software will also include `Level`, `Room`, `Position`, and `Hallway` classes. Those will be defined/structure by the following:
 * The `Level` class fields and methods will include:
