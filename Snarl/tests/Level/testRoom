@@ -1,0 +1,15 @@
+#!/bin/bash
+# compile all the Game components as class files for dependency adding
+javac -d ../../bin -cp ../../java-json.jar:../../bin ../../src/Game/Adversary.java
+javac -d ../../bin -cp ../../java-json.jar:../../bin ../../src/Game/Player.java
+javac -d ../../bin -cp ../../java-json.jar:../../bin ../../src/Game/Hallway.java
+javac -d ../../bin -cp ../../java-json.jar:../../bin ../../src/Game/Position.java
+javac -d ../../bin -cp ../../java-json.jar:../../bin ../../src/Game/Room.java
+javac -d ../../bin -cp ../../java-json.jar:../../bin ../../src/Game/Level.java
+
+# make class file for testing suite, create jar file, then execute program
+javac -cp ../../java-json.jar:../../bin -d ../../bin ../../src/Level/TestingSuite.java
+jar cfm suite.jar ../../MANIFEST.MF ../../bin/Level/TestingSuite.class
+java -jar ./suite.jar
+#rm TestingSuite.class
+#rm suite.jar
