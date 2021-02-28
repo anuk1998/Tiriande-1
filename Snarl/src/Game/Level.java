@@ -150,6 +150,28 @@ import java.util.*;
       }
     }
 
+    // adds the key on the levelPlane based on the given position
+    public void addKey(Position p) throws ArrayIndexOutOfBoundsException {
+      try {
+        levelPlane[p.getRow()][p.getCol()] = "*";
+      }
+      catch (ArrayIndexOutOfBoundsException e) {
+        throw new ArrayIndexOutOfBoundsException("Given coordinate for key is beyond bounds of the room.");
+      }
+
+    }
+
+    // adds the exit on the levelPlane based on the given position
+    public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
+      try{
+        levelPlane[p.getRow()][p.getCol()] = "●";
+      }
+      catch (ArrayIndexOutOfBoundsException e) {
+        throw new ArrayIndexOutOfBoundsException("Given coordinate for exit is beyond bounds of the room.");
+      }
+
+    }
+
     // returns the position of the key tile in the level
     public Position getKeyPositionInLevel() {
       for (int i = 0; i < levelNumOfRows; i++) {
@@ -262,18 +284,16 @@ import java.util.*;
         return startAndEndRoomList;
     }
 
-    public void addKey() {
-      
-    }
-
-    public void addExit() {
-      
-    }
-
-
     // returns what kind of tile is at the given position
     public String getTileInLevel(Position tilePosition) {
       return levelPlane[tilePosition.getRow()][tilePosition.getCol()];
+    }
+
+    public boolean isTileTraversable(Position tile) {
+      if (getTileInLevel(tile).equals(".") || getTileInLevel(tile).equals("P")) {
+        return false;
+      }
+      return true;
     }
 
     // expels the given player from the level

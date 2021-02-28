@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Game.Hallway;
 import Game.Level;
 import Game.Position;
 import Game.Room;
@@ -16,7 +17,7 @@ public class TestLevel {
     StringBuilder input_as_string = new StringBuilder();
     String text;
     Scanner scanner = new Scanner(System.in);
-    JSONArray output = new JSONArray();
+    JSONObject output = new JSONObject();
 
     while (scanner.hasNextLine()) {
       text = scanner.nextLine();
@@ -28,32 +29,40 @@ public class TestLevel {
       JSONArray jsonArrayInput = new JSONArray(input_as_string.toString());
       JSONObject levelObject = jsonArrayInput.getJSONObject(0);
       JSONArray pointObject = jsonArrayInput.getJSONArray(1);
+      Position point = new Position(pointObject.getInt(0), pointObject.getInt(1));
 
-      JSONArray rooms = levelObject.getJSONArray("rooms");
-      parseRoomObjects(rooms);
-
-      System.out.println(output);
+      Level level = new Level();
+      constructLevel(levelObject, level);
+      constructOutput(output, point, level);
     }
     catch (JSONException e) {
       System.out.println("Invalid input rendered: []");
     }
-
   }
 
-  private static void parseRoomObjects(JSONArray rooms) throws JSONException {
+  private static void constructLevel(JSONObject levelObject, Level level) throws JSONException {
+    // iterates through the JSONArray of rooms and sends each one to constructRoom method to be translated and added
+    JSONArray rooms = levelObject.getJSONArray("rooms");
     for (int i=0; i<rooms.length(); i++) {
-      String type = rooms.getJSONObject(i).getString("type");
-      if (type.equals("room")) {
-        output = typeIsRoom(levelObject, pointObject);
-      }
+      constructRoom(rooms.getJSONObject(i), level);
     }
+    // iterates through the JSONArray of hallways and sends each one to constructHallway to be translated and added
+    JSONArray hallways = levelObject.getJSONArray("hallways");
+    for (int i=0; i<hallways.length(); i++) {
+      constructHallway(hallways.getJSONObject(i), level);
+    }
+    // places the key and exit at their respective given positions
+    JSONArray objects = levelObject.getJSONArray("objects");
+    JSONArray keyPositionObject = objects.getJSONObject(0).getJSONArray("position");
+    Position keyPosition = new Position(keyPositionObject.getInt(0), keyPositionObject.getInt(1));
+    level.addKey(keyPosition);
 
+    JSONArray exitPositionObject = objects.getJSONObject(1).getJSONArray("position");
+    Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
+    level.addExit(exitPosition);
   }
 
-  public static JSONArray typeIsRoom(JSONObject roomToMake, JSONArray JSONpoint) throws JSONException {
-    Level level = new Level();
-
-    Position point = new Position(JSONpoint.getInt(0), JSONpoint.getInt(1));
+  public static void constructRoom(JSONObject roomToMake, Level level) throws JSONException {
     JSONArray origin = roomToMake.getJSONArray("origin");
     JSONObject bounds = roomToMake.getJSONObject("bounds");
     int rows = bounds.getInt("rows");
@@ -67,31 +76,101 @@ public class TestLevel {
     Room roomObj = new Room(extractedOrigin, rows, columns);
     roomObj.createRoomFromJSON(layout);
     level.addRoom(roomObj);
-
-    ArrayList<Position> adjacentTiles = level.getAllAdjacentTiles(point, roomObj);
-
-    JSONArray outputArray = new JSONArray();
-    if (adjacentTiles == null) {
-      outputArray.put("Failure: Point ");
-      outputArray.put(JSONpoint);
-      outputArray.put(" is not in room at ");
-      outputArray.put(origin);
-    }
-    else {
-      JSONArray innerArray = new JSONArray();
-      for (Position tile : adjacentTiles) {
-        JSONArray tempArray = new JSONArray();
-        tempArray.put(tile.getRow());
-        tempArray.put(tile.getCol());
-        innerArray.put(tempArray);
-      }
-      outputArray.put("Success: Traversable points from ");
-      outputArray.put(JSONpoint);
-      outputArray.put(" in room at ");
-      outputArray.put(origin);
-      outputArray.put(" are ");
-      outputArray.put(innerArray);
-    }
-    return outputArray;
   }
+
+  private static void constructHallway(JSONObject hallwayToMake, Level level) throws JSONException {
+    JSONArray from = hallwayToMake.getJSONArray("from");
+    JSONArray to = hallwayToMake.getJSONArray("to");
+    JSONArray waypoints = hallwayToMake.getJSONArray("waypoints");
+
+    Position fromPos = new Position(from.getInt(0), from.getInt(1));
+    Position toPos = new Position(to.getInt(0), to.getInt(1));
+    Hallway newHallway = new Hallway(fromPos, toPos);
+
+    for (int i=0; i<waypoints.length(); i++) {
+      int waypointRow = waypoints.getJSONArray(i).getInt(0);
+      int waypointCol = waypoints.getJSONArray(i).getInt(1);
+      Position waypoint = new Position(waypointRow, waypointCol);
+      newHallway.addAWaypoint(waypoint);
+    }
+    newHallway.connectHallwayWaypoints();
+    level.addHallway(newHallway);
+  }
+
+  private static void constructOutput(JSONObject output, Position point, Level level) throws JSONException {
+    output.put("traversable", level.isTileTraversable(point));
+
+    String object = "";
+    String tile = level.getTileInLevel(point);
+    switch (tile) {
+      case "*":
+        object = "key";
+        break;
+      case "●":
+      case "O":
+        object = "exit";
+        break;
+      default:
+        object = null;
+    }
+    output.put("object", object);
+
+    String type = "";
+    switch (tile) {
+      case "X":
+        type = "hallway";
+        break;
+      case "■":
+      case "|":
+        type = "room";
+        break;
+      default:
+        type = "void";
+    }
+    output.put("type", type);
+
+    // TODO: figure out how to get the Room or Hallway object from the given point and get
+    //       neighboring Room object origins
+
+  }
+
 }
+
+/*
+{
+  "rooms":
+        [
+                { "type" : "room",
+                  "origin" : [0, 1],
+                  "bounds" : { "rows" : 3,
+                               "columns" : 5 },
+                  "layout" : [ [0, 0, 2, 0, 0],
+                               [0, 1, 1, 1, 0],
+                               [0, 0, 2, 0, 0] ]
+                },
+                { "type" : "room",
+                  "origin" : [0, 1],
+                  "bounds" : { "rows" : 3,
+                               "columns" : 5 },
+                  "layout" : [ [0, 0, 2, 0, 0],
+                               [0, 1, 1, 1, 0],
+                               [0, 0, 2, 0, 0]]
+                }
+        ],
+        "hallways": [
+                { "from": (point), "to": (point),"waypoints": (point-list)},
+                { "from": (point), "to": (point),"waypoints": (point-list)}
+                    ],
+        "objects": [ { "type": "key", "position": (point) },
+                     { "type": "exit", "position": (point) } ]
+        }
+ */
+
+  /*
+{
+  "traversable": (either true or false),
+  "object": (either "key", "exit", or null),
+  "type": (either "room", "hallway", or "void"),
+  "reachable": [[row, col], [row,col], ...] or []
+}
+ */
