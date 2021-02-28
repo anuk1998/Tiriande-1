@@ -3,8 +3,8 @@
 javac -cp ../../java-json.jar:../../bin -d ../../bin ../../src/Game/Adversary.java ../../src/Game/Player.java ../../src/Game/Hallway.java ../../src/Game/Position.java ../../src/Game/Room.java ../../src/Game/Level.java > NUL
 
 # make class file for testing suite, create jar file, then execute program
-javac -cp ../../java-json.jar:../../bin -d ../../bin ../../src/Level/TestingSuite.java > NUL
-jar cfm suite.jar ../../MANIFEST.MF -C ../../bin/ Level/TestingSuite.class
+javac -cp ../../java-json.jar:../../bin -d ../../bin ../../src/Room/TestRoom.java > NUL
+jar cfm suite.jar ../../MANIFEST.MF -C ../../bin/ Room/TestRoom.class
 java -jar ./suite.jar
 
 rm NUL

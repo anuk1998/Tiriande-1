@@ -111,10 +111,6 @@ public class Room {
                 listOfEdgePositions.add(tempPosCol);
             }
         }
-        //DEBUG PURPOSES ONLY
-//        for (Position edge : this.listOfEdgePositions) {
-//            System.out.println("(" + edge.getY() + ", " + edge.getX() + ")");
-//        }
     }
 
     public void addKey(Position p) throws ArrayIndexOutOfBoundsException {

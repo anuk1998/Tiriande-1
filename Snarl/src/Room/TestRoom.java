@@ -1,4 +1,4 @@
-package Level;
+package Room;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,7 +11,7 @@ import Game.Level;
 import Game.Position;
 import Game.Room;
 
-public class TestingSuite {
+public class TestRoom {
 
     public static void main(String[] args) throws JSONException {
         StringBuilder input_as_string = new StringBuilder();

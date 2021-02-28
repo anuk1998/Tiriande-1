@@ -33,6 +33,18 @@ public class Hallway {
         return this.endPosition;
     }
 
+
+    //This method creates a list of all waypoints and door points (start/end positions),
+    //then connects all the points in the Level plane in between that list using 'X's
+    //  e.g. <door/"|"> . . . . <waypoint-1 "X">
+    //                                .
+    //                                .
+    //                          <waypoint-2 "X"> . . . . <door/"|">
+    // Turns into a filled-in hallways with "X"s:
+    //            | X X X X X
+    //                      X
+    //                      X
+    //                      X X X X X |
     public void connectHallwayWaypoints() {
         ArrayList<Position> waypointsAndDoors = new ArrayList<Position>();
 
@@ -41,13 +53,6 @@ public class Hallway {
             waypointsAndDoors.add(wp);
         }
         waypointsAndDoors.add(this.endPosition);
-
-        // JUST FOR DEBUGGING
-        //System.out.println("About to print waypointsAndDoors");
-        //for (Position p : waypointsAndDoors) {
-        //    System.out.println("(" + p.getX() + ", " + p.getY() + ")");
-        //}
-        //////////////////////
 
         for (int i=1; i<waypointsAndDoors.size(); i++) {
             int tempRow1 = waypointsAndDoors.get(i).getRow();
@@ -81,14 +86,6 @@ public class Hallway {
                 }
             }
         }
-
-
-        // DEBUG PURPOSES ONLY
-        // System.out.println("ALLHALLWAYPOSITIONS::::::");
-        //for (Position p : allHallwayPositions) {
-        //    System.out.println("(" + p.getY() + ", " + p.getX() + ")");
-        //}
-        //////////////////////
 
     }
 

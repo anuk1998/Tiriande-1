@@ -4,11 +4,11 @@ public class Player {
     Position playerPosition;
     Room currentRoom;
     Level currentLevel;
-    int playerID;
+    int id;
     boolean isExpelled;
 
     public Player(int id) {
-        this.playerID = id;
+        this.id = id;
         boolean isExpelled = false;
     }
 

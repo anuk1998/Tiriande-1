@@ -40,6 +40,9 @@ import java.util.*;
           }
           roomRowIndex++;
         }
+        for (Position doorPos : r.getDoorPositions()) {
+          listOfDoorsInLevel.put(doorPos, r);
+        }
       }
       catch (ArrayIndexOutOfBoundsException e) {
         throw new ArrayIndexOutOfBoundsException("The given room dimensions are invalid.");
@@ -250,6 +253,23 @@ import java.util.*;
       }
       return false;
     }
+     public ArrayList<Room> startAndEndRooms(Hallway h) {
+        ArrayList<Room> startAndEndRoomList = new ArrayList<Room>();
+        Room startRoom = listOfDoorsInLevel.get(h.getStartPositionOfHallway());
+        Room endRoom = listOfDoorsInLevel.get(h.getEndPositionOfHallway());
+        startAndEndRoomList.add(startRoom);
+        startAndEndRoomList.add(endRoom);
+        return startAndEndRoomList;
+    }
+
+    public void addKey() {
+      
+    }
+
+    public void addExit() {
+      
+    }
+
 
     // returns what kind of tile is at the given position
     public String getTileInLevel(Position tilePosition) {
