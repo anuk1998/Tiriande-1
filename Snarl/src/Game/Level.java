@@ -1,7 +1,7 @@
 package Game;
 import java.util.*;
 
-  public class Level {
+public class Level {
     int levelNumOfRows;
     int levelNumOfCols;
     String[][] levelPlane;
@@ -13,6 +13,9 @@ import java.util.*;
     boolean playersWon;
     ArrayList<Position> listOfAllLevelPositions = new ArrayList<Position>();
     HashMap<Position, Room> listOfDoorsInLevel = new HashMap<Position, Room>();
+    Set<Hallway> listOfHallwaysInLevel = new HashSet<>();
+    HashMap<Position, ArrayList<Hallway>> roomsAndTheirHallways = new HashMap<Position, ArrayList<Hallway>>();
+    HashMap<Position, Room> positionsAndTheirRooms = new HashMap<>();
 
     public Level() {
       levelNumOfRows = 40;
@@ -33,16 +36,20 @@ import java.util.*;
         for (int i = startPosRow; i < startPosRow + roomRows; i++) {
           int roomColIndex = 0;
           for (int j = startPosCol; j < startPosCol + roomCols; j++) {
-            String tile = r.getTileInRoom(new Position(roomRowIndex, roomColIndex)); // may have to switch order
+            String tile = r.getTileInRoom(new Position(roomRowIndex, roomColIndex));
             levelPlane[i][j] = tile;
             this.allRooms.add(r);
+            this.positionsAndTheirRooms.put(new Position(i, j), r);
             roomColIndex++;
           }
           roomRowIndex++;
         }
+        System.out.println(r.getDoorPositions());
         for (Position doorPos : r.getDoorPositions()) {
-          listOfDoorsInLevel.put(doorPos, r);
+          this.listOfDoorsInLevel.put(doorPos, r);
         }
+        this.allRooms.add(r);
+        this.roomsAndTheirHallways.put(r.getRoomOriginInLevel(), new ArrayList<>());
       }
       catch (ArrayIndexOutOfBoundsException e) {
         throw new ArrayIndexOutOfBoundsException("The given room dimensions are invalid.");
@@ -51,9 +58,36 @@ import java.util.*;
 
     // adds a hallway to the levelPlane 2D array
     public void addHallway(Hallway hallway) {
+      listOfHallwaysInLevel.add(hallway);
       for (Position hallwayPos : hallway.getAllHallwayPositions()) {
         this.levelPlane[hallwayPos.getRow()][hallwayPos.getCol()] = "X";
       }
+      // adds that hallway to its room's list of connected hallways
+      for (Room r : startAndEndRooms(hallway)) {
+        System.out.println(r.getRoomOriginInLevel());
+        this.roomsAndTheirHallways.get(r.getRoomOriginInLevel()).add(hallway);
+      }
+    }
+
+    public ArrayList<Hallway> getConnectedHallways(Room r) {
+      return this.roomsAndTheirHallways.get(r);
+    }
+
+    public Room getBelongingRoom(Position p) {
+      return this.positionsAndTheirRooms.get(p);
+    }
+
+    // returns the Hallway that the given point belongs to
+    public Hallway getHallwayFromPoint(Position p) {
+      Hallway hallway = null;
+      for (Hallway h : this.listOfHallwaysInLevel) {
+        for (Position pos : h.getAllHallwayPositions()) {
+          if (p == pos) {
+            hallway = h;
+          }
+        }
+      }
+      return hallway;
     }
 
     public ArrayList<Position> getAllAdjacentTiles(Position pos, Room room) {
@@ -144,10 +178,32 @@ import java.util.*;
       for (int i = 0; i < this.levelNumOfRows; i++) {
         for (int j = 0; j < this.levelNumOfCols; j++) {
           this.levelPlane[i][j] = ".";
-          Position tempPos = new Position(i, j); // may need to revert this to (i, j)
+          Position tempPos = new Position(i, j);
           listOfAllLevelPositions.add(tempPos);
         }
       }
+    }
+
+    // adds the key on the levelPlane based on the given position
+    public void addKey(Position p) throws ArrayIndexOutOfBoundsException {
+      try {
+        levelPlane[p.getRow()][p.getCol()] = "*";
+      }
+      catch (ArrayIndexOutOfBoundsException e) {
+        throw new ArrayIndexOutOfBoundsException("Given coordinate for key is beyond bounds of the room.");
+      }
+
+    }
+
+    // adds the exit on the levelPlane based on the given position
+    public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
+      try{
+        levelPlane[p.getRow()][p.getCol()] = "●";
+      }
+      catch (ArrayIndexOutOfBoundsException e) {
+        throw new ArrayIndexOutOfBoundsException("Given coordinate for exit is beyond bounds of the room.");
+      }
+
     }
 
     // returns the position of the key tile in the level
@@ -254,26 +310,27 @@ import java.util.*;
       return false;
     }
      public ArrayList<Room> startAndEndRooms(Hallway h) {
+      System.out.println(this.listOfDoorsInLevel);
         ArrayList<Room> startAndEndRoomList = new ArrayList<Room>();
+        /////// STARTROOM IS NULL, NOT GETTING THE RIGHT KEY IN HASHMAP, SOMETHING TO DO WITH EQUALS? HASHCHODE?
         Room startRoom = listOfDoorsInLevel.get(h.getStartPositionOfHallway());
+        System.out.println(startRoom);
         Room endRoom = listOfDoorsInLevel.get(h.getEndPositionOfHallway());
         startAndEndRoomList.add(startRoom);
         startAndEndRoomList.add(endRoom);
         return startAndEndRoomList;
     }
 
-    public void addKey() {
-      
-    }
-
-    public void addExit() {
-      
-    }
-
-
     // returns what kind of tile is at the given position
     public String getTileInLevel(Position tilePosition) {
       return levelPlane[tilePosition.getRow()][tilePosition.getCol()];
+    }
+
+    public boolean isTileTraversable(Position tile) {
+      if (getTileInLevel(tile).equals(".") || getTileInLevel(tile).equals("P")) {
+        return false;
+      }
+      return true;
     }
 
     // expels the given player from the level
