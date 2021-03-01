@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/Snarl/foo</output-path>
     <root id="archive" name="suite.jar">
       <element id="directory" name="META-INF">
-        <element id="file-copy" path="$PROJECT_DIR$/Snarl/MANIFEST.MF" />
+        <element id="file-copy" path="$PROJECT_DIR$/Snarl/MANIFESTROOM.MF" />
       </element>
       <element id="module-output" name="traveller-client" />
       <element id="module-output" name="A2" />

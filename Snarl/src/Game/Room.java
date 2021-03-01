@@ -72,6 +72,7 @@ public class Room {
                     this.room[i][j] = "■";
                 } else if (num == 2) {
                     this.room[i][j] = "|";
+                    this.listOfDoorsInRoom.add(new Position(i, j));
                 } else {
                     // do something, invalid number
                 }

@@ -40,6 +40,7 @@ public class TestLevel {
     }
   }
 
+  // builds the level image based on the given JSON input
   private static void constructLevel(JSONObject levelObject, Level level) throws JSONException {
     // iterates through the JSONArray of rooms and sends each one to constructRoom method to be translated and added
     JSONArray rooms = levelObject.getJSONArray("rooms");
@@ -62,6 +63,7 @@ public class TestLevel {
     level.addExit(exitPosition);
   }
 
+  // builds each room JSON object into our Room representation
   public static void constructRoom(JSONObject roomToMake, Level level) throws JSONException {
     JSONArray origin = roomToMake.getJSONArray("origin");
     JSONObject bounds = roomToMake.getJSONObject("bounds");
@@ -78,6 +80,7 @@ public class TestLevel {
     level.addRoom(roomObj);
   }
 
+  // builds each hallway JSON object into our Hallway representation
   private static void constructHallway(JSONObject hallwayToMake, Level level) throws JSONException {
     JSONArray from = hallwayToMake.getJSONArray("from");
     JSONArray to = hallwayToMake.getJSONArray("to");
@@ -97,6 +100,7 @@ public class TestLevel {
     level.addHallway(newHallway);
   }
 
+  // builds the JSON output for the program
   private static void constructOutput(JSONObject output, Position point, Level level) throws JSONException {
     output.put("traversable", level.isTileTraversable(point));
 
@@ -120,8 +124,8 @@ public class TestLevel {
       case "X":
         type = "hallway";
         break;
-      case "■":
       case "|":
+      case "■":
         type = "room";
         break;
       default:
@@ -129,9 +133,35 @@ public class TestLevel {
     }
     output.put("type", type);
 
-    // TODO: figure out how to get the Room or Hallway object from the given point and get
-    //       neighboring Room object origins
-
+    JSONArray reachableArray = new JSONArray();
+    if (type.equals("hallway")) {
+      Hallway hallway = level.getHallwayFromPoint(point);
+      ArrayList<Room> attachedRooms = level.startAndEndRooms(hallway);
+      for (Room r : attachedRooms) {
+        JSONArray innerArray = new JSONArray();
+        innerArray.put(r.getRoomOriginInLevel().getRow());
+        innerArray.put(r.getRoomOriginInLevel().getCol());
+        reachableArray.put(innerArray);
+      }
+    }
+    else if (type.equals("room")) {
+      Room room = level.getBelongingRoom(point);
+      ArrayList<Hallway> connectedHallways = level.getConnectedHallways(room);
+      for (Hallway h : connectedHallways) {
+        JSONArray innerArray = new JSONArray();
+        Room start = level.startAndEndRooms(h).get(0);
+        Room end = level.startAndEndRooms(h).get(1);
+        if (start.getRoomOriginInLevel().equals(room.getRoomOriginInLevel())) {
+          innerArray.put(end.getRoomOriginInLevel().getRow());
+          innerArray.put(end.getRoomOriginInLevel().getCol());
+        } else {
+          innerArray.put(start.getRoomOriginInLevel().getRow());
+          innerArray.put(start.getRoomOriginInLevel().getCol());
+        }
+        reachableArray.put(innerArray);
+      }
+    }
+    output.put("reachable", reachableArray);
   }
 
 }

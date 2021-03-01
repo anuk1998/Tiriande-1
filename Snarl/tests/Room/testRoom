@@ -4,7 +4,7 @@ javac -cp ../../java-json.jar:../../bin -d ../../bin ../../src/Game/Adversary.ja
 
 # make class file for testing suite, create jar file, then execute program
 javac -cp ../../java-json.jar:../../bin -d ../../bin ../../src/Room/TestRoom.java > NUL
-jar cfm suite.jar ../../MANIFEST.MF -C ../../bin/ Room/TestRoom.class
+jar cfm suite.jar ../../MANIFESTROOM.MF -C ../../bin/ Room/TestRoom.class
 java -jar ./suite.jar
 
 rm NUL
