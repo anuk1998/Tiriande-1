@@ -162,6 +162,7 @@ public class TestLevel {
       }
     }
     output.put("reachable", reachableArray);
+    System.out.println(output);
   }
 
 }

@@ -67,7 +67,7 @@ public class Room {
             for (int j = 0; j < innerArray.length(); j++) {
                 int num = innerArray.getInt(j);
                 if (num == 0) {
-                    this.room[i][j] = ".";
+                    this.room[i][j] = "#";
                 } else if (num == 1) {
                     this.room[i][j] = "■";
                 } else if (num == 2) {

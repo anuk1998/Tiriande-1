@@ -12,10 +12,10 @@ public class Level {
     Set<Adversary> adversaries = new HashSet<Adversary>();
     boolean playersWon;
     ArrayList<Position> listOfAllLevelPositions = new ArrayList<Position>();
-    HashMap<Position, Room> listOfDoorsInLevel = new HashMap<Position, Room>();
+    HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
     Set<Hallway> listOfHallwaysInLevel = new HashSet<>();
-    HashMap<Position, ArrayList<Hallway>> roomsAndTheirHallways = new HashMap<Position, ArrayList<Hallway>>();
-    HashMap<Position, Room> positionsAndTheirRooms = new HashMap<>();
+    HashMap<String, ArrayList<Hallway>> roomsAndTheirHallways = new HashMap<String, ArrayList<Hallway>>();
+    HashMap<String, Room> positionsAndTheirRooms = new HashMap<>();
 
     public Level() {
       levelNumOfRows = 40;
@@ -39,17 +39,18 @@ public class Level {
             String tile = r.getTileInRoom(new Position(roomRowIndex, roomColIndex));
             levelPlane[i][j] = tile;
             this.allRooms.add(r);
-            this.positionsAndTheirRooms.put(new Position(i, j), r);
+            this.positionsAndTheirRooms.put(new Position(i, j).toString(), r);
             roomColIndex++;
           }
           roomRowIndex++;
         }
-        System.out.println(r.getDoorPositions());
         for (Position doorPos : r.getDoorPositions()) {
-          this.listOfDoorsInLevel.put(doorPos, r);
+          Position scaledPos = new Position(doorPos.getRow() + r.getRoomOriginInLevel().getRow(),
+                  doorPos.getCol() + r.getRoomOriginInLevel().getCol());
+          this.listOfDoorsInLevel.put(scaledPos.toString(), r);
         }
         this.allRooms.add(r);
-        this.roomsAndTheirHallways.put(r.getRoomOriginInLevel(), new ArrayList<>());
+        this.roomsAndTheirHallways.put(r.getRoomOriginInLevel().toString(), new ArrayList<>());
       }
       catch (ArrayIndexOutOfBoundsException e) {
         throw new ArrayIndexOutOfBoundsException("The given room dimensions are invalid.");
@@ -64,17 +65,16 @@ public class Level {
       }
       // adds that hallway to its room's list of connected hallways
       for (Room r : startAndEndRooms(hallway)) {
-        System.out.println(r.getRoomOriginInLevel());
-        this.roomsAndTheirHallways.get(r.getRoomOriginInLevel()).add(hallway);
+        this.roomsAndTheirHallways.get(r.getRoomOriginInLevel().toString()).add(hallway);
       }
     }
 
     public ArrayList<Hallway> getConnectedHallways(Room r) {
-      return this.roomsAndTheirHallways.get(r);
+      return this.roomsAndTheirHallways.get(r.getRoomOriginInLevel().toString());
     }
 
     public Room getBelongingRoom(Position p) {
-      return this.positionsAndTheirRooms.get(p);
+      return this.positionsAndTheirRooms.get(p.toString());
     }
 
     // returns the Hallway that the given point belongs to
@@ -309,16 +309,13 @@ public class Level {
       }
       return false;
     }
-     public ArrayList<Room> startAndEndRooms(Hallway h) {
-      System.out.println(this.listOfDoorsInLevel);
-        ArrayList<Room> startAndEndRoomList = new ArrayList<Room>();
-        /////// STARTROOM IS NULL, NOT GETTING THE RIGHT KEY IN HASHMAP, SOMETHING TO DO WITH EQUALS? HASHCHODE?
-        Room startRoom = listOfDoorsInLevel.get(h.getStartPositionOfHallway());
-        System.out.println(startRoom);
-        Room endRoom = listOfDoorsInLevel.get(h.getEndPositionOfHallway());
-        startAndEndRoomList.add(startRoom);
-        startAndEndRoomList.add(endRoom);
-        return startAndEndRoomList;
+    public ArrayList<Room> startAndEndRooms(Hallway h) {
+      ArrayList<Room> startAndEndRoomList = new ArrayList<Room>();
+      Room startRoom = listOfDoorsInLevel.get(h.getStartPositionOfHallway().toString());
+      Room endRoom = listOfDoorsInLevel.get(h.getEndPositionOfHallway().toString());
+      startAndEndRoomList.add(startRoom);
+      startAndEndRoomList.add(endRoom);
+      return startAndEndRoomList;
     }
 
     // returns what kind of tile is at the given position
