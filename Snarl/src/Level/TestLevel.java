@@ -3,6 +3,7 @@ package Level;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONString;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -117,7 +118,13 @@ public class TestLevel {
       default:
         object = null;
     }
-    output.put("object", object);
+
+    if (object == null) {
+      output.put("object", JSONObject.NULL);
+    }
+    else {
+      output.put("object", object);
+    }
 
     String type = "";
     switch (tile) {
