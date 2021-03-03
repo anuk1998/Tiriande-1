@@ -1,1 +1,54 @@
-//add a test here where the given point in [(level), (point)] is a key tile
+[
+  {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [3, 2],
+        "bounds" : { "rows" : 2,
+          "columns" : 2 },
+        "layout" : [
+          [1, 2],
+          [0, 1]
+
+        ]
+      },
+      { "type" : "room",
+        "origin" : [6, 7],
+        "bounds" : { "rows" : 2,
+          "columns" : 3 },
+        "layout" : [
+          [1, 2, 1],
+          [2, 0, 1]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [11, 4],
+        "bounds" : { "rows" : 3,
+          "columns" : 2 },
+        "layout" : [
+          [0, 2],
+          [0, 1],
+          [1, 1]
+        ]
+      }
+
+    ],
+    "hallways": [
+      {
+        "from": [3, 3],
+        "to": [6, 8],
+        "waypoints": [[3, 8]]
+      },
+      {
+        "from": [7, 7],
+        "to": [11, 5],
+        "waypoints": [[7, 5]]
+      }
+
+    ],
+    "objects": [
+      { "type": "key", "position": [6, 9] },
+      { "type": "exit", "position": [13, 4] }
+    ]
+  },
+  [6, 9]
+]

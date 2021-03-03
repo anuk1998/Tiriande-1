@@ -1,0 +1,23 @@
+[
+  {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [8, 4],
+        "bounds" : { "rows" : 5,
+          "columns" : 5 },
+        "layout" : [ [0, 0, 2, 0, 0],
+          [0, 1, 1, 1, 2],
+          [0, 1, 1, 1, 0],
+          [0, 1, 1, 1, 0],
+          [0, 2, 0, 0, 0]
+        ]
+      }
+    ],
+    "hallways": [],
+    "objects": [
+      { "type": "key", "position": [10, 5] },
+      { "type": "exit", "position": [10, 6] }
+    ]
+  },
+  [10, 5]
+]

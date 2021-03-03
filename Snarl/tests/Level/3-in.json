@@ -1,1 +1,39 @@
-//add a test here where the given point in [(level), (point)] is a door tile
+[
+  {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [3, 2],
+        "bounds" : { "rows" : 3,
+          "columns" : 4 },
+        "layout" : [
+          [1, 0, 1, 1],
+          [1, 1, 1, 2],
+          [0, 0, 1, 1]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [7, 12],
+        "bounds" : { "rows" : 4,
+          "columns" : 4 },
+        "layout" : [
+          [0, 0, 1, 0],
+          [0, 1, 1, 2],
+          [0, 1, 1, 1],
+          [0, 1, 1, 1]
+        ]
+      }
+    ],
+    "hallways": [
+      {
+        "from": [4, 5],
+        "to": [8, 15],
+        "waypoints": [[4, 16], [8, 16]]
+      }
+    ],
+    "objects": [
+      { "type": "key", "position": [9, 13] },
+      { "type": "exit", "position": [4, 3] }
+    ]
+  },
+  [8, 15]
+]

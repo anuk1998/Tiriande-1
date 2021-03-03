@@ -1,1 +1,40 @@
-//add a test here where the given point in [(level), (point)] is a grid/void/nothing tile
+[
+  {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [4, 0],
+        "bounds" : { "rows" : 6,
+          "columns" : 3 },
+        "layout" : [
+          [0, 2, 1],
+          [0, 1, 1],
+          [0, 0, 1],
+          [1, 1, 1],
+          [1, 1, 0],
+          [1, 1, 0]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [16, 14],
+        "bounds" : { "rows" : 2,
+          "columns" : 3 },
+        "layout" : [
+          [2, 0, 0],
+          [1, 1, 1]
+        ]
+      }
+    ],
+    "hallways": [
+      {
+        "from": [4, 1],
+        "to": [16, 14],
+        "waypoints": [[2, 1], [2, 14]]
+      }
+    ],
+    "objects": [
+      { "type": "key", "position": [8, 0] },
+      { "type": "exit", "position": [17, 16] }
+    ]
+  },
+  [15, 9]
+]

@@ -1,1 +1,42 @@
-//add a test here where the given point in [(level), (point)] is a wall tile
+[
+  {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [3, 2],
+        "bounds" : { "rows" : 3,
+          "columns" : 6 },
+        "layout" : [
+          [0, 1, 1, 2, 1, 1],
+          [0, 1, 1, 1, 1, 1],
+          [0, 0, 0, 1, 1, 0]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [9, 5],
+        "bounds" : { "rows" : 7,
+          "columns" : 2 },
+        "layout" : [
+          [1, 1],
+          [0, 1],
+          [0, 1],
+          [1, 1],
+          [1, 0],
+          [1, 1],
+          [1, 2]
+        ]
+      }
+    ],
+    "hallways": [
+      {
+        "from": [3, 5],
+        "to": [15, 6],
+        "waypoints": [[2, 5], [2, 8], [15, 8]]
+      }
+    ],
+    "objects": [
+      { "type": "key", "position": [4, 4] },
+      { "type": "exit", "position": [14, 5] }
+    ]
+  },
+  [5, 7]
+]

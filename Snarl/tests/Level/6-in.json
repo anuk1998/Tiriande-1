@@ -1,1 +1,39 @@
-//add a test here where the given point in [(level), (point)] is a exit tile
+[
+  {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [7, 1],
+        "bounds" : { "rows" : 4,
+          "columns" : 5 },
+        "layout" : [
+          [0, 1, 1, 1, 0],
+          [0, 1, 1, 1, 0],
+          [0, 1, 0, 1, 1],
+          [0, 0, 0, 2, 1]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [2, 10],
+        "bounds" : { "rows" : 3,
+          "columns" : 3 },
+        "layout" : [
+          [0, 0, 1],
+          [1, 0, 1],
+          [2, 1, 1]
+        ]
+      }
+    ],
+    "hallways": [
+      {
+        "from": [4, 10],
+        "to": [10, 4],
+        "waypoints": [[12, 10], [12, 4]]
+      }
+    ],
+    "objects": [
+      { "type": "key", "position": [9, 2] },
+      { "type": "exit", "position": [2, 12] }
+    ]
+  },
+  [2, 12]
+]

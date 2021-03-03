@@ -82,7 +82,7 @@ public class Level {
       Hallway hallway = null;
       for (Hallway h : this.listOfHallwaysInLevel) {
         for (Position pos : h.getAllHallwayPositions()) {
-          if (p == pos) {
+          if (p.equals(pos)) {
             hallway = h;
           }
         }
@@ -324,7 +324,8 @@ public class Level {
     }
 
     public boolean isTileTraversable(Position tile) {
-      if (getTileInLevel(tile).equals(".") || getTileInLevel(tile).equals("P")) {
+      if (getTileInLevel(tile).equals(".") || getTileInLevel(tile).equals("#") ||
+              getTileInLevel(tile).equals("P")) {
         return false;
       }
       return true;
