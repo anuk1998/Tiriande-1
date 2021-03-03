@@ -135,6 +135,7 @@ public class TestLevel {
           innerArray.put(r.getRoomOriginInLevel().getCol());
           reachableArray.put(innerArray);
         }
+        break;
       case "room":
         Room room = level.getBelongingRoom(point);
         ArrayList<Hallway> connectedHallways = level.getConnectedHallways(room);
@@ -153,6 +154,7 @@ public class TestLevel {
           }
           reachableArray.put(innerArray);
         }
+        break;
     }
     output.put("reachable", reachableArray);
   }
