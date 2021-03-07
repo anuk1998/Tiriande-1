@@ -30,10 +30,10 @@ class LevelTesting {
   static Hallway h6 = new Hallway(new Position(7, 25), new Position(7,19));
   static Hallway h7 = new Hallway(new Position(28, 8), new Position(33, 27));
   static Hallway h8 = new Hallway(new Position(23, 24), new Position(30, 29));
-  static Player p1 = new Player(1);
-  static Player p2 = new Player(2);
-  static Player p3 = new Player(3);
-  static Player p4 = new Player(4);
+  static Player p1 = new Player("1");
+  static Player p2 = new Player("2");
+  static Player p3 = new Player("3");
+  static Player p4 = new Player("4");
   static Adversary a1 = new Adversary(1);
   static Adversary a2 = new Adversary(2);
 

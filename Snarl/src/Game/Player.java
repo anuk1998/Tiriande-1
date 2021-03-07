@@ -4,11 +4,11 @@ public class Player {
     Position playerPosition;
     Room currentRoom;
     Level currentLevel;
-    int id;
+    String name;
     boolean isExpelled;
 
-    public Player(int id) {
-        this.id = id;
+    public Player(String n) {
+        this.name = n;
         boolean isExpelled = false;
     }
 
