@@ -8,10 +8,9 @@ public class Level {
     LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
     Position keyLevelPosition;
     Position exitLevelPosition;
-    boolean isKeyFound = false;
     Set<Player> players = new HashSet<Player>();
     Set<Player> activePlayers = new HashSet<Player>();
-    Set<Adversary> adversaries = new HashSet<Adversary>();
+    Set<IAdversary> adversaries = new HashSet<IAdversary>();
     boolean playersWon;
     ArrayList<Position> listOfAllLevelPositions = new ArrayList<Position>();
     HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
@@ -136,12 +135,7 @@ public class Level {
     public int getLevelNumOfCols() {
       return this.levelNumOfCols;
     }
-
-    // gets the isKeyFound field
-    public boolean getIsKeyFound() {
-      return this.isKeyFound;
-    }
-
+    
     // gets the set of allRooms
     public LinkedHashSet<Room> getAllRooms() {
       return this.allRooms;
@@ -158,7 +152,7 @@ public class Level {
     }
 
     // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
-    public Set<Adversary> getAdversaries() {
+    public Set<IAdversary> getAdversaries() {
       return this.adversaries;
     }
 
@@ -167,10 +161,7 @@ public class Level {
       return this.playersWon;
     }
 
-    // sets the isKeyFound field to whatever given boolean
-    public void setIsKeyFound(boolean keyFound) {
-      this.isKeyFound = keyFound;
-    }
+    
 
     // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
     public void setPlayersWon(boolean won) {
@@ -246,7 +237,7 @@ public class Level {
     }
     // places new adversaries on the board at the given location if valid (will check validity
     //    when we implement RuleChecker interface)
-    public void addAdversary(Adversary a, Position placeLocation) {
+    public void addAdversary(IAdversary a, Position placeLocation) {
       if (isOccupiedByAdversary(placeLocation)) {
         // then do something
         System.out.println("Sorry, adversary is already in position (" + placeLocation.getRow() +
@@ -257,6 +248,15 @@ public class Level {
       this.adversaries.add(a);
     }
 
+    public void moveCharacter(ICharacter character, Position movePosition) {
+      if (character instanceof Player) {
+        movePlayer((Player) character, movePosition);
+      }
+      else if (character instanceof IAdversary) {
+        moveAdversary((IAdversary) character, movePosition);
+      }
+    }
+
     // Moves existing player to the given position if valid, will be checking validity in later milestone
     public void movePlayer(Player p, Position movePosition) {
       this.levelPlane[p.getPlayerPosition().getRow()][p.getPlayerPosition().getCol()] = "■";
@@ -265,7 +265,7 @@ public class Level {
     }
 
     // Moves an existing adversary to the given position if valid, will be checking validity in later milestone
-    public void moveAdversary(Adversary a, Position movePosition) {
+    public void moveAdversary(IAdversary a, Position movePosition) {
       this.levelPlane[a.getAdversaryPosition().getRow()][a.getAdversaryPosition().getCol()] = "■";
       this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "A";
       a.setAdversaryPosition(movePosition);
@@ -306,6 +306,15 @@ public class Level {
         return false;
       }
       return true;
+    }
+    
+    public Player playerAtGivenPosition(Position p) {
+      for (Player player : this.activePlayers) {
+        if (player.getPlayerPosition().toString().equals(p.toString())) {
+          return player;
+        }
+      }
+      return null;
     }
 
     // expels the given player from the level

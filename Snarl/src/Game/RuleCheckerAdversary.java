@@ -1,6 +1,10 @@
 package Game;
 
 public class RuleCheckerAdversary implements IRuleChecker {
+    
+    public RuleCheckerAdversary(Level currentLevel, IAdversary adversary) {
+        
+    }
     @Override
     public GameStatus runRuleChecker(Position destination) {
         return null;

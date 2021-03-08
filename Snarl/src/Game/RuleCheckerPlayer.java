@@ -72,18 +72,17 @@ public class RuleCheckerPlayer implements IRuleChecker {
     }
 
     private GameStatus keyTileIsLandedOn() {
-        currentLevel.setIsKeyFound(true);
         return GameStatus.KEY_FOUND;
     }
 
     private GameStatus exitTileIsLandedOn() {
       if (isExitUnlocked()) {
-          if (isLastLevel()) {
-              return GameStatus.GAME_WON;
-          }
-          return GameStatus.LEVEL_WON;
+        if (isLastLevel()) {
+            return GameStatus.GAME_WON;
+        }
+        return GameStatus.LEVEL_WON;
       }
-        return GameStatus.VALID;
+      return GameStatus.VALID;
     }
 
     private boolean isExitUnlocked() {
@@ -103,7 +102,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
         if (currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.GAME_LOST;
         }
-        return GameStatus.PLAYER_DIES;
+        return GameStatus.PLAYER_SELF_ELIMINATES;
     }
 
 }
