@@ -1,26 +1,27 @@
 package Game;
 
-public class Adversary {
+public class Ghost implements IAdversary{
     Position advPosition;
     Room currentRoom;
     int adversaryID;
     boolean isExpelled;
 
-    public Adversary(int id) {
+    public Ghost(int id) {
         this.isExpelled = false;
     }
-
-    // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
-    void expelPlayer(boolean expel) {
-
-    }
     
-    void setAdversaryPosition(Position p) {
+    @Override
+    public void expelPlayer(boolean expel) {
+        
+    }
+
+    @Override
+    public void setAdversaryPosition(Position p) {
         this.advPosition = p;
     }
-    
+
+    @Override
     public Position getAdversaryPosition() {
         return this.advPosition;
     }
-
 }

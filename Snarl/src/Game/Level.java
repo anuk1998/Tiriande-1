@@ -6,6 +6,8 @@ public class Level {
     int levelNumOfCols;
     String[][] levelPlane;
     LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
+    Position keyLevelPosition;
+    Position exitLevelPosition;
     boolean isKeyFound = false;
     Set<Player> players = new HashSet<Player>();
     Set<Player> activePlayers = new HashSet<Player>();
@@ -94,11 +96,14 @@ public class Level {
       ArrayList<Position> adjacentTiles = new ArrayList<Position>();
       int row = pos.getRow();
       int col = pos.getCol();
-      int scaledRow = row - room.getRoomOriginInLevel().getRow();
-      int scaledCol = col - room.getRoomOriginInLevel().getCol();
 
-      if (scaledRow >= room.getNumOfRows() || scaledCol >= room.getNumOfCols()) {
-        return null;
+      if (room != null) {
+        int scaledRow = row - room.getRoomOriginInLevel().getRow();
+        int scaledCol = col - room.getRoomOriginInLevel().getCol();
+
+        if (scaledRow >= room.getNumOfRows() || scaledCol >= room.getNumOfCols()) {
+          return null;
+        }
       }
 
       Position[] adjacentsToCheck = {
@@ -110,7 +115,7 @@ public class Level {
       for (Position adjacentTile : adjacentsToCheck) {
         try {
           String tile = this.levelPlane[adjacentTile.getRow()][adjacentTile.getCol()];
-          if (tile.equals("■") || tile.equals("|")) {
+          if (tile.equals("■") || tile.equals("|") || tile.equals("X")) {
             adjacentTiles.add(adjacentTile);
           }
         }
@@ -123,12 +128,12 @@ public class Level {
     }
 
     // gets the levelNumOfRows field
-    public int getLevelWidth() {
+    public int getLevelNumOfRows() {
       return this.levelNumOfRows;
     }
 
     // gets the levelNumOfCols field
-    public int getLevelHeight() {
+    public int getLevelNumOfCols() {
       return this.levelNumOfCols;
     }
 
@@ -188,6 +193,7 @@ public class Level {
     public void addKey(Position p) throws ArrayIndexOutOfBoundsException {
       try {
         levelPlane[p.getRow()][p.getCol()] = "*";
+        keyLevelPosition = new Position(p.getRow(), p.getCol());
       }
       catch (ArrayIndexOutOfBoundsException e) {
         throw new ArrayIndexOutOfBoundsException("Given coordinate for key is beyond bounds of the room.");
@@ -199,6 +205,7 @@ public class Level {
     public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
       try{
         levelPlane[p.getRow()][p.getCol()] = "●";
+        exitLevelPosition = new Position(p.getRow(), p.getCol());
       }
       catch (ArrayIndexOutOfBoundsException e) {
         throw new ArrayIndexOutOfBoundsException("Given coordinate for exit is beyond bounds of the room.");
@@ -208,26 +215,12 @@ public class Level {
 
     // returns the position of the key tile in the level
     public Position getKeyPositionInLevel() {
-      for (int i = 0; i < levelNumOfRows; i++) {
-        for (int j = 0; j < levelNumOfCols; j++) {
-          if (levelPlane[i][j].equals("*")) {
-            return new Position(i, j);
-          }
-        }
-      }
-      return null;
+      return this.keyLevelPosition;
     }
 
     // returns the position of the exit tile in the level
     public Position getExitPositionInLevel() {
-      for (int i = 0; i < levelNumOfRows; i++) {
-        for (int j = 0; j < levelNumOfCols; j++) {
-          if (levelPlane[i][j].equals("●") || levelPlane[i][j].equals("O")) {
-            return new Position(i, j);
-          }
-        }
-      }
-      return null;
+      return this.exitLevelPosition;
     }
 
     // changes a closed exit tile to an open exit tile when the key is found by a player
@@ -267,10 +260,6 @@ public class Level {
     // Moves existing player to the given position if valid, will be checking validity in later milestone
     public void movePlayer(Player p, Position movePosition) {
       this.levelPlane[p.getPlayerPosition().getRow()][p.getPlayerPosition().getCol()] = "■";
-      if (movePosition.equals(getKeyPositionInLevel())) {
-        this.isKeyFound = true;
-        openExitTile();
-      }
       this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "P";
       p.setPlayerPosition(movePosition);
     }
@@ -278,34 +267,22 @@ public class Level {
     // Moves an existing adversary to the given position if valid, will be checking validity in later milestone
     public void moveAdversary(Adversary a, Position movePosition) {
       this.levelPlane[a.getAdversaryPosition().getRow()][a.getAdversaryPosition().getCol()] = "■";
-      if (movePosition.equals(getKeyPositionInLevel())) {
-        this.isKeyFound = true;
-        openExitTile();
-      }
       this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "A";
       a.setAdversaryPosition(movePosition);
     }
 
     // checks if the given position on the levelPlane already has a player on it
     public boolean isOccupiedByPlayer(Position p) {
-      for (int i = 0; i < levelNumOfRows; i++) {
-        for (int j = 0; j < levelNumOfCols; j++) {
-          if (levelPlane[p.getRow()][p.getCol()].equals("P")) {
-            return true;
-          }
-        }
+      if (levelPlane[p.getRow()][p.getCol()].equals("P")) {
+        return true;
       }
       return false;
     }
 
     // checks if the given position on the levelPlane has an adversary on it
     public boolean isOccupiedByAdversary(Position p) {
-      for (int i = 0; i < levelNumOfRows; i++) {
-        for (int j = 0; j < levelNumOfCols; j++) {
-          if (levelPlane[p.getRow()][p.getCol()].equals("A")) {
-            return true;
-          }
-        }
+      if (levelPlane[p.getRow()][p.getCol()].equals("A")) {
+        return true;
       }
       return false;
     }

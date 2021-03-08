@@ -1,6 +1,6 @@
 package Game;
 
-public class Player {
+public class Player implements ICharacter{
     Position playerPosition;
     Room currentRoom;
     Level currentLevel;
