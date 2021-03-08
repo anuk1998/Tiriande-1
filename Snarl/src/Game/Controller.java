@@ -5,6 +5,6 @@ public class Controller {
 
     public String getMoveFromUser() {
         Scanner s = new Scanner(System.in);
-
+        return "";
     }
 }

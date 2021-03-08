@@ -235,6 +235,7 @@ public class Level {
         this.activePlayers.add(player);
       }
     }
+
     // places new adversaries on the board at the given location if valid (will check validity
     //    when we implement RuleChecker interface)
     public void addAdversary(IAdversary a, Position placeLocation) {
