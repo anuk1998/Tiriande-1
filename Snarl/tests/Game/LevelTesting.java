@@ -1,11 +1,4 @@
-package GameTest;
-
-import Game.Adversary;
-import Game.Hallway;
-import Game.Level;
-import Game.Player;
-import Game.Position;
-import Game.Room;
+package Game;
 
 import org.junit.Test;
 
@@ -34,8 +27,8 @@ class LevelTesting {
   static Player p2 = new Player("2");
   static Player p3 = new Player("3");
   static Player p4 = new Player("4");
-  static Adversary a1 = new Adversary(1);
-  static Adversary a2 = new Adversary(2);
+  static IAdversary a1 = new Ghost("Scary Ghost");
+  static IAdversary a2 = new Zombie("Weird Zombie");
 
 
   public static void main(String[] args) throws Exception {

@@ -540,10 +540,6 @@ class LevelGenerated {
       randomDoor2 = doorsKeySetList.get(randomDoor2Index);
     }
 
-
-
-
-
   }
 
   public String renderLevel() {

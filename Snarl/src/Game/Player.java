@@ -2,23 +2,12 @@ package Game;
 
 public class Player implements ICharacter{
     Position playerPosition;
-    Room currentRoom;
-    Level currentLevel;
     String name;
     boolean isExpelled;
 
     public Player(String n) {
         this.name = n;
         boolean isExpelled = false;
-    }
-
-
-    public void setPlayerPosition(Position p) {
-        this.playerPosition = p;
-    }
-
-    public Position getPlayerPosition() {
-        return this.playerPosition;
     }
 
     public void setIsExpelled(boolean expel) {
@@ -29,7 +18,19 @@ public class Player implements ICharacter{
         return this.isExpelled;
     }
 
+    @Override
+    public String getName() {
+        return this.name;
+    }
 
+    @Override
+    public Position getCharacterPosition() {
+        return this.playerPosition;
+    }
 
+    @Override
+    public void setCharacterPosition(Position p) {
+        this.playerPosition = p;
+    }
 }
 

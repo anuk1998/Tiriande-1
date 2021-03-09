@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Set;
 
 public class Room {
@@ -12,7 +13,7 @@ public class Room {
     int numOfRows;
     int numOfCols;
     Set<Player> playersInRoom;
-    Set<Adversary> adversariesInRoom;
+    Set<IAdversary> adversariesInRoom;
     ArrayList<Position> listOfAllPositions = new ArrayList<Position>();
     ArrayList<Position> listOfEdgePositions = new ArrayList<Position>();
     ArrayList<Position> listOfDoorsInRoom = new ArrayList<Position>();
@@ -156,22 +157,6 @@ public class Room {
         return null;
     }
 
-    /*
-    public ArrayList<Position> getTilePosition(int row, int col) {
-        ArrayList<Position> tilePositions = new ArrayList<Position>();
-
-        for (int i = 0; i < this.numOfRows; i++) {
-            for (int j = 0; j < this.numOfCols; j++) {
-                if (room[i][j].equals("■")) {
-                    tilePositions.add(new Position(i, j));
-
-                }
-            }
-        }
-        return tilePositions;
-    }
-     */
-
     public ArrayList<Position> getDoorPositions() {
         return this.listOfDoorsInRoom;
     }
@@ -186,6 +171,25 @@ public class Room {
             }
         }
         return null;
+    }
+
+    public Position placeCharacterInRandomLocation(ICharacter c) {
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(listOfAllPositions.size());
+        Position randomPos = listOfAllPositions.get(randomIndex);
+        String tile = this.room[randomPos.getRow()][randomPos.getCol()];
+
+        while (tile.equals("#") || tile.equals("*") || tile.equals("O")
+                || tile.equals("●") || tile.equals("P") || tile.equals("A")) {
+            randomIndex = rand.nextInt(listOfAllPositions.size());
+            randomPos = listOfAllPositions.get(randomIndex);
+            tile = this.room[randomPos.getRow()][randomPos.getCol()];
+        }
+        Position randomStartPosInRoom = new Position(this.roomPositionInLevel.getRow() + randomPos.getRow(),
+                this.roomPositionInLevel.getCol() + randomPos.getCol());
+
+        c.setCharacterPosition(randomStartPosInRoom);
+        return randomStartPosInRoom;
     }
 
 

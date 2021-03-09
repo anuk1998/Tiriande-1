@@ -161,8 +161,6 @@ public class Level {
       return this.playersWon;
     }
 
-    
-
     // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
     public void setPlayersWon(boolean won) {
       this.playersWon = won;
@@ -201,7 +199,6 @@ public class Level {
       catch (ArrayIndexOutOfBoundsException e) {
         throw new ArrayIndexOutOfBoundsException("Given coordinate for exit is beyond bounds of the room.");
       }
-
     }
 
     // returns the position of the key tile in the level
@@ -230,7 +227,7 @@ public class Level {
       }
       else {
         levelPlane[placeLocation.getRow()][placeLocation.getCol()] = "P";
-        player.setPlayerPosition(placeLocation);
+        player.setCharacterPosition(placeLocation);
         this.players.add(player);
         this.activePlayers.add(player);
       }
@@ -245,8 +242,17 @@ public class Level {
                 ", " + placeLocation.getCol() + "). Try going somewhere else.");
       }
       levelPlane[placeLocation.getRow()][placeLocation.getCol()] = "A";
-      a.setAdversaryPosition(placeLocation);
+      a.setCharacterPosition(placeLocation);
       this.adversaries.add(a);
+    }
+
+    public Position pickRandomPositionForCharacter(ICharacter character) {
+      Random rand = new Random();
+      int randomIndex = rand.nextInt(allRooms.size());
+      ArrayList<Room> allRoomsList = new ArrayList<>(allRooms);
+      Room randomRoom = allRoomsList.get(randomIndex);
+
+      return randomRoom.placeCharacterInRandomLocation(character);
     }
 
     public void moveCharacter(ICharacter character, Position movePosition) {
@@ -260,16 +266,16 @@ public class Level {
 
     // Moves existing player to the given position if valid, will be checking validity in later milestone
     public void movePlayer(Player p, Position movePosition) {
-      this.levelPlane[p.getPlayerPosition().getRow()][p.getPlayerPosition().getCol()] = "■";
+      this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = "■";
       this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "P";
-      p.setPlayerPosition(movePosition);
+      p.setCharacterPosition(movePosition);
     }
 
     // Moves an existing adversary to the given position if valid, will be checking validity in later milestone
     public void moveAdversary(IAdversary a, Position movePosition) {
-      this.levelPlane[a.getAdversaryPosition().getRow()][a.getAdversaryPosition().getCol()] = "■";
+      this.levelPlane[a.getCharacterPosition().getRow()][a.getCharacterPosition().getCol()] = "■";
       this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "A";
-      a.setAdversaryPosition(movePosition);
+      a.setCharacterPosition(movePosition);
     }
 
     // checks if the given position on the levelPlane already has a player on it
@@ -311,7 +317,7 @@ public class Level {
     
     public Player playerAtGivenPosition(Position p) {
       for (Player player : this.activePlayers) {
-        if (player.getPlayerPosition().toString().equals(p.toString())) {
+        if (player.getCharacterPosition().toString().equals(p.toString())) {
           return player;
         }
       }
@@ -320,10 +326,16 @@ public class Level {
 
     // expels the given player from the level
     public void expelPlayer(Player p) {
-      this.levelPlane[p.getPlayerPosition().getRow()][p.getPlayerPosition().getCol()] = "A";
+      this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = "A";
       this.activePlayers.remove(p);
       p.setIsExpelled(true);
 
+    }
+
+    // method that handles when a player successfully passes through the exit
+    public void playerPassedThroughExit(ICharacter c) {
+      this.levelPlane[c.getCharacterPosition().getRow()][c.getCharacterPosition().getCol()] = "O";
+      this.getActivePlayers().remove(c);
     }
 
     // draws the levelPlane
@@ -341,6 +353,6 @@ public class Level {
       return levelASCII.toString();
     }
 
-  }
+}
 
 
