@@ -27,7 +27,7 @@ public class GameManager {
             broadcastTurn(character, playerIsActive);
             if (playerIsActive) {
                 Position requestedMove = getUserMove(character); // will be more legitimately implemented at a later milestone
-                GameStatus moveStatus = getGameStatusOfMove(character, requestedMove);
+                GameStatus moveStatus = callRuleChecker(character, requestedMove);
                 gameStillGoing = parseMoveStatusAndDoAction(moveStatus, requestedMove, character);
             }
             // check if we're on the last character in the list and if so, loop back to the beginning
@@ -40,24 +40,6 @@ public class GameManager {
         }
         System.out.println("Game has ended.");
         // add other game terminus actions once networking elements/client/scanner/etc elements are known
-    }
-
-    /**
-     * Calls the rule checker to retrieve the status of the game with the requested move.
-     * If the move is invalid, the user is asked for a new move until the status is not invalid.
-     *
-     * @param character the character whose turn it is
-     * @param requestedMove the requested destination by the user
-     * @return a non-invalid GameStatus for the requested move
-     */
-    public GameStatus getGameStatusOfMove(ICharacter character, Position requestedMove) {
-        GameStatus moveStatus = callRuleChecker(character, requestedMove);
-        while (moveStatus.equals(GameStatus.INVALID)) {
-            System.out.println("The move you requested was invalid, please make another move.");
-            requestedMove = getUserMove(character);
-            moveStatus = callRuleChecker(character, requestedMove);
-        }
-        return moveStatus;
     }
 
     /**
@@ -114,6 +96,7 @@ public class GameManager {
     /**
      * Renders the view for the given character before they request a move.
      * Currently only accounts for players, whose maximum tile view is 2 on all sides.
+     * Not implemented for Milestone 5, as per Piazza post @684
      *
      * @param character the character whose turn it is
      */

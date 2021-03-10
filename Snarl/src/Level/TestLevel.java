@@ -41,7 +41,7 @@ public class TestLevel {
   }
 
   // builds the level image based on the given JSON input
-  private static void constructLevel(JSONObject levelObject, Level level) throws JSONException {
+  public static void constructLevel(JSONObject levelObject, Level level) throws JSONException {
     // iterates through the JSONArray of rooms and sends each one to constructRoom method to be translated and added
     JSONArray rooms = levelObject.getJSONArray("rooms");
     for (int i=0; i<rooms.length(); i++) {
@@ -62,6 +62,8 @@ public class TestLevel {
     JSONArray exitPositionObject = objects.getJSONObject(1).getJSONArray("position");
     Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
     level.addExit(exitPosition);
+
+    System.out.println("HHyr");
   }
 
   // builds each room JSON object into our Room representation
