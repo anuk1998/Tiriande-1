@@ -220,12 +220,24 @@ public class GameManager {
      *
      * Not called anywhere for Milestone 5 because we don't know user entry point yet.
      */
-    public void registerAdversary(String name) {
-        IAdversary adversary = new Ghost(name);
-        this.allCharacters.add(adversary);
-        System.out.println("New adversary " + name + " has been registered.");
-        currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
+    public void registerAdversary(String name, String type) {
+
+        if (type.equalsIgnoreCase("Zombie")) {
+            IAdversary adversary = new Zombie(name);
+            this.allCharacters.add(adversary);
+            currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
+        }
+        else if(type.equalsIgnoreCase("Ghost")) {
+            IAdversary adversary = new Ghost(name);
+            this.allCharacters.add(adversary);
+            currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
+        }
+
+        System.out.println("New adversary " + name + " of type: " + type + " has been registered.");
+
     }
+
+
 
     public Level getCurrentLevel() {
         return this.currentLevel;
