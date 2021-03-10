@@ -11,6 +11,13 @@ public class RuleCheckerPlayer implements IRuleChecker {
         this.player = player;
     }
 
+
+    /**
+     * Returns a GameStatus based on the player's move to a destination Position
+     * Returns GameStatus.INVALID if move is not possible, GameStatus.VALID if possible, etc.
+     * @param destination
+     * @return GameStatus
+     */
     @Override
     public GameStatus runRuleChecker(Position destination) {
         GameStatus status = GameStatus.INVALID;
@@ -29,6 +36,11 @@ public class RuleCheckerPlayer implements IRuleChecker {
 
 
 
+    /**
+     * Determines whether a given destination Position is a valid move by a player
+     * @param destPoint
+     * @return true if the destination position is valid, false if not
+     */
     @Override
     public boolean isValidMove(Position destPoint) {
         boolean valid = false;
@@ -55,6 +67,11 @@ public class RuleCheckerPlayer implements IRuleChecker {
                 && destPoint.getCol() >= 0 && destPoint.getCol() < levelNumCols;
     }
 
+    /**
+     * Returns whether a destination position is 2 cardinal units away from the player's current position
+     * @param destPoint
+     * @return true if destPoint is 2 units away, false if not
+     */
     public boolean is2CardinalTilesAway(Position destPoint) {
         boolean withinReach = false;
         ArrayList<Position> cardinalTiles = new ArrayList<Position>();
@@ -74,10 +91,18 @@ public class RuleCheckerPlayer implements IRuleChecker {
         return withinReach;
     }
 
+    /**
+     * Returns the appropriate GameStatus for when a key tile is landed on
+     * @return GameStatus.KEY_FOUND
+     */
     private GameStatus keyTileIsLandedOn() {
         return GameStatus.KEY_FOUND;
     }
 
+    /**
+     * Returns the appropriate GameStatus for when a exit tile is landed on depending on whether it is locked or unlocked
+     * @return GameStatus
+     */
     private GameStatus exitTileIsLandedOn() {
       if (isExitUnlocked()) {
         if (isLastLevel()) {

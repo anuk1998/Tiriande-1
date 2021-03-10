@@ -1,10 +1,8 @@
 package Game;
 
 public class Ghost implements IAdversary{
-    Position ghostPosition;
-    Room currentRoom;
+    Position advPosition;
     String name;
-
 
     public Ghost(String name) {
         this.name = name;
@@ -12,7 +10,7 @@ public class Ghost implements IAdversary{
 
     @Override
     public void setAdversaryPosition(Position p) {
-        this.ghostPosition = p;
+        this.advPosition = p;
     }
 
     @Override
@@ -22,16 +20,17 @@ public class Ghost implements IAdversary{
 
     @Override
     public String getName() {
-        return null;
+        return this.name;
     }
 
     @Override
     public Position getCharacterPosition() {
-        return null;
+        return this.advPosition;
     }
 
     @Override
     public void setCharacterPosition(Position p) {
-
+        this.advPosition = p;
     }
+
 }

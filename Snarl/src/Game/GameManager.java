@@ -11,7 +11,7 @@ public class GameManager {
     Level currentLevel;
 
     public GameManager(ArrayList<Level> allLevels) {
-
+        this.currentLevel = allLevels.get(0);
     }
 
     /**
@@ -195,7 +195,6 @@ public class GameManager {
      * Not called anywhere for Milestone 5 because we don't know user entry point yet.
      */
     public void registerPlayer(String name) {
-
         if (allPlayers.containsKey(name)) {
             System.out.println("Cannot register Player with name `" + name + "`. Name already has been taken. Please pick again.");
         }
@@ -223,6 +222,10 @@ public class GameManager {
         System.out.println("New adversary " + name + " has been registered.");
         currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
     }
+
+    public Level getCurrentLevel() {
+        return this.currentLevel;
+    }
 }
 
 // TO DO
@@ -230,3 +233,6 @@ public class GameManager {
 // 3) request moves from players/users
 // 4) decide where a level is coming from
 // 5) registering different types of adversaries
+
+// 3) Register players to the game
+// 4) Add Javadocs to all methods

@@ -1,38 +1,26 @@
 package Game;
 
 public class Zombie implements IAdversary {
-    Position zombiePosition;
-    Room currentRoom;
+    Position advPosition;
     String name;
 
     public Zombie(String name) {
         this.name = name;
     }
 
-
-
-    @Override
-    public void setAdversaryPosition(Position p) {
-        this.zombiePosition = p;
-    }
-
-    @Override
-    public Position getAdversaryPosition() {
-        return null;
-    }
-
     @Override
     public String getName() {
-        return null;
+        return this.name;
     }
 
     @Override
     public Position getCharacterPosition() {
-        return null;
+        return this.advPosition;
     }
 
     @Override
     public void setCharacterPosition(Position p) {
-
+      this.advPosition = p;
     }
 }
+

@@ -349,12 +349,12 @@ class LevelTesting {
   }
 
   @Test
-  public static void testgetLevelWidth() {
+  public static void testgetLevelRows() {
     assertEquals(40, level1.getLevelNumOfRows());
   }
 
   @Test
-  public static void testgetLevelHeight() {
+  public static void testgetLevelCols() {
     assertEquals(40, level1.getLevelNumOfCols());
   }
 
