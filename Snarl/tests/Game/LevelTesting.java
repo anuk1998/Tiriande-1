@@ -358,10 +358,7 @@ class LevelTesting {
     assertEquals(40, level1.getLevelNumOfCols());
   }
 
-  @Test
-  public static void testgetLevelCols() {
-    assertEquals(40, level1.getLevelNumOfCols());
-  }
+
 
   @Test
   public static void testRoomGetNumOfCols() {

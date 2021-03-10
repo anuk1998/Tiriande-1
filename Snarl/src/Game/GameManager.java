@@ -84,7 +84,7 @@ public class GameManager {
     public GameStatus callRuleChecker(ICharacter character, Position requestedMove) {
         GameStatus moveStatus = GameStatus.DEFAULT;
         if (character instanceof Player) {
-            System.out.println(character.getCharacterPosition());
+            System.out.println("Player " + character.getName() + " position in callRuleChecker: " + character.getCharacterPosition());
             RuleCheckerPlayer rcPlayer = new RuleCheckerPlayer(currentLevel, (Player)character);
             moveStatus = rcPlayer.runRuleChecker(requestedMove);
         }

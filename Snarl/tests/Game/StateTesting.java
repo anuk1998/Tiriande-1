@@ -42,10 +42,10 @@ public class StateTesting {
     listOfLevels.add(level1);
     gm = new GameManager(listOfLevels);
     //register players and add them to the board
-    //gm.registerPlayer(p5.getName());
-    //gm.registerPlayer(p6.getName());
-    //gm.registerPlayer(p7.getName());
-    //gm.registerPlayer(p8.getName());
+    gm.registerPlayer(p5.getName());
+    gm.registerPlayer(p6.getName());
+    gm.registerPlayer(p7.getName());
+    gm.registerPlayer(p8.getName());
 
     //register adversaries and add them to the board
     //gm.registerAdversary(ghost.getName());
@@ -53,17 +53,20 @@ public class StateTesting {
 
     //start game
     //gm.startGame();
-   //testGetGameStatusOfMove();
-   testis2CardinalTilesAway();
+
+      testis2CardinalTilesAway();
+    testGetGameStatusOfMove();
+
     testisOnLevelPlane();
     testIsValidMove();
     testRunRuleCheckerPlayer();
-      testCallRuleCheckerPlayer();
+    testCallRuleCheckerPlayer();
 
   }
 
   @Test
   public static void testGetGameStatusOfMove() {
+      System.out.println("p1's position: " + p1.getCharacterPosition());
     assertEquals(GameStatus.VALID, gm.getGameStatusOfMove(p1, new Position (5,6)));
   }
 
@@ -81,6 +84,7 @@ public class StateTesting {
 
   @Test public static void testis2CardinalTilesAway() {
       RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, p1);
+      level1.addPlayer(p1, new Position (5,5));
       level1.addPlayer(p1, new Position (5,5));
       assertEquals(false, ruleCheckerp1.is2CardinalTilesAway(new Position (0,0)));
   }
@@ -101,11 +105,13 @@ public class StateTesting {
     room1.addDoor(new Position(2, 9));
     room1.addDoor(new Position(7, 6));
 
-    room4.addKey(new Position(3, 2));
+    //adding key and exit
+    level1.addKey(new Position(5, 27));
+    level1.addExit(new Position(17, 18));
 
     //Room 2
     room2.addDoor(new Position(0, 0));
-    room2.addExit(new Position(2, 3));
+
     room2.addDoor(new Position(6, 0));
     room2.addDoor(new Position(8, 9));
 

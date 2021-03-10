@@ -15,7 +15,7 @@ public class Ghost implements IAdversary{
 
     @Override
     public Position getAdversaryPosition() {
-        return null;
+        return this.advPosition;
     }
 
     @Override
@@ -25,12 +25,12 @@ public class Ghost implements IAdversary{
 
     @Override
     public Position getCharacterPosition() {
-        return this.advPosition;
+        return null;
     }
 
     @Override
     public void setCharacterPosition(Position p) {
-        this.advPosition = p;
+
     }
 
 }
