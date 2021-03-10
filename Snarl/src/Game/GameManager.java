@@ -10,9 +10,8 @@ public class GameManager {
     ArrayList<Level> allLevels = new ArrayList<Level>();
     Level currentLevel;
 
-    public GameManager() {
-        Controller controller = new Controller();
-        startGame();
+    public GameManager(ArrayList<Level> allLevels) {
+
     }
 
     /**
@@ -196,6 +195,7 @@ public class GameManager {
      * Not called anywhere for Milestone 5 because we don't know user entry point yet.
      */
     public void registerPlayer(String name) {
+
         if (allPlayers.containsKey(name)) {
             System.out.println("Cannot register Player with name `" + name + "`. Name already has been taken. Please pick again.");
         }
@@ -203,7 +203,8 @@ public class GameManager {
             Player newPlayer = new Player(name);
             allPlayers.put(name, newPlayer);
             allCharacters.add(newPlayer);
-            currentLevel.addPlayer(newPlayer, currentLevel.pickRandomPositionForCharacter(newPlayer));
+            Position randomPos = currentLevel.pickRandomPositionForCharacter(newPlayer);
+            currentLevel.addPlayer(newPlayer, randomPos);
             System.out.println("Player " + name + " has been registered.");
         }
         else {
@@ -228,3 +229,4 @@ public class GameManager {
 // 2) update players on changes to the game state as they happen
 // 3) request moves from players/users
 // 4) decide where a level is coming from
+// 5) registering different types of adversaries

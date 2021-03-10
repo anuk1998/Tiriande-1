@@ -27,10 +27,13 @@ public class StateTesting {
   static Player p2 = new Player("Rob");
   static Player p3 = new Player("Jane");
   static Player p4 = new Player("Alice");
+  static Player p5 = new Player("hehe");
+  static Player p6 = new Player("hoho");
+  static Player p7 = new Player("lala");
+  static Player p8 = new Player("booboo");
   static IAdversary ghost = new Ghost("Scary Ghost");
-  static IAdversary zombie = new Zombie("Weird Zombie");
+  static IAdversary ghosty = new Ghost("Weird Ghost");
   static ArrayList<Level> listOfLevels = new ArrayList<Level>();
-
  static GameManager gm;
 
   public static void main(String[] args) {
@@ -38,28 +41,34 @@ public class StateTesting {
   listOfLevels.add(level1);
     gm = new GameManager(listOfLevels);
     //register players and add them to the board
-    //gm.registerPlayer(p1.getName());
-    //gm.registerPlayer(p2.getName());
-    //gm.registerPlayer(p3.getName());
-    //gm.registerPlayer(p4.getName());
+    //gm.registerPlayer(p5.getName());
+    //gm.registerPlayer(p6.getName());
+    //gm.registerPlayer(p7.getName());
+    //gm.registerPlayer(p8.getName());
 
     //register adversaries and add them to the board
-    gm.registerAdversary(ghost.getName());
-    gm.registerAdversary(zombie.getName());
+    //gm.registerAdversary(ghost.getName());
+    //gm.registerAdversary(ghosty.getName());
 
     //start game
     //gm.startGame();
    //testGetGameStatusOfMove();
-    testis2CardinalTilesAway();
+   testis2CardinalTilesAway();
     testisOnLevelPlane();
     testIsValidMove();
     testRunRuleCheckerPlayer();
+      testCallRuleCheckerPlayer();
 
   }
 
   @Test
   public static void testGetGameStatusOfMove() {
-    assertEquals(GameStatus.VALID, gm.getGameStatusOfMove(p1, new Position (0,0)));
+    assertEquals(GameStatus.VALID, gm.getGameStatusOfMove(p1, new Position (5,6)));
+  }
+
+  @Test
+  public static void testCallRuleCheckerPlayer() {
+      assertEquals(GameStatus.VALID, gm.callRuleChecker(p1, new Position (5,6)));
   }
 
   @Test

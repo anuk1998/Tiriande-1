@@ -65,7 +65,7 @@ class LevelTesting {
   }
 
   private static void testGetIsKeyFoundBefore() {
-    assertEquals(false, level1.getIsKeyFound());
+    assertEquals("*", level1.getTileInLevel(level1.getKeyPositionInLevel()));
   }
 
   private static void testGetExitTileInLevelAfterUnlocked() {
@@ -75,7 +75,7 @@ class LevelTesting {
   private static void createModifiedAfterObjectGameState() {
     System.out.println("MODIFIED AFTER OBJECT INTERACTION GAMESTATE:\n\n\n");
     //expels player 2 from board
-    level1.moveAdversary(a2, p4.getPlayerPosition());
+    level1.moveAdversary(a2, p4.getCharacterPosition());
     level1.expelPlayer(p4);
     // this moves player 2 to the key tile
     level1.movePlayer(p2, new Position(5, 27));
@@ -239,7 +239,7 @@ class LevelTesting {
 
   @Test
   public static void testGetIsKeyFound() {
-    assertEquals(true, level1.getIsKeyFound());
+    assertEquals("■", level1.getTileInLevel(level1.getKeyPositionInLevel()));
   }
 
   @Test
@@ -350,12 +350,12 @@ class LevelTesting {
 
   @Test
   public static void testgetLevelWidth() {
-    assertEquals(40, level1.getLevelWidth());
+    assertEquals(40, level1.getLevelNumOfRows());
   }
 
   @Test
   public static void testgetLevelHeight() {
-    assertEquals(40, level1.getLevelHeight());
+    assertEquals(40, level1.getLevelNumOfCols());
   }
 
   @Test

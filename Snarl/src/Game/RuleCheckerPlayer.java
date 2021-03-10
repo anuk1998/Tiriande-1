@@ -16,16 +16,18 @@ public class RuleCheckerPlayer implements IRuleChecker {
         GameStatus status = GameStatus.INVALID;
         if (isValidMove(destination)) {
             status = GameStatus.VALID;
-            if (currentLevel.isOccupiedByAdversary(destination)) {
+        }
+            else if (currentLevel.isOccupiedByAdversary(destination)) {
                 status = encountersOppositeCharacter();
             } else if (currentLevel.getKeyPositionInLevel().equals(destination)) {
                 status = keyTileIsLandedOn();
             } else if (currentLevel.getExitPositionInLevel().equals(destination)) {
                 status = exitTileIsLandedOn();
             }
-        }
         return status;
-    }
+        }
+
+
 
     @Override
     public boolean isValidMove(Position destPoint) {

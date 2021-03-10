@@ -249,6 +249,7 @@ public class Level {
     public Position pickRandomPositionForCharacter(ICharacter character) {
       Random rand = new Random();
       int randomIndex = rand.nextInt(allRooms.size());
+
       ArrayList<Room> allRoomsList = new ArrayList<>(allRooms);
       Room randomRoom = allRoomsList.get(randomIndex);
 

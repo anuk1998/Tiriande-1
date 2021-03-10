@@ -1,18 +1,19 @@
 package Game;
 
-public class Ghost implements IAdversary{
-    Position ghostPosition;
+public class Zombie implements IAdversary {
+    Position zombiePosition;
     Room currentRoom;
     String name;
 
-
-    public Ghost(String name) {
+    public Zombie(String name) {
         this.name = name;
     }
 
+
+
     @Override
     public void setAdversaryPosition(Position p) {
-        this.ghostPosition = p;
+        this.zombiePosition = p;
     }
 
     @Override
