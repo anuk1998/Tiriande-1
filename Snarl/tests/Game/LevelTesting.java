@@ -57,8 +57,8 @@ class LevelTesting {
     testGetDoorPositions();
     testGetTileInRoom();
     testgetAllRoomsInLevel();
-    testgetLevelHeight();
-    testgetLevelWidth();
+    testgetLevelRows();
+    testgetLevelCols();
     testRoomGetNumOfRows();
     testRoomGetNumOfCols();
     testGetRoomOriginInLevel();
@@ -351,6 +351,11 @@ class LevelTesting {
   @Test
   public static void testgetLevelRows() {
     assertEquals(40, level1.getLevelNumOfRows());
+  }
+
+  @Test
+  public static void testgetLevelCols() {
+    assertEquals(40, level1.getLevelNumOfCols());
   }
 
   @Test
