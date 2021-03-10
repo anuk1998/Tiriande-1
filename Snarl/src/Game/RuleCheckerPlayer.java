@@ -2,6 +2,7 @@ package Game;
 
 import java.util.ArrayList;
 
+
 public class RuleCheckerPlayer implements IRuleChecker {
     Level currentLevel;
     Player player;
@@ -10,6 +11,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
         this.currentLevel = currentLevel;
         this.player = player;
     }
+
 
 
     /**

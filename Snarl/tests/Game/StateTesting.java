@@ -95,6 +95,9 @@ public class StateTesting {
     assertEquals(true, ruleCheckerp2.isValidMove(new Position (5,8)));
   }
 
+
+
+
   @Test public static void testisOnLevelPlane() {
     RuleCheckerPlayer ruleCheckerp3 = new RuleCheckerPlayer(level1, p3);
     assertEquals(true, ruleCheckerp3.isOnLevelPlane(new Position(13,13)));

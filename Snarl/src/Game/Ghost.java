@@ -18,6 +18,7 @@ public class Ghost implements IAdversary{
         return this.advPosition;
     }
 
+
     @Override
     public String getName() {
         return this.name;

@@ -366,6 +366,7 @@ class LevelTesting {
     assertEquals(6, room3.getNumOfCols());
     assertEquals(7, room5.getNumOfCols());
   }
+  
 
   @Test
   public static void testRoomGetNumOfRows() {

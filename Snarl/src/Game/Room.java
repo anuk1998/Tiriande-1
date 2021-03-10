@@ -113,7 +113,9 @@ public class Room {
                 listOfEdgePositions.add(tempPosCol);
             }
         }
+
     }
+
 
     public void addKey(Position p) throws ArrayIndexOutOfBoundsException {
         try {

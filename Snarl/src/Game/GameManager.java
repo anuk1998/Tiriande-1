@@ -216,6 +216,8 @@ public class GameManager {
         if (allPlayers.containsKey(name)) {
             System.out.println("Cannot register Player with name `" + name + "`. Name already has been taken. Please pick again.");
         }
+
+
         else if (allPlayers.size() < 4) {
             System.out.println("registering a player by the name " + name);
             Player newPlayer = new Player(name);

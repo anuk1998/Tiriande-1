@@ -13,6 +13,7 @@ public class Zombie implements IAdversary {
         return this.name;
     }
 
+
     @Override
     public Position getCharacterPosition() {
         return null;

@@ -6,4 +6,5 @@ public interface IAdversary extends ICharacter {
     void setAdversaryPosition(Position p);
     Position getAdversaryPosition();
 
+
 }
