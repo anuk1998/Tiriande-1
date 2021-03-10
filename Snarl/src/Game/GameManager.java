@@ -21,6 +21,7 @@ public class GameManager {
         boolean gameStillGoing = true;
         int index = 0;
         while (gameStillGoing) {
+            System.out.println("all characters are: " + allCharacters);
             ICharacter character = (ICharacter)allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
             broadcastTurn(character, playerIsActive);
@@ -107,7 +108,7 @@ public class GameManager {
         else {
             System.out.print("Sorry, " + character.getName() + ", you're expelled. No move for you! Here's the view of your last position:");
         }
-        renderView(character);
+        System.out.println(callRenderView(character));
     }
 
     /**
@@ -116,8 +117,25 @@ public class GameManager {
      *
      * @param character the character whose turn it is
      */
-    private void renderView(ICharacter character) {
+    private String callRenderView(ICharacter character) {
+        //if (character instanceof )
+        return "";
     }
+    /*
+    public String renderLevel() {
+      StringBuilder levelASCII = new StringBuilder();
+      for (int i = 0; i < levelNumOfRows; i++) {
+        for (int j = 0; j < levelNumOfCols; j++) {
+          if (j == levelNumOfCols - 1) {
+            levelASCII.append(levelPlane[i][j] + "\n");
+          } else {
+            levelASCII.append(levelPlane[i][j] + " ");
+          }
+        }
+      }
+      return levelASCII.toString();
+    }
+     */
 
 
     /**
@@ -199,6 +217,7 @@ public class GameManager {
             System.out.println("Cannot register Player with name `" + name + "`. Name already has been taken. Please pick again.");
         }
         else if (allPlayers.size() < 4) {
+            System.out.println("registering a player by the name " + name);
             Player newPlayer = new Player(name);
             allPlayers.put(name, newPlayer);
             allCharacters.add(newPlayer);

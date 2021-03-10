@@ -253,7 +253,11 @@ public class Level {
       ArrayList<Room> allRoomsList = new ArrayList<>(allRooms);
       Room randomRoom = allRoomsList.get(randomIndex);
 
-      return randomRoom.placeCharacterInRandomLocation(character);
+
+     Position randomPos = randomRoom.placeCharacterInRandomLocation(character);
+     character.setCharacterPosition(randomPos);
+     System.out.println("character " + character.getName() + " pos in level's pick random pos function: " + character.getCharacterPosition());
+      return randomPos;
     }
 
     public void moveCharacter(ICharacter character, Position movePosition) {

@@ -38,7 +38,8 @@ public class StateTesting {
 
   public static void main(String[] args) {
     createInitialGameBoard();
-  listOfLevels.add(level1);
+    System.out.println(level1.renderLevel());
+    listOfLevels.add(level1);
     gm = new GameManager(listOfLevels);
     //register players and add them to the board
     //gm.registerPlayer(p5.getName());
