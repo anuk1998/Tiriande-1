@@ -1,0 +1,100 @@
+[ "Success", "Player ","Giselle", " exited.", {
+  "type": "state",
+  "level": {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [3, 1],
+        "bounds" : { "rows" : 2,
+          "columns" : 4 },
+        "layout" : [
+          [1, 1, 1, 2],
+          [2, 0, 0, 1]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [9, 3],
+        "bounds" : { "rows" : 5,
+          "columns" : 3 },
+        "layout" : [
+          [2, 1, 1],
+          [1, 0, 1],
+          [1, 0, 1],
+          [1, 0, 2],
+          [1, 1, 1]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [6, 11],
+        "bounds" : { "rows" : 4,
+          "columns" : 3 },
+        "layout" : [
+          [2, 1, 2],
+          [0, 1, 1],
+          [0, 1, 1],
+          [2, 1, 1]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [14, 12],
+        "bounds" : { "rows" : 2,
+          "columns" : 2 },
+        "layout" : [
+          [2, 1],
+          [0, 1]
+        ]
+      }
+
+    ],
+    "hallways": [
+      {
+        "from": [3, 4],
+        "to": [6, 13],
+        "waypoints": [[3, 13]]
+      },
+      {
+        "from": [4, 1],
+        "to": [9, 3],
+        "waypoints": [[9, 1]]
+      },
+      {
+        "from": [12, 5],
+        "to": [6, 11],
+        "waypoints": [[12, 7], [6,7]]
+      },
+      {
+        "from": [9, 11],
+        "to": [14, 12],
+        "waypoints": [[12, 11], [12,12]]
+      }
+    ],
+    "objects": [
+      { "type": "key", "position": [8, 13] },
+      { "type": "exit", "position": [15, 13] }
+    ]
+  },
+  "players": [
+    {
+      "type": "player",
+      "name": "Rob",
+      "position": [4, 4]
+    },
+    {
+      "type": "player",
+      "name": "Anu",
+      "position": [9, 13]
+    }
+  ],
+  "adversaries": [
+    {
+      "type": "ghost",
+      "name": "Casper",
+      "position": [9, 5]
+    },
+    {
+      "type": "zombie",
+      "name": "brain-eater",
+      "position": [7, 12]
+    }
+  ],
+  "exit-locked": false
+} ]

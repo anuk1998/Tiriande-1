@@ -63,7 +63,7 @@ public class TestState {
 
     addPlayersToLevel(playersArray, level);
     addAdversariesToLevel(adversariesArray, level);
-    System.out.println(level.renderLevel());
+    //System.out.println(level.renderLevel());
 
     // check if name exists in players
     if (checkIfPlayerExists(name, level)) {
@@ -73,7 +73,7 @@ public class TestState {
     else {
       JSONArray outputArray = new JSONArray();
       outputArray = outputPlayerDoesNotExistMessage(outputArray, name);
-      System.out.println(outputArray.toString(4));
+      System.out.println(outputArray.toString(2));
     }
   }
 
@@ -110,8 +110,7 @@ public class TestState {
     else {
       outputArray = outputInvalidMoveMessage(outputArray, pointObject);
     }
-    System.out.println("hiiii");
-    System.out.println(outputArray.toString(4));
+    System.out.println(outputArray.toString(2));
   }
 
   // TODO: see if this function and the one below can be abstracted -- lots of duplicate code
