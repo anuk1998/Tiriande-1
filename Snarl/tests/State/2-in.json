@@ -1,0 +1,70 @@
+[{
+  "type": "state",
+  "level": {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [1, 1],
+        "bounds" : { "rows" : 5,
+          "columns" : 5 },
+        "layout" : [
+          [0, 0, 2, 0, 0],
+          [0, 1, 1, 1, 2],
+          [0, 1, 1, 1, 0],
+          [0, 1, 1, 1, 0],
+          [0, 0, 0, 0, 0]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [2, 7],
+        "bounds" : { "rows" : 5,
+          "columns" : 6 },
+        "layout" : [
+          [0, 2, 0, 0, 0, 0],
+          [0, 1, 1, 1, 1, 0],
+          [0, 1, 1, 1, 1, 0],
+          [0, 1, 1, 1, 1, 2],
+          [0, 0, 0, 0, 0, 0]
+        ]
+      }
+    ],
+    "hallways": [
+      {
+        "from": [1, 3],
+        "to": [2, 8],
+        "waypoints": [[0, 3], [0, 8]]
+      },
+      {
+        "from": [2, 5],
+        "to": [5, 12],
+        "waypoints": [[2, 6], [8, 6], [8, 13], [5, 13]]
+      }
+    ],
+    "objects": [
+      { "type": "key", "position": [4, 9] },
+      { "type": "exit", "position": [2, 2] }
+    ]
+  },
+  "players": [
+    {
+      "type": "player",
+      "name": "Bob",
+      "position": [3, 2]
+    },
+    {
+      "type": "player",
+      "name": "Alice",
+      "position": [4, 11]
+    }
+  ],
+  "adversaries": [
+    {
+      "type": "zombie",
+      "name": "Frankenstein",
+      "position": [5, 10]
+    }
+  ],
+  "exit-locked": true
+},
+  "Alice",
+  [4,12]
+]

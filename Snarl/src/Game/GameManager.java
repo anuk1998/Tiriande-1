@@ -21,13 +21,12 @@ public class GameManager {
         boolean gameStillGoing = true;
         int index = 0;
         while (gameStillGoing) {
-            System.out.println("all characters are: " + allCharacters);
             ICharacter character = (ICharacter)allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
             broadcastTurn(character, playerIsActive);
             if (playerIsActive) {
                 Position requestedMove = getUserMove(character); // will be more legitimately implemented at a later milestone
-                GameStatus moveStatus = getGameStatusOfMove(character, requestedMove);
+                GameStatus moveStatus = callRuleChecker(character, requestedMove);
                 gameStillGoing = parseMoveStatusAndDoAction(moveStatus, requestedMove, character);
             }
             // check if we're on the last character in the list and if so, loop back to the beginning
@@ -40,24 +39,6 @@ public class GameManager {
         }
         System.out.println("Game has ended.");
         // add other game terminus actions once networking elements/client/scanner/etc elements are known
-    }
-
-    /**
-     * Calls the rule checker to retrieve the status of the game with the requested move.
-     * If the move is invalid, the user is asked for a new move until the status is not invalid.
-     *
-     * @param character the character whose turn it is
-     * @param requestedMove the requested destination by the user
-     * @return a non-invalid GameStatus for the requested move
-     */
-    public GameStatus getGameStatusOfMove(ICharacter character, Position requestedMove) {
-        GameStatus moveStatus = callRuleChecker(character, requestedMove);
-        while (moveStatus.equals(GameStatus.INVALID)) {
-            System.out.println("The move you requested was invalid, please make another move.");
-            requestedMove = getUserMove(character);
-            moveStatus = callRuleChecker(character, requestedMove);
-        }
-        return moveStatus;
     }
 
     /**
@@ -114,6 +95,7 @@ public class GameManager {
     /**
      * Renders the view for the given character before they request a move.
      * Currently only accounts for players, whose maximum tile view is 2 on all sides.
+     * Not implemented for Milestone 5, as per Piazza post @684
      *
      * @param character the character whose turn it is
      */
@@ -137,7 +119,6 @@ public class GameManager {
     }
      */
 
-
     /**
      * The purpose of this function is to collect the user's desired move position.
      * This function will be implemented at a later milestone.
@@ -156,10 +137,13 @@ public class GameManager {
      * @param c: the current character whose move it is
      * @return a boolean indicating if the game is still in play
      */
-    private boolean parseMoveStatusAndDoAction(GameStatus moveStatus, Position destination, ICharacter c) {
+    public boolean parseMoveStatusAndDoAction(GameStatus moveStatus, Position destination, ICharacter c) {
         switch (moveStatus) {
             case VALID:
                 currentLevel.moveCharacter(c, destination);
+                return true;
+            case INVALID:
+                System.out.println("Requested move was invalid. You miss your turn.");
                 return true;
             case KEY_FOUND:
                 currentLevel.moveCharacter(c, destination);
@@ -170,8 +154,8 @@ public class GameManager {
                 currentLevel.expelPlayer((Player) c);
                 return true;
             case PLAYER_EXPELLED:
-                currentLevel.moveCharacter(c, destination);
                 currentLevel.expelPlayer(currentLevel.playerAtGivenPosition(destination));
+                currentLevel.moveCharacter(c, destination);
                 return true;
             case PLAYER_EXITED:
                 currentLevel.moveCharacter(c, destination);
@@ -237,12 +221,24 @@ public class GameManager {
      *
      * Not called anywhere for Milestone 5 because we don't know user entry point yet.
      */
-    public void registerAdversary(String name) {
-        IAdversary adversary = new Ghost(name);
-        this.allCharacters.add(adversary);
-        System.out.println("New adversary " + name + " has been registered.");
-        currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
+    public void registerAdversary(String name, String type) {
+
+        if (type.equalsIgnoreCase("Zombie")) {
+            IAdversary adversary = new Zombie(name);
+            this.allCharacters.add(adversary);
+            currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
+        }
+        else if(type.equalsIgnoreCase("Ghost")) {
+            IAdversary adversary = new Ghost(name);
+            this.allCharacters.add(adversary);
+            currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
+        }
+
+        System.out.println("New adversary " + name + " of type: " + type + " has been registered.");
+
     }
+
+
 
     public Level getCurrentLevel() {
         return this.currentLevel;

@@ -32,7 +32,7 @@ public class StateTesting {
   static Player p7 = new Player("lala");
   static Player p8 = new Player("booboo");
   static IAdversary ghost = new Ghost("Scary Ghost");
-  static IAdversary ghosty = new Ghost("Weird Ghost");
+  static IAdversary zombie = new Ghost("Weird Zombie");
   static ArrayList<Level> listOfLevels = new ArrayList<Level>();
  static GameManager gm;
 
@@ -48,15 +48,13 @@ public class StateTesting {
     gm.registerPlayer(p8.getName());
 
     //register adversaries and add them to the board
-    //gm.registerAdversary(ghost.getName());
-    //gm.registerAdversary(ghosty.getName());
+    gm.registerAdversary(ghost.getName(), "ghost");
+    gm.registerAdversary(zombie.getName(), "zombie");
 
     //start game
     //gm.startGame();
 
-      testis2CardinalTilesAway();
-    testGetGameStatusOfMove();
-
+    testis2CardinalTilesAway();
     testisOnLevelPlane();
     testIsValidMove();
     testRunRuleCheckerPlayer();
@@ -64,11 +62,6 @@ public class StateTesting {
 
   }
 
-  @Test
-  public static void testGetGameStatusOfMove() {
-      System.out.println("p1's position: " + p1.getCharacterPosition());
-    assertEquals(GameStatus.VALID, gm.getGameStatusOfMove(p1, new Position (5,6)));
-  }
 
   @Test
   public static void testCallRuleCheckerPlayer() {
