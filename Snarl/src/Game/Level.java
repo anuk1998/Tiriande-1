@@ -11,8 +11,6 @@ public class Level {
     Set<Player> players = new HashSet<Player>();
     Set<Player> activePlayers = new HashSet<Player>();
     Set<IAdversary> adversaries = new HashSet<IAdversary>();
-    boolean playersWon;
-    ArrayList<Position> listOfAllLevelPositions = new ArrayList<Position>();
     HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
     Set<Hallway> listOfHallwaysInLevel = new HashSet<>();
     HashMap<String, ArrayList<Hallway>> roomsAndTheirHallways = new HashMap<String, ArrayList<Hallway>>();
@@ -156,24 +154,12 @@ public class Level {
       return this.adversaries;
     }
 
-    // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
-    public boolean getPlayersWon() {
-      return this.playersWon;
-    }
-
-    // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
-    public void setPlayersWon(boolean won) {
-      this.playersWon = won;
-    }
-
     // constructs the 2D String array of the level, populating all entries with '.'
     //    and constructs the set containing all level positions
     public void makeLevel() {
       for (int i = 0; i < this.levelNumOfRows; i++) {
         for (int j = 0; j < this.levelNumOfCols; j++) {
           this.levelPlane[i][j] = ".";
-          Position tempPos = new Position(i, j);
-          listOfAllLevelPositions.add(tempPos);
         }
       }
     }
@@ -187,13 +173,11 @@ public class Level {
       catch (ArrayIndexOutOfBoundsException e) {
         throw new ArrayIndexOutOfBoundsException("Given coordinate for key is beyond bounds of the room.");
       }
-
-
     }
 
     // adds the exit on the levelPlane based on the given position
     public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
-      try{
+      try {
         levelPlane[p.getRow()][p.getCol()] = "●";
         exitLevelPosition = new Position(p.getRow(), p.getCol());
       }
@@ -335,7 +319,6 @@ public class Level {
       this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = "A";
       this.activePlayers.remove(p);
       p.setIsExpelled(true);
-
     }
 
     // method that handles when a player successfully passes through the exit

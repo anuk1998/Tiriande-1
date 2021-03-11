@@ -21,7 +21,6 @@ public class GameManager {
         boolean gameStillGoing = true;
         int index = 0;
         while (gameStillGoing) {
-            System.out.println("all characters are: " + allCharacters);
             ICharacter character = (ICharacter)allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
             broadcastTurn(character, playerIsActive);
@@ -120,7 +119,6 @@ public class GameManager {
     }
      */
 
-
     /**
      * The purpose of this function is to collect the user's desired move position.
      * This function will be implemented at a later milestone.
@@ -139,10 +137,13 @@ public class GameManager {
      * @param c: the current character whose move it is
      * @return a boolean indicating if the game is still in play
      */
-    private boolean parseMoveStatusAndDoAction(GameStatus moveStatus, Position destination, ICharacter c) {
+    public boolean parseMoveStatusAndDoAction(GameStatus moveStatus, Position destination, ICharacter c) {
         switch (moveStatus) {
             case VALID:
                 currentLevel.moveCharacter(c, destination);
+                return true;
+            case INVALID:
+                System.out.println("Requested move was invalid. You miss your turn.");
                 return true;
             case KEY_FOUND:
                 currentLevel.moveCharacter(c, destination);
@@ -153,8 +154,8 @@ public class GameManager {
                 currentLevel.expelPlayer((Player) c);
                 return true;
             case PLAYER_EXPELLED:
-                currentLevel.moveCharacter(c, destination);
                 currentLevel.expelPlayer(currentLevel.playerAtGivenPosition(destination));
+                currentLevel.moveCharacter(c, destination);
                 return true;
             case PLAYER_EXITED:
                 currentLevel.moveCharacter(c, destination);

@@ -9,3 +9,4 @@ java -jar ./testState.jar
 
 rm NUL
 rm testState.jar
+rm -r ../../bin

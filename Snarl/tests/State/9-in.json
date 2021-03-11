@@ -81,7 +81,7 @@
     {
       "type": "player",
       "name": "Giselle",
-      "position": [11, 3]
+      "position": [3, 1]
     },
     {
       "type": "player",
@@ -103,6 +103,6 @@
   ],
   "exit-locked": true
 },
-  "Anu",
-  [8,13]
+  "Rob",
+  [3,6]
 ]

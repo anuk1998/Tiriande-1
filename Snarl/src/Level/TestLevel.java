@@ -62,8 +62,6 @@ public class TestLevel {
     JSONArray exitPositionObject = objects.getJSONObject(1).getJSONArray("position");
     Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
     level.addExit(exitPosition);
-
-    System.out.println("HHyr");
   }
 
   // builds each room JSON object into our Room representation
