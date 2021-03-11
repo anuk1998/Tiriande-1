@@ -38,6 +38,107 @@ public class TestState {
     }
   }
 
+  /**
+   * Takes the input from the scanner as a JSON Object and begins parsing it and converting it to
+   * a Level representation, following our data structures.
+   *
+   * @param jsonArrayInput the scanner input
+   * @throws JSONException thrown if the input is not valid JSON
+   */
+  private static void parseJSONAndConvertToLevel(JSONArray jsonArrayInput) throws JSONException {
+    JSONObject stateObject = jsonArrayInput.getJSONObject(0);
+    String name = jsonArrayInput.getString(1);
+    JSONArray pointObject = jsonArrayInput.getJSONArray(2);
+
+    JSONObject levelObject = stateObject.getJSONObject("level");
+    JSONArray playersArray = stateObject.getJSONArray("players");
+    JSONArray adversariesArray = stateObject.getJSONArray("adversaries");
+    boolean exitLocked = stateObject.getBoolean("exit-locked");
+
+    Level level = new Level();
+    TestLevel.constructLevel(levelObject, level);
+    if (!exitLocked) {
+      level.openExitTile();
+    }
+
+    addPlayersToLevel(playersArray, level);
+    addAdversariesToLevel(adversariesArray, level);
+    System.out.println(level.renderLevel());
+
+    // check if name exists in players
+    if (checkIfPlayerExists(name, level)) {
+      Player playerToBeMoved = getPlayerObjectFromName(name, level);
+      checkMoveValidity(playerToBeMoved, pointObject, level, stateObject);
+    }
+    else {
+      JSONArray outputArray = new JSONArray();
+      outputPlayerDoesNotExistMessage(outputArray, name);
+    }
+  }
+
+  private static void checkMoveValidity(Player player, JSONArray pointObject, Level level, JSONObject stateObject) throws JSONException {
+    // create a GameManager instance to be able to conduct various actions based on the type of move
+    ArrayList<Level> listOfOneLevel = new ArrayList<>();
+    listOfOneLevel.add(level);
+    GameManager gameManager = new GameManager(listOfOneLevel);
+    // convert given point destination to our Position data representation for parsing
+    Position point = new Position(pointObject.getInt(0), pointObject.getInt(1));
+    // initialize the resulting output array that will be passed through functions below to be added to
+    JSONArray outputArray = new JSONArray();
+
+    if (level.isTileTraversable(point)) {
+      String tile = level.getTileInLevel(point);
+      switch (tile) {
+        case "A":
+          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, point, player);
+          outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "ejected");
+          break;
+        case "O":
+          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_EXITED, point, player);
+          outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "exited");
+          break;
+        case "*":
+          gameManager.parseMoveStatusAndDoAction(GameStatus.KEY_FOUND, point, player);
+          outputRegularMoveMessage(outputArray, level, stateObject, false);
+          break;
+        default:
+          gameManager.parseMoveStatusAndDoAction(GameStatus.VALID, point, player);
+          outputRegularMoveMessage(outputArray, level, stateObject, true);
+      }
+    }
+    else {
+      outputInvalidMoveMessage(outputArray, pointObject);
+    }
+  }
+
+  // TODO: see if this function and the one below can be abstracted -- lots of duplicate code
+  private static Player getPlayerObjectFromName(String name, Level level) {
+    for (Player p: level.getActivePlayers()) {
+      if (p.getName().equals(name)) {
+        return p;
+      }
+    }
+    return null;
+  }
+
+
+  private static boolean checkIfPlayerExists(String name, Level level) {
+    for (Player p: level.getActivePlayers()) {
+      if (p.getName().equals(name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Iterates through the list of player objects and adds each of them to the level and creates
+   * them as Player objects.
+   *
+   * @param playersArray list of player JSON objects
+   * @param level the level instance that will be added to
+   * @throws JSONException thrown if there's malformed JSON
+   */
   private static void addPlayersToLevel(JSONArray playersArray, Level level) throws JSONException {
     for (int i=0; i<playersArray.length(); i++) {
       JSONObject playerObj = playersArray.getJSONObject(i);
