@@ -53,13 +53,24 @@ public class StateTesting {
 
     //start game
     //gm.startGame();
-
+    testRegisterAdversary();
+    testRegisterPlayer();
     testis2CardinalTilesAway();
     testisOnLevelPlane();
     testIsValidMove();
     testRunRuleCheckerPlayer();
     testCallRuleCheckerPlayer();
 
+  }
+
+  @Test
+  public static void testRegisterPlayer() {
+    assertEquals(4, level1.activePlayers.size());
+  }
+
+  @Test
+  public static void testRegisterAdversary() {
+    assertEquals(2, level1.getAdversaries().size());
   }
 
 
