@@ -72,7 +72,8 @@ public class TestState {
     }
     else {
       JSONArray outputArray = new JSONArray();
-      outputPlayerDoesNotExistMessage(outputArray, name);
+      outputArray = outputPlayerDoesNotExistMessage(outputArray, name);
+      System.out.println(outputArray.toString(4));
     }
   }
 
@@ -91,24 +92,26 @@ public class TestState {
       switch (tile) {
         case "A":
           gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, point, player);
-          outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "ejected");
+          outputArray = outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "ejected");
           break;
         case "O":
           gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_EXITED, point, player);
-          outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "exited");
+          outputArray = outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "exited");
           break;
         case "*":
           gameManager.parseMoveStatusAndDoAction(GameStatus.KEY_FOUND, point, player);
-          outputRegularMoveMessage(outputArray, level, stateObject, false);
+          outputArray = outputRegularMoveMessage(outputArray, level, stateObject, false);
           break;
         default:
           gameManager.parseMoveStatusAndDoAction(GameStatus.VALID, point, player);
-          outputRegularMoveMessage(outputArray, level, stateObject, true);
+          outputArray = outputRegularMoveMessage(outputArray, level, stateObject, true);
       }
     }
     else {
-      outputInvalidMoveMessage(outputArray, pointObject);
+      outputArray = outputInvalidMoveMessage(outputArray, pointObject);
     }
+    System.out.println("hiiii");
+    System.out.println(outputArray.toString(4));
   }
 
   // TODO: see if this function and the one below can be abstracted -- lots of duplicate code
@@ -176,23 +179,23 @@ public class TestState {
     }
   }
 
-  private static void outputPlayerDoesNotExistMessage(JSONArray outputArray, String name) {
+  private static JSONArray outputPlayerDoesNotExistMessage(JSONArray outputArray, String name) {
     outputArray.put("Failure");
     outputArray.put("Player");
     outputArray.put(name);
     outputArray.put("is not a part of the game.");
-    System.out.println(outputArray);
+    return outputArray;
   }
 
-  private static void outputInvalidMoveMessage(JSONArray outputArray, JSONArray pointObj) {
+  private static JSONArray outputInvalidMoveMessage(JSONArray outputArray, JSONArray pointObj) {
     outputArray.put("Failure");
     outputArray.put("The destination position ");
     outputArray.put(pointObj);
     outputArray.put(" is invalid.");
-    System.out.println(outputArray);
+    return outputArray;
   }
 
-  private static void outputPlayerEjectedOrExitedMessage(JSONArray outputArray, Player player, Level level, JSONObject stateObject, String status) throws JSONException {
+  private static JSONArray outputPlayerEjectedOrExitedMessage(JSONArray outputArray, Player player, Level level, JSONObject stateObject, String status) throws JSONException {
     boolean isLocked = true;
     String reason = status.equals("ejected") ? " was ejected." : " exited.";
     if (status.equals("exited")) {
@@ -205,14 +208,14 @@ public class TestState {
 
     outputArray.put(reason);
     outputArray.put(updatedState);
-    System.out.println(outputArray);
+    return outputArray;
   }
 
-  private static void outputRegularMoveMessage(JSONArray outputArray, Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
+  private static JSONArray outputRegularMoveMessage(JSONArray outputArray, Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
     JSONObject updatedState = updateStateObject(level, stateObject, isExitLocked);
     outputArray.put("Success");
     outputArray.put(updatedState);
-    System.out.println(outputArray);
+    return outputArray;
   }
 
   private static JSONObject updateStateObject(Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
