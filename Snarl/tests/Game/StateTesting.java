@@ -34,7 +34,6 @@ public class StateTesting {
 
   public static void main(String[] args) {
     createInitialGameBoard();
-    System.out.println(level1.renderLevel());
     listOfLevels.add(level1);
     gm = new GameManager(listOfLevels);
     //register players and add them to the board
@@ -114,32 +113,53 @@ public class StateTesting {
 
   @Test
   public static void testCallRuleCheckerPlayer() {
-      assertEquals(GameStatus.VALID, gm.callRuleChecker(p1, new Position (5,6)));
+    Player bob = level1.getPlayerObjectFromName("Bob");
+    bob.setCharacterPosition(new Position(4, 2));
+    assertEquals(GameStatus.VALID, gm.callRuleChecker(bob, new Position(4,3)));
+    assertEquals(GameStatus.INVALID, gm.callRuleChecker(level1.getPlayerObjectFromName("Santiago"), new Position(100,100)));
   }
 
   @Test
   public static void testRunRuleCheckerPlayer() {
-    RuleCheckerPlayer ruleCheckerp4 = new RuleCheckerPlayer(level1, p4);
-    level1.addPlayer(p4, new Position (3,3));
-    assertEquals(GameStatus.VALID, ruleCheckerp4.runRuleChecker((new Position(3,4))));
+    Player ruleChecker = new Player("ruleChecker444");
+    RuleCheckerPlayer ruleChecker444 = new RuleCheckerPlayer(level1, ruleChecker);
+    level1.addPlayer(ruleChecker, new Position (3,3));
+    assertEquals(GameStatus.VALID, ruleChecker444.runRuleChecker(new Position(3,4)));
   }
 
   @Test public static void testis2CardinalTilesAway() {
-      RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, p1);
-      level1.addPlayer(p1, new Position (5,5));
-      level1.addPlayer(p1, new Position (5,5));
+      RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, level1.getPlayerObjectFromName("Bob"));
+      level1.addPlayer(level1.getPlayerObjectFromName("Bob"), new Position (5,5));
       assertEquals(false, ruleCheckerp1.is2CardinalTilesAway(new Position (0,0)));
   }
 
   @Test public static void testIsValidMove() {
-    RuleCheckerPlayer ruleCheckerp2 = new RuleCheckerPlayer(level1, p2);
-    level1.addPlayer(p2, new Position (5,7));
-    assertEquals(true, ruleCheckerp2.isValidMove(new Position (5,8)));
+    Player validMover = new Player("ValidMover223");
+    RuleCheckerPlayer ruleCheckerValid = new RuleCheckerPlayer(level1, validMover);
+    level1.addPlayer(validMover, new Position (5,7));
+    assertEquals(true, ruleCheckerValid.isValidMove(new Position (5,8)));
+    assertEquals(false, ruleCheckerValid.isValidMove(new Position(40,400)));
   }
 
   @Test public static void testisOnLevelPlane() {
-    RuleCheckerPlayer ruleCheckerp3 = new RuleCheckerPlayer(level1, p3);
+    RuleCheckerPlayer ruleCheckerp3 = new RuleCheckerPlayer(level1, level1.getPlayerObjectFromName("Jane"));
     assertEquals(true, ruleCheckerp3.isOnLevelPlane(new Position(13,13)));
+  }
+
+  @Test
+  public static void testKeyTileIsLandedOnAndExitLandedOnAfter() {
+    Player keyFinder = new Player("KeyFinder229");
+    RuleCheckerPlayer ruleCheckerKey = new RuleCheckerPlayer(level1, keyFinder);
+    level1.addPlayer(keyFinder, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
+    level1.moveCharacter(keyFinder, level1.getKeyPositionInLevel());
+    assertEquals(GameStatus.KEY_FOUND, ruleCheckerKey.keyTileIsLandedOn());
+
+    Player exitLander = new Player("exitlander777");
+    level1.addPlayer(exitLander, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
+    level1.moveCharacter(exitLander, level1.getExitPositionInLevel());
+    RuleCheckerPlayer exitLanderRCP = new RuleCheckerPlayer(level1, exitLander);
+    level1.openExitTile();
+    assertEquals(GameStatus.PLAYER_EXITED, exitLanderRCP.exitTileIsLandedOn());
   }
 
   public static void createInitialGameBoard() {

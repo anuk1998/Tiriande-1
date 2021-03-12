@@ -97,7 +97,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * Returns the appropriate GameStatus for when a key tile is landed on
      * @return GameStatus.KEY_FOUND
      */
-    private GameStatus keyTileIsLandedOn() {
+    public GameStatus keyTileIsLandedOn() {
         return GameStatus.KEY_FOUND;
     }
 
@@ -105,13 +105,13 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * Returns the appropriate GameStatus for when a exit tile is landed on depending on whether it is locked or unlocked
      * @return GameStatus
      */
-    private GameStatus exitTileIsLandedOn() {
+    public GameStatus exitTileIsLandedOn() {
       if (isExitUnlocked()) {
-        if (isLastLevel()) {
+        if (isLastLevel() && currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.GAME_WON;
         }
         //if it is the last player exiting through the exit tile
-        if (currentLevel.getActivePlayers().size() == 1) {
+        else if (currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.LEVEL_WON;
         }
         return GameStatus.PLAYER_EXITED;
@@ -123,7 +123,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * Returns whether or not the exit tile is unlocked
      * @return true if the exit tile is unlocked, false if it is locked
      */
-    private boolean isExitUnlocked() {
+    public boolean isExitUnlocked() {
         // returns true if the exit tile in the level has been unlocked, false otherwise
         return currentLevel.getTileInLevel(currentLevel.getExitPositionInLevel()).equals("O");
     }
@@ -132,7 +132,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * Not elaborated on in Milestone 5 because we are only dealing with one level so this will always be true
      * @return true if the game is on the last level, false if not
      */
-    private boolean isLastLevel() {
+    public boolean isLastLevel() {
         return true;
     }
 

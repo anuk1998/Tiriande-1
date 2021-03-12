@@ -16,7 +16,7 @@ public class Zombie implements IAdversary {
 
     @Override
     public Position getCharacterPosition() {
-        return null;
+        return this.advPosition;
     }
 
     @Override
@@ -24,14 +24,5 @@ public class Zombie implements IAdversary {
         this.advPosition = new Position(p.getRow(), p.getCol());
     }
 
-    @Override
-    public Position getAdversaryPosition() {
-        return this.advPosition;
-    }
-
-    @Override
-    public void setAdversaryPosition(Position p) {
-      this.advPosition = p;
-    }
 }
 

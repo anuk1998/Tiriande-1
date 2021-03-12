@@ -48,7 +48,7 @@ public class GameManager {
      * @return Returns true if the Player has been expelled/are no longer active, false if the Player is
      *         still active or if the character is an Adversary (i.e. ghost, zombie)
      */
-    private boolean checkPlayerActiveStatus(ICharacter character) {
+    public boolean checkPlayerActiveStatus(ICharacter character) {
         if (character instanceof Player) {
             return !((Player) character).getIsExpelled();
         }
@@ -221,8 +221,4 @@ public class GameManager {
     }
 
 
-
-    public Level getCurrentLevel() {
-        return this.currentLevel;
-    }
 }
