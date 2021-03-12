@@ -212,7 +212,7 @@ public class Level {
       }
       else {
         levelPlane[placeLocation.getRow()][placeLocation.getCol()] = "P";
-        player.setCharacterPosition(placeLocation);
+        player.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
         this.players.add(player);
         this.activePlayers.add(player);
       }
@@ -222,13 +222,15 @@ public class Level {
     //    when we implement RuleChecker interface)
     public void addAdversary(IAdversary a, Position placeLocation) {
       if (isOccupiedByAdversary(placeLocation)) {
-        // then do something
         System.out.println("Sorry, adversary is already in position (" + placeLocation.getRow() +
                 ", " + placeLocation.getCol() + "). Try going somewhere else.");
       }
-      levelPlane[placeLocation.getRow()][placeLocation.getCol()] = "A";
-      a.setCharacterPosition(placeLocation);
-      this.adversaries.add(a);
+      else {
+        levelPlane[placeLocation.getRow()][placeLocation.getCol()] = "A";
+        a.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
+        this.adversaries.add(a);
+      }
+
     }
 
     public Position pickRandomPositionForCharacter(ICharacter character) {
@@ -238,10 +240,8 @@ public class Level {
       ArrayList<Room> allRoomsList = new ArrayList<>(allRooms);
       Room randomRoom = allRoomsList.get(randomIndex);
 
-
      Position randomPos = randomRoom.placeCharacterInRandomLocation(character);
-     character.setCharacterPosition(randomPos);
-     System.out.println("character " + character.getName() + " pos in level's pick random pos function: " + character.getCharacterPosition());
+     character.setCharacterPosition(new Position(randomPos.getRow(), randomPos.getCol()));
       return randomPos;
     }
 
@@ -258,14 +258,14 @@ public class Level {
     public void movePlayer(Player p, Position movePosition) {
       this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = "■";
       this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "P";
-      p.setCharacterPosition(movePosition);
+      p.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
     }
 
     // Moves an existing adversary to the given position if valid, will be checking validity in later milestone
     public void moveAdversary(IAdversary a, Position movePosition) {
       this.levelPlane[a.getCharacterPosition().getRow()][a.getCharacterPosition().getCol()] = "■";
       this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "A";
-      a.setCharacterPosition(movePosition);
+      a.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
     }
 
     // checks if the given position on the levelPlane already has a player on it
@@ -283,6 +283,16 @@ public class Level {
       }
       return false;
     }
+
+    public Player getPlayerObjectFromName(String name) {
+      for (Player p: getActivePlayers()) {
+        if (p.getName().equals(name)) {
+          return p;
+        }
+      }
+      return null;
+    }
+
     public ArrayList<Room> startAndEndRooms(Hallway h) {
       ArrayList<Room> startAndEndRoomList = new ArrayList<Room>();
       Room startRoom = listOfDoorsInLevel.get(h.getStartPositionOfHallway().toString());

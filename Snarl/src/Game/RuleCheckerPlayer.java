@@ -23,7 +23,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
     @Override
     public GameStatus runRuleChecker(Position destination) {
         GameStatus status = GameStatus.INVALID;
-        System.out.println("key position: " + currentLevel.getKeyPositionInLevel());
         if (isValidMove(destination)) {
             status = GameStatus.VALID;
             if (currentLevel.isOccupiedByAdversary(destination)) {
@@ -78,7 +77,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public boolean is2CardinalTilesAway(Position destPoint) {
         boolean withinReach = false;
         ArrayList<Position> cardinalTiles = new ArrayList<Position>();
-        System.out.println("character " + this.player.getName() + " pos: " + this.player.getCharacterPosition());
         ArrayList<Position> adjTiles = currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition(), null);
 
         for (Position adjacent : adjTiles) {

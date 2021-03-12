@@ -27,14 +27,10 @@ public class StateTesting {
   static Player p2 = new Player("Rob");
   static Player p3 = new Player("Jane");
   static Player p4 = new Player("Alice");
-  static Player p5 = new Player("hehe");
-  static Player p6 = new Player("hoho");
-  static Player p7 = new Player("lala");
-  static Player p8 = new Player("booboo");
   static IAdversary ghost = new Ghost("Scary Ghost");
   static IAdversary zombie = new Ghost("Weird Zombie");
   static ArrayList<Level> listOfLevels = new ArrayList<Level>();
- static GameManager gm;
+  static GameManager gm;
 
   public static void main(String[] args) {
     createInitialGameBoard();
@@ -42,17 +38,16 @@ public class StateTesting {
     listOfLevels.add(level1);
     gm = new GameManager(listOfLevels);
     //register players and add them to the board
-    gm.registerPlayer(p5.getName());
-    gm.registerPlayer(p6.getName());
-    gm.registerPlayer(p7.getName());
-    gm.registerPlayer(p8.getName());
+    gm.registerPlayer("Bob");
+    gm.registerPlayer("Carl");
+    gm.registerPlayer("Santiago");
 
     //register adversaries and add them to the board
     gm.registerAdversary(ghost.getName(), "ghost");
     gm.registerAdversary(zombie.getName(), "zombie");
 
-    //start game
-    //gm.startGame();
+    testIsLastLevel();
+    testParseMoveDoAction();
     testRegisterAdversary();
     testRegisterPlayer();
     testis2CardinalTilesAway();
@@ -60,19 +55,62 @@ public class StateTesting {
     testIsValidMove();
     testRunRuleCheckerPlayer();
     testCallRuleCheckerPlayer();
+    testCheckPlayerActiveStatus();
+    testIsExitUnlocked();
+    testKeyTileIsLandedOnAndExitLandedOnAfter();
+    testEncountersOppositeCharacter();
 
   }
 
   @Test
+  public static void testParseMoveDoAction() {
+    assertEquals(true, gm.parseMoveStatusAndDoAction(GameStatus.INVALID, new Position(2000, 2), level1.getPlayerObjectFromName("Carl") ));
+  }
+
+  @Test
+  public static void testIsExitUnlocked() {
+    RuleCheckerPlayer exitUnlocked = new RuleCheckerPlayer(level1, p1);
+    assertEquals(false, exitUnlocked.isExitUnlocked() );
+  }
+
+  @Test
+  public static void testIsLastLevel() {
+    RuleCheckerPlayer rcp = new RuleCheckerPlayer(level1, level1.getPlayerObjectFromName("Rob"));
+    assertEquals(true, rcp.isLastLevel());
+  }
+
+  @Test 
+  public static void testCheckPlayerActiveStatus() {
+    Player bob = level1.getPlayerObjectFromName("Bob");
+    // checking active status before Player is expelled
+    assertEquals(true, gm.checkPlayerActiveStatus(bob));
+    // checking active status after Player has been expelled
+    IAdversary evil = new Ghost("evil");
+    level1.addAdversary(evil, new Position(bob.getCharacterPosition().getRow() - 1, bob.getCharacterPosition().getCol()));
+    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, evil.getCharacterPosition(), bob);
+    assertEquals(false, gm.checkPlayerActiveStatus(bob));
+  }
+
+  @Test
+  public static void testEncountersOppositeCharacter() {
+    Player selfEliminator = new Player("selfEliminator455");
+    level1.addPlayer(selfEliminator, new Position(4,4));
+    IAdversary boo = new Ghost("boo!");
+    level1.addAdversary(boo, new Position(4,5));
+    level1.moveCharacter(selfEliminator, boo.getCharacterPosition());
+    RuleCheckerPlayer selfElimRCP = new RuleCheckerPlayer(level1, selfEliminator);
+    assertEquals(GameStatus.PLAYER_SELF_ELIMINATES, selfElimRCP.encountersOppositeCharacter());
+  }
+
+  @Test
   public static void testRegisterPlayer() {
-    assertEquals(4, level1.activePlayers.size());
+    assertEquals(3, level1.activePlayers.size());
   }
 
   @Test
   public static void testRegisterAdversary() {
     assertEquals(2, level1.getAdversaries().size());
   }
-
 
   @Test
   public static void testCallRuleCheckerPlayer() {
@@ -98,9 +136,6 @@ public class StateTesting {
     level1.addPlayer(p2, new Position (5,7));
     assertEquals(true, ruleCheckerp2.isValidMove(new Position (5,8)));
   }
-
-
-
 
   @Test public static void testisOnLevelPlane() {
     RuleCheckerPlayer ruleCheckerp3 = new RuleCheckerPlayer(level1, p3);

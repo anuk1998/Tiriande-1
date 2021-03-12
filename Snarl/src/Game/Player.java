@@ -30,7 +30,7 @@ public class Player implements ICharacter{
 
     @Override
     public void setCharacterPosition(Position p) {
-        this.playerPosition = p;
+        this.playerPosition = new Position(p.getRow(), p.getCol());
     }
 }
 

@@ -34,7 +34,7 @@ public class TestState {
       parseJSONAndConvertToLevel(jsonArrayInput);
     }
     catch (JSONException e) {
-      System.out.println("Invalid input rendered: []");
+      System.out.println("Invalid input rendered: " + e);
     }
   }
 
@@ -63,11 +63,10 @@ public class TestState {
 
     addPlayersToLevel(playersArray, level);
     addAdversariesToLevel(adversariesArray, level);
-    //System.out.println(level.renderLevel());
 
     // check if name exists in players
     if (checkIfPlayerExists(name, level)) {
-      Player playerToBeMoved = getPlayerObjectFromName(name, level);
+      Player playerToBeMoved = level.getPlayerObjectFromName(name);
       checkMoveValidity(playerToBeMoved, pointObject, level, stateObject);
     }
     else {
@@ -77,6 +76,16 @@ public class TestState {
     }
   }
 
+  /**
+   * Checks the given pointObject's validity as a move destination and according to the move's status,
+   * calls a specific output function to send back to the user.
+   *
+   * @param player the player whose turn it is
+   * @param pointObject the JSONArray destination position
+   * @param level the current level being played
+   * @param stateObject the given JSON state object from the input
+   * @throws JSONException if malformed JSON is given
+   */
   private static void checkMoveValidity(Player player, JSONArray pointObject, Level level, JSONObject stateObject) throws JSONException {
     // create a GameManager instance to be able to conduct various actions based on the type of move
     ArrayList<Level> listOfOneLevel = new ArrayList<>();
@@ -112,17 +121,6 @@ public class TestState {
     }
     System.out.println(outputArray.toString(2));
   }
-
-  // TODO: see if this function and the one below can be abstracted -- lots of duplicate code
-  private static Player getPlayerObjectFromName(String name, Level level) {
-    for (Player p: level.getActivePlayers()) {
-      if (p.getName().equals(name)) {
-        return p;
-      }
-    }
-    return null;
-  }
-
 
   private static boolean checkIfPlayerExists(String name, Level level) {
     for (Player p: level.getActivePlayers()) {
@@ -178,6 +176,13 @@ public class TestState {
     }
   }
 
+  /**
+   * Constructs the JSONArray output message for when the given player doesn't exist.
+   *
+   * @param outputArray the resulting JSONArray to be returned
+   * @param name the name of the given player
+   * @return a populated JSONArray containing the result message
+   */
   private static JSONArray outputPlayerDoesNotExistMessage(JSONArray outputArray, String name) {
     outputArray.put("Failure");
     outputArray.put("Player");
@@ -186,6 +191,13 @@ public class TestState {
     return outputArray;
   }
 
+  /**
+   * Constructs the JSONArray output message for when the given move is invalid.
+   *
+   * @param outputArray the resulting JSONArray to be returned
+   * @param pointObj the JSONArray destination position
+   * @return a populated JSONArray containing the result message
+   */
   private static JSONArray outputInvalidMoveMessage(JSONArray outputArray, JSONArray pointObj) {
     outputArray.put("Failure");
     outputArray.put("The destination position ");
@@ -194,10 +206,22 @@ public class TestState {
     return outputArray;
   }
 
+  /**
+   * Constructs the JSONArray output message for when the given move results in ejecting the given
+   * player or exiting them from the game (after passing through the exit).
+   *
+   * @param outputArray the resulting JSONArray to be returned
+   * @param player the player whose turn it is
+   * @param level the level being played
+   * @param stateObject the given JSON state object from the input
+   * @param status a string indicating if the player exited or was expelled as a result of the move
+   * @return a populated JSONArray containing the result message
+   * @throws JSONException if malformed JSON is given
+   */
   private static JSONArray outputPlayerEjectedOrExitedMessage(JSONArray outputArray, Player player, Level level, JSONObject stateObject, String status) throws JSONException {
     boolean isLocked = true;
     String reason = status.equals("ejected") ? " was ejected." : " exited.";
-    if (status.equals("exited")) {
+    if (status.equals("exited") || level.getTileInLevel(level.getExitPositionInLevel()).equals("O")) {
       isLocked = false;
     }
     JSONObject updatedState = updateStateObject(level, stateObject, isLocked);
@@ -210,6 +234,16 @@ public class TestState {
     return outputArray;
   }
 
+  /**
+   * Constructs the JSONArray for a regular, valid move.
+   *
+   * @param outputArray the resulting JSONArray to be returned
+   * @param level the level being played
+   * @param stateObject the given JSON state object from the input
+   * @param isExitLocked boolean indicating if the level's exit is locked or not
+   * @return a populated JSONArray containing the result message
+   * @throws JSONException if malformed JSON is given
+   */
   private static JSONArray outputRegularMoveMessage(JSONArray outputArray, Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
     JSONObject updatedState = updateStateObject(level, stateObject, isExitLocked);
     outputArray.put("Success");
@@ -217,6 +251,15 @@ public class TestState {
     return outputArray;
   }
 
+  /**
+   * Updates the original state JSONObject to reflect the new changes as a result of the valid move.
+   *
+   * @param level the level being played
+   * @param stateObject the given JSON state object from the input
+   * @param isExitLocked boolean indicating if the level's exit is locked or not
+   * @return the updated JSONArray after executing the valid move
+   * @throws JSONException if malformed JSON is given
+   */
   private static JSONObject updateStateObject(Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
     JSONArray newPlayersList = new JSONArray();
     // make a new list of players based on the list of active players in Level

@@ -55,13 +55,21 @@ public class TestLevel {
     }
     // places the key and exit at their respective given positions
     JSONArray objects = levelObject.getJSONArray("objects");
-    JSONArray keyPositionObject = objects.getJSONObject(0).getJSONArray("position");
-    Position keyPosition = new Position(keyPositionObject.getInt(0), keyPositionObject.getInt(1));
-    level.addKey(keyPosition);
+    try {
+      JSONArray keyPositionObject = objects.getJSONObject(0).getJSONArray("position");
+      Position keyPosition = new Position(keyPositionObject.getInt(0), keyPositionObject.getInt(1));
+      level.addKey(keyPosition);
+      JSONArray exitPositionObject = objects.getJSONObject(1).getJSONArray("position");
+      Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
+      level.addExit(exitPosition);
+    }
+    catch (Exception e) {
+      JSONArray exitPositionObject = objects.getJSONObject(0).getJSONArray("position");
+      Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
+      level.addExit(exitPosition);
+    }
 
-    JSONArray exitPositionObject = objects.getJSONObject(1).getJSONArray("position");
-    Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
-    level.addExit(exitPosition);
+
   }
 
   // builds each room JSON object into our Room representation

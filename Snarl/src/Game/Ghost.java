@@ -9,29 +9,18 @@ public class Ghost implements IAdversary{
     }
 
     @Override
-    public void setAdversaryPosition(Position p) {
-        this.advPosition = p;
-    }
-
-    @Override
-    public Position getAdversaryPosition() {
-        return this.advPosition;
-    }
-
-
-    @Override
     public String getName() {
         return this.name;
     }
 
     @Override
     public Position getCharacterPosition() {
-        return null;
+        return this.advPosition;
     }
 
     @Override
     public void setCharacterPosition(Position p) {
-
+        this.advPosition = new Position(p.getRow(), p.getCol());
     }
 
 }
