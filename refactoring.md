@@ -1,6 +1,7 @@
 # Milestone 6 - Refactoring Report
 
 **Team members:**
+Giselle Briand and Anu Kandasamy
 
 **Github team/repo:**
 
