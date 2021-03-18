@@ -1,8 +1,9 @@
 package Game;
 
 public interface IRuleChecker {
-    public GameStatus runRuleChecker(Position destination);
-    public GameStatus encountersOppositeCharacter();
-    public boolean isValidMove(Position destPoint);
+    GameStatus runRuleChecker(Position destination);
+    GameStatus encountersOppositeCharacter();
+    boolean isValidMove(Position destPoint);
+    boolean isTileTraversable(Position tile);
 
 }

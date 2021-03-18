@@ -34,9 +34,7 @@ class LevelTesting {
   public static void main(String[] args) throws Exception {
     createInitialGameState();
     testGetIsKeyFoundBefore(); // will be false, key hasn't been found yet
-    testGetKeyPosition();
     testGetDoorPositions();
-    testGetExitPosition();
     testGetKeyPositionInLevel();
     testGetExitPositionInLevel();
 
@@ -56,9 +54,6 @@ class LevelTesting {
     testGetColPosition();
     testGetDoorPositions();
     testGetTileInRoom();
-    testgetAllRoomsInLevel();
-    testgetLevelRows();
-    testgetLevelCols();
     testRoomGetNumOfRows();
     testRoomGetNumOfCols();
     testGetRoomOriginInLevel();
@@ -233,11 +228,6 @@ class LevelTesting {
   }
 
   @Test
-  public static void testGetKeyPosition() {
-    assertEquals(new Position(3,2), room4.getKeyPosition());
-  }
-
-  @Test
   public static void testGetIsKeyFound() {
     assertEquals("■", level1.getTileInLevel(level1.getKeyPositionInLevel()));
   }
@@ -262,12 +252,6 @@ class LevelTesting {
     //assertEquals("O", room2.getTileInRoom(new Position(3, 2)));
     assertEquals("|", room3.getTileInRoom(new Position(3, 2)));
     assertEquals("*", room4.getTileInRoom(new Position(3, 2)));
-  }
-
-  @Test
-  public static void testGetExitPosition() {
-    Position result = new Position(2, 3);
-    assertEquals(result, room2.getExitPosition());
   }
 
   @Test
@@ -335,30 +319,6 @@ class LevelTesting {
     assertEquals(waypoints, h6.getWaypoints());
 
   }
-
-  @Test
-  public static void testgetAllRoomsInLevel() {
-    LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
-    allRooms.add(room1);
-    allRooms.add(room2);
-    allRooms.add(room3);
-    allRooms.add(room4);
-    allRooms.add(room5);
-    allRooms.add(room6);
-    assertEquals(allRooms, level1.getAllRooms());
-  }
-
-  @Test
-  public static void testgetLevelRows() {
-    assertEquals(40, level1.getLevelNumOfRows());
-  }
-
-  @Test
-  public static void testgetLevelCols() {
-    assertEquals(40, level1.getLevelNumOfCols());
-  }
-
-
 
   @Test
   public static void testRoomGetNumOfCols() {

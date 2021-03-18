@@ -8,7 +8,6 @@ public class Level {
     LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
     Position keyLevelPosition;
     Position exitLevelPosition;
-    Set<Player> players = new HashSet<Player>();
     Set<Player> activePlayers = new HashSet<Player>();
     Set<IAdversary> adversaries = new HashSet<IAdversary>();
     HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
@@ -120,7 +119,6 @@ public class Level {
           continue;
         }
       }
-
       return adjacentTiles;
     }
 
@@ -133,23 +131,11 @@ public class Level {
     public int getLevelNumOfCols() {
       return this.levelNumOfCols;
     }
-    
-    // gets the set of allRooms
-    public LinkedHashSet<Room> getAllRooms() {
-      return this.allRooms;
-    }
 
-    // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
-    public Set<Player> getPlayers() {
-      return this.players;
-    }
-
-    // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
     public Set<Player> getActivePlayers() {
       return this.activePlayers;
     }
 
-    // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
     public Set<IAdversary> getAdversaries() {
       return this.adversaries;
     }
@@ -205,34 +191,21 @@ public class Level {
     // places new players on the board at the given location if valid (will check validity
     //    when we implement RuleChecker interface)
     public void addPlayer(Player player, Position placeLocation) {
-      if (isOccupiedByPlayer(placeLocation)) {
-        // then do something
-        System.out.println("Sorry, player is already in position (" + placeLocation.getRow() +
-                ", " + placeLocation.getCol() + "). Try going somewhere else.");
-      }
-      else {
-        levelPlane[placeLocation.getRow()][placeLocation.getCol()] = "P";
+        levelPlane[placeLocation.getRow()][placeLocation.getCol()] = player.getAvatar();
         player.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
         this.players.add(player);
         this.activePlayers.add(player);
-      }
     }
 
     // places new adversaries on the board at the given location if valid (will check validity
     //    when we implement RuleChecker interface)
     public void addAdversary(IAdversary a, Position placeLocation) {
-      if (isOccupiedByAdversary(placeLocation)) {
-        System.out.println("Sorry, adversary is already in position (" + placeLocation.getRow() +
-                ", " + placeLocation.getCol() + "). Try going somewhere else.");
-      }
-      else {
-        levelPlane[placeLocation.getRow()][placeLocation.getCol()] = "A";
+        levelPlane[placeLocation.getRow()][placeLocation.getCol()] = a.getAvatar();
         a.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
         this.adversaries.add(a);
-      }
-
     }
 
+    //TODO: REFACTOR THIS SO IT'S POTENTIALLY ALL IN LEVEL AND NOT IN ROOM CLASS
     public Position pickRandomPositionForCharacter(ICharacter character) {
       Random rand = new Random();
       int randomIndex = rand.nextInt(allRooms.size());
@@ -240,8 +213,8 @@ public class Level {
       ArrayList<Room> allRoomsList = new ArrayList<>(allRooms);
       Room randomRoom = allRoomsList.get(randomIndex);
 
-     Position randomPos = randomRoom.placeCharacterInRandomLocation(character);
-     character.setCharacterPosition(new Position(randomPos.getRow(), randomPos.getCol()));
+      Position randomPos = randomRoom.placeCharacterInRandomLocationInRoom(character);
+      character.setCharacterPosition(new Position(randomPos.getRow(), randomPos.getCol()));
       return randomPos;
     }
 
@@ -307,14 +280,6 @@ public class Level {
       return levelPlane[tilePosition.getRow()][tilePosition.getCol()];
     }
 
-    public boolean isTileTraversable(Position tile) {
-      if (getTileInLevel(tile).equals(".") || getTileInLevel(tile).equals("#") ||
-              getTileInLevel(tile).equals("P")) {
-        return false;
-      }
-      return true;
-    }
-    
     public Player playerAtGivenPosition(Position p) {
       for (Player player : this.activePlayers) {
         if (player.getCharacterPosition().toString().equals(p.toString())) {

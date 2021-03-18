@@ -1,10 +1,14 @@
 package Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Random;
 
 public class GameManager {
+    String[] avatars = {"@", "¤", "+", "~"};
+    ArrayList<String> playerAvatars = new ArrayList<>(Arrays.asList(avatars));
     LinkedHashMap<String, Player> allPlayers = new LinkedHashMap<>();
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
     ArrayList<Level> allLevels = new ArrayList<Level>();
@@ -176,6 +180,19 @@ public class GameManager {
     }
 
     /**
+     * Randomly chooses the avatar for that new player from a list of avatars.
+     *
+     * @param newPlayer the current player we're registering
+     */
+    public void assignPlayerAvatar(Player newPlayer) {
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(playerAvatars.size());
+        String randomAvatar = playerAvatars.get(randomIndex);
+        newPlayer.setAvatar(randomAvatar);
+        playerAvatars.remove(randomAvatar);
+    }
+
+    /**
      * Registers a player with a given unique name and add them to the level.
      * Not called anywhere for Milestone 5 because we don't know user entry point yet.
      *
@@ -187,6 +204,7 @@ public class GameManager {
         }
         else if (allPlayers.size() < 4) {
             Player newPlayer = new Player(name);
+            assignPlayerAvatar(newPlayer);
             allPlayers.put(name, newPlayer);
             allCharacters.add(newPlayer);
             Position randomPos = currentLevel.pickRandomPositionForCharacter(newPlayer);
@@ -219,6 +237,4 @@ public class GameManager {
         currentLevel.addAdversary(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
         System.out.println("New adversary " + name + " of type: " + type + " has been registered.");
     }
-
-
 }

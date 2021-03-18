@@ -8,9 +8,11 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import Game.Hallway;
+import Game.IRuleChecker;
 import Game.Level;
 import Game.Position;
 import Game.Room;
+import Game.RuleCheckerPlayer;
 
 public class TestLevel {
   public static void main(String[] args) throws JSONException {
@@ -88,7 +90,7 @@ public class TestLevel {
     // makes a Room object of our data representation type from the extracted values and sends the room's
     //   board to be instantiated in the Room class and then adds the room to the level plane
     Room roomObj = new Room(extractedOrigin, rows, columns);
-    roomObj.createRoomFromJSON(layout);
+    createRoomFromJSON(layout, roomObj);
     level.addRoom(roomObj);
   }
 
@@ -119,7 +121,8 @@ public class TestLevel {
 
   // builds the JSON output for the program
   private static void constructOutput(JSONObject output, Position point, Level level) throws JSONException {
-    boolean isTraversable = level.isTileTraversable(point);
+    IRuleChecker rcPlayer = new RuleCheckerPlayer(level, null);
+    boolean isTraversable = rcPlayer.isTileTraversable(point);
     output.put("traversable", isTraversable); // adds first field
 
     String tile = level.getTileInLevel(point);
@@ -209,5 +212,22 @@ public class TestLevel {
       output.put("object", object);
     }
   }
+
+  public static void createRoomFromJSON(JSONArray inputArray, Room roomObj) throws JSONException {
+    for (int i=0; i<inputArray.length(); i++) {
+      JSONArray innerArray = inputArray.getJSONArray(i);
+      for (int j = 0; j < innerArray.length(); j++) {
+        int num = innerArray.getInt(j);
+        if (num == 0) {
+          roomObj.setTileInRoom(i, j, "#");
+        } else if (num == 1) {
+          roomObj.setTileInRoom(i, j, "■");
+        } else if (num == 2) {
+          roomObj.addDoor(new Position(i, j));
+        }
+      }
+    }
+  }
+
 
 }

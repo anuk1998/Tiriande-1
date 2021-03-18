@@ -58,7 +58,7 @@ public class TestRoom {
 
         Position extractedOrigin = new Position(originRow, originCol);
         Room roomObj = new Room(extractedOrigin, rows, columns);
-        roomObj.createRoomFromJSON(layout);
+        createRoomFromJSON(layout, roomObj);
         level.addRoom(roomObj);
 
         ArrayList<Position> adjacentTiles = level.getAllAdjacentTiles(point, roomObj);
@@ -86,6 +86,22 @@ public class TestRoom {
             outputArray.put(innerArray);
         }
         return outputArray;
+    }
+
+    public static void createRoomFromJSON(JSONArray inputArray, Room roomObj) throws JSONException {
+        for (int i=0; i<inputArray.length(); i++) {
+            JSONArray innerArray = inputArray.getJSONArray(i);
+            for (int j = 0; j < innerArray.length(); j++) {
+                int num = innerArray.getInt(j);
+                if (num == 0) {
+                    roomObj.setTileInRoom(i, j, "#");
+                } else if (num == 1) {
+                    roomObj.setTileInRoom(i, j, "■");
+                } else if (num == 2) {
+                    roomObj.addDoor(new Position(i, j));
+                }
+            }
+        }
     }
 
 }

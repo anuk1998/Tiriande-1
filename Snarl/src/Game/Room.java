@@ -1,20 +1,13 @@
 package Game;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Set;
-
 
 public class Room {
     String[][] room;
     Position roomPositionInLevel;
     int numOfRows;
     int numOfCols;
-    Set<Player> playersInRoom;
-    Set<IAdversary> adversariesInRoom;
     ArrayList<Position> listOfAllPositions = new ArrayList<Position>();
     ArrayList<Position> listOfEdgePositions = new ArrayList<Position>();
     ArrayList<Position> listOfDoorsInRoom = new ArrayList<Position>();
@@ -53,6 +46,11 @@ public class Room {
         return room[tilePosition.getRow()][tilePosition.getCol()];
     }
 
+    // used for Testing tasks
+    public void setTileInRoom(int row, int col, String tile) {
+        this.room[row][col] = tile;
+    }
+
     public void makeRoom() {
         for (int i = 0; i < this.numOfRows; i++) {
             for (int j = 0; j < this.numOfCols; j++) {
@@ -61,39 +59,6 @@ public class Room {
                 listOfAllPositions.add(tempPos);
             }
         }
-    }
-
-    public void createRoomFromJSON(JSONArray inputArray) throws JSONException {
-        for (int i=0; i<inputArray.length(); i++) {
-            JSONArray innerArray = inputArray.getJSONArray(i);
-            for (int j = 0; j < innerArray.length(); j++) {
-                int num = innerArray.getInt(j);
-                if (num == 0) {
-                    this.room[i][j] = "#";
-                } else if (num == 1) {
-                    this.room[i][j] = "■";
-                } else if (num == 2) {
-                    this.room[i][j] = "|";
-                    this.listOfDoorsInRoom.add(new Position(i, j));
-                } else {
-                    // do something, invalid number
-                }
-            }
-        }
-    }
-
-    private void renderRoom() {
-        StringBuilder levelASCII = new StringBuilder();
-        for (int i = 0; i < numOfRows; i++) {
-            for (int j = 0; j < numOfCols; j++) {
-                if (j == numOfCols - 1) {
-                    levelASCII.append(room[i][j] + "\n");
-                } else {
-                    levelASCII.append(room[i][j] + " ");
-                }
-            }
-        }
-        System.out.println(levelASCII.toString());
     }
 
     private void collectEdges() {
@@ -114,28 +79,6 @@ public class Room {
                 listOfEdgePositions.add(tempPosCol);
             }
         }
-
-    }
-
-
-    public void addKey(Position p) throws ArrayIndexOutOfBoundsException {
-        try {
-            room[p.getRow()][p.getCol()] = "*";
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
-            throw new ArrayIndexOutOfBoundsException("Given coordinate for key is beyond bounds of the room.");
-        }
-
-    }
-
-    public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
-        try{
-            room[p.getRow()][p.getCol()] = "●";
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
-            throw new ArrayIndexOutOfBoundsException("Given coordinate for exit is beyond bounds of the room.");
-        }
-
     }
 
     public void addDoor(Position p) throws IllegalArgumentException{
@@ -149,34 +92,11 @@ public class Room {
         }
     }
 
-    public Position getKeyPosition() {
-        for (int i = 0; i < this.numOfRows; i++) {
-            for (int j = 0; j < this.numOfCols; j++) {
-                if (room[i][j].equals("*")) {
-                    return new Position(i, j);
-                }
-            }
-        }
-        return null;
-    }
-
     public ArrayList<Position> getDoorPositions() {
         return this.listOfDoorsInRoom;
     }
 
-    public Position getExitPosition() {
-        for (int i = 0; i < this.numOfRows; i++) {
-            for (int j = 0; j < this.numOfCols; j++) {
-                if (room[i][j].equals("O") || room[i][j].equals("●")) {
-                    return new Position(i, j);
-
-                }
-            }
-        }
-        return null;
-    }
-
-    public Position placeCharacterInRandomLocation(ICharacter c) {
+    public Position placeCharacterInRandomLocationInRoom(ICharacter c) {
         Random rand = new Random();
         int randomIndex = rand.nextInt(listOfAllPositions.size());
         Position randomPos = listOfAllPositions.get(randomIndex);
