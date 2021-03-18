@@ -16,11 +16,10 @@ anything that comes to mind. Tip: translate this list into Github Issues.
 * Look into different ASCII symbols for players/users -- they currently are all represented as 'P's
     * @, smiley face icon, $, etc.
     * Alternatively, look at 1, 2, 3, 4
-* Look into different ASCII symbols for adversaries on the level board (they're all represented by 'A's)  
+DONE * Look into different ASCII symbols for adversaries on the level board (they're all represented by 'A's)  
     * Z for Zombie
     * G for Ghost
 * Include a list of waypoints field in the constructor of a `Hallway` object
-* Create an inventory attribute for players
 * Look into randomly generating hallways
 * Change traversable room tile representation (possible a '.') in level board
 
@@ -33,6 +32,8 @@ Summarize the work you have performed during this week.
 
 Summarize work you'd still like to do if there's time. This can include features
 you'd like to implement if given time.
+
+* Create an inventory attribute for players
 
 
 ## Conclusion

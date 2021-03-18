@@ -21,15 +21,6 @@ public class Room {
         collectEdges();
     }
 
-    //removes the given player from that room
-    public void removePlayer(Player p) {
-    }
-
-    // UNUSED IN THIS MILESTONE, WILL TEST AT LATER DATE
-    public boolean isValidMove(Position from, Position to) {
-        return true;
-    }
-
     public int getNumOfRows() {
         return this.numOfRows;
     }

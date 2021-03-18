@@ -188,12 +188,17 @@ public class Level {
       levelPlane[exitPos.getRow()][exitPos.getCol()] = ("O");
     }
 
+    // method that handles when a player successfully passes through the exit
+    public void playerPassedThroughExit(ICharacter c) {
+      this.levelPlane[c.getCharacterPosition().getRow()][c.getCharacterPosition().getCol()] = "O";
+      this.getActivePlayers().remove(c);
+    }
+
     // places new players on the board at the given location if valid (will check validity
     //    when we implement RuleChecker interface)
     public void addPlayer(Player player, Position placeLocation) {
         levelPlane[placeLocation.getRow()][placeLocation.getCol()] = player.getAvatar();
         player.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
-        this.players.add(player);
         this.activePlayers.add(player);
     }
 
@@ -230,31 +235,15 @@ public class Level {
     // Moves existing player to the given position if valid, will be checking validity in later milestone
     public void movePlayer(Player p, Position movePosition) {
       this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = "■";
-      this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "P";
+      this.levelPlane[movePosition.getRow()][movePosition.getCol()] = p.getAvatar();
       p.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
     }
 
     // Moves an existing adversary to the given position if valid, will be checking validity in later milestone
     public void moveAdversary(IAdversary a, Position movePosition) {
       this.levelPlane[a.getCharacterPosition().getRow()][a.getCharacterPosition().getCol()] = "■";
-      this.levelPlane[movePosition.getRow()][movePosition.getCol()] = "A";
+      this.levelPlane[movePosition.getRow()][movePosition.getCol()] = a.getAvatar();
       a.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
-    }
-
-    // checks if the given position on the levelPlane already has a player on it
-    public boolean isOccupiedByPlayer(Position p) {
-      if (levelPlane[p.getRow()][p.getCol()].equals("P")) {
-        return true;
-      }
-      return false;
-    }
-
-    // checks if the given position on the levelPlane has an adversary on it
-    public boolean isOccupiedByAdversary(Position p) {
-      if (levelPlane[p.getRow()][p.getCol()].equals("A")) {
-        return true;
-      }
-      return false;
     }
 
     public Player getPlayerObjectFromName(String name) {
@@ -289,17 +278,20 @@ public class Level {
       return null;
     }
 
-    // expels the given player from the level
-    public void expelPlayer(Player p) {
-      this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = "A";
-      this.activePlayers.remove(p);
-      p.setIsExpelled(true);
+    public IAdversary adversaryAtGivenPosition(Position p) {
+      for (IAdversary adversary : this.adversaries) {
+        if (adversary.getCharacterPosition().toString().equals(p.toString())) {
+          return adversary;
+        }
+      }
+      return null;
     }
 
-    // method that handles when a player successfully passes through the exit
-    public void playerPassedThroughExit(ICharacter c) {
-      this.levelPlane[c.getCharacterPosition().getRow()][c.getCharacterPosition().getCol()] = "O";
-      this.getActivePlayers().remove(c);
+    // expels the given player from the level
+    public void expelPlayer(Player p) {
+      this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = adversaryAtGivenPosition(p.getCharacterPosition()).getAvatar();
+      this.activePlayers.remove(p);
+      p.setIsExpelled(true);
     }
 
     // draws the levelPlane

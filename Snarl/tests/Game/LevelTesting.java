@@ -109,11 +109,11 @@ class LevelTesting {
     room1.addDoor(new Position(2, 9));
     room1.addDoor(new Position(7,6));
 
-    room4.addKey(new Position(3, 2));
+    level1.addKey(new Position(3, 2));
 
     //Room 2
     room2.addDoor(new Position(0, 0));
-    room2.addExit(new Position(2, 3));
+    level1.addExit(new Position(2, 3));
     room2.addDoor(new Position(6,0));
     room2.addDoor(new Position(8,9));
 

@@ -52,6 +52,29 @@ public class RuleCheckerPlayer implements IRuleChecker {
     }
 
     /**
+     * Determines if the given position on the level plane is a traversable tile for a player.
+     *
+     * @param tile the given position
+     * @return boolean indicating if the tile is traversable or not for a player
+     */
+    @Override
+    public boolean isTileTraversable(Position tile) {
+        return !this.currentLevel.getTileInLevel(tile).equals(".") && !this.currentLevel.getTileInLevel(tile).equals("#") &&
+                !isOccupiedByAnotherPlayer(tile);
+    }
+
+    /**
+     * Determines if the given tile is occupied by another player, a.k.a. another avatar.
+     *
+     * @param tile the position in question/goal destination
+     * @return boolean representing whether or not the position is already occupied by another player
+     */
+    private boolean isOccupiedByAnotherPlayer(Position tile) {
+        String symbol = this.currentLevel.getTileInLevel(tile);
+        return symbol.equals("@") || symbol.equals("¤") || symbol.equals("+") || symbol.equals("~");
+    }
+
+    /**
      * Checks whether the destination position is within the bounds of the level plane.
      *
      * @param destPoint goal Position requested by player
