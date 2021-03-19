@@ -1,9 +1,12 @@
 package Game;
+import java.util.ArrayList;
 
 public class Player implements ICharacter{
     Position playerPosition;
     String name;
+    String avatar;
     boolean isExpelled;
+    ArrayList<String> inventory;
 
     public Player(String n) {
         this.name = n;
@@ -31,6 +34,15 @@ public class Player implements ICharacter{
     @Override
     public void setCharacterPosition(Position p) {
         this.playerPosition = new Position(p.getRow(), p.getCol());
+    }
+
+    @Override
+    public String getAvatar() {
+        return this.avatar;
+    }
+
+    public void setAvatar(String newAvatar) {
+        this.avatar = newAvatar;
     }
 }
 

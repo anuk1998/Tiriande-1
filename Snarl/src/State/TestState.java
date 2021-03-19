@@ -9,10 +9,12 @@ import java.util.Scanner;
 
 import Game.GameManager;
 import Game.GameStatus;
+import Game.IRuleChecker;
 import Game.Level;
 import Game.Position;
 import Game.IAdversary;
 import Game.Ghost;
+import Game.RuleCheckerPlayer;
 import Game.Zombie;
 import Game.Player;
 import Level.TestLevel;
@@ -96,10 +98,12 @@ public class TestState {
     // initialize the resulting output array that will be passed through functions below to be added to
     JSONArray outputArray = new JSONArray();
 
-    if (level.isTileTraversable(point)) {
+    IRuleChecker rcPlayer = new RuleCheckerPlayer(level, player);
+    if (rcPlayer.isTileTraversable(point)) {
       String tile = level.getTileInLevel(point);
       switch (tile) {
-        case "A":
+        case "G":
+        case "Z":
           gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, point, player);
           outputArray = outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "ejected");
           break;
@@ -146,7 +150,7 @@ public class TestState {
       JSONArray playerPosJSON = playerObj.getJSONArray("position");
       Position playerPos = new Position(playerPosJSON.getInt(0), playerPosJSON.getInt(1));
       Player newPlayer = new Player(playerName);
-      level.addPlayer(newPlayer, playerPos);
+      level.addCharacter(newPlayer, playerPos);
     }
   }
 
@@ -167,11 +171,11 @@ public class TestState {
       Position adversaryPos = new Position(adversaryPosJSON.getInt(0), adversaryPosJSON.getInt(1));
       if (type.equals("zombie")) {
         IAdversary newZombie = new Zombie(adversaryName);
-        level.addAdversary(newZombie, adversaryPos);
+        level.addCharacter(newZombie, adversaryPos);
       }
       else if (type.equals("ghost")) {
         IAdversary newGhost = new Ghost(adversaryName);
-        level.addAdversary(newGhost, adversaryPos);
+        level.addCharacter(newGhost, adversaryPos);
       }
     }
   }

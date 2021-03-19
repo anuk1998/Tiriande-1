@@ -3,7 +3,7 @@ package Game;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,55 +15,39 @@ public class StateTesting {
   static Room room4 = new Room(new Position(2, 25), 7, 11);
   static Room room5 = new Room(new Position(23, 2), 14, 7);
   static Room room6 = new Room(new Position(30,27), 7,7);
-  static Hallway h1 = new Hallway(new Position(2, 9), new Position(4, 20));
-  static Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 15));
-  static Hallway h3 = new Hallway(new Position(21, 15), new Position(23, 6));
-  static Hallway h4 = new Hallway(new Position(4, 35), new Position(26, 2));
-  static Hallway h5 = new Hallway(new Position(8, 29), new Position(30, 32));
-  static Hallway h6 = new Hallway(new Position(7, 25), new Position(7,19));
-  static Hallway h7 = new Hallway(new Position(28, 8), new Position(33, 27));
-  static Hallway h8 = new Hallway(new Position(23, 24), new Position(30, 29));
   static Player p1 = new Player("Bob");
-  static Player p2 = new Player("Rob");
-  static Player p3 = new Player("Jane");
-  static Player p4 = new Player("Alice");
-  static IAdversary ghost = new Ghost("Scary Ghost");
-  static IAdversary zombie = new Ghost("Weird Zombie");
-  static ArrayList<Level> listOfLevels = new ArrayList<Level>();
-  static GameManager gm;
+  //static IAdversary ghost = new Ghost("Scary Ghost");
+  //static IAdversary zombie = new Ghost("Weird Zombie");
+  static Level[] lev = {level1};
+  static ArrayList<Level> listOfLevels = new ArrayList<Level>(Arrays.asList(lev));
+  static GameManager gm = new GameManager(listOfLevels);
 
   public static void main(String[] args) {
-    createInitialGameBoard();
     listOfLevels.add(level1);
-    gm = new GameManager(listOfLevels);
-    //register players and add them to the board
-    gm.registerPlayer("Bob");
-    gm.registerPlayer("Carl");
-    gm.registerPlayer("Santiago");
+    createInitialGameBoard();
 
-    //register adversaries and add them to the board
-    gm.registerAdversary(ghost.getName(), "ghost");
-    gm.registerAdversary(zombie.getName(), "zombie");
-
-    testIsLastLevel();
+    //testIsLastLevel();
     testParseMoveDoAction();
-    testRegisterAdversary();
-    testRegisterPlayer();
-    testis2CardinalTilesAway();
-    testisOnLevelPlane();
-    testIsValidMove();
-    testRunRuleCheckerPlayer();
-    testCallRuleCheckerPlayer();
-    testCheckPlayerActiveStatus();
-    testIsExitUnlocked();
-    testKeyTileIsLandedOnAndExitLandedOnAfter();
-    testEncountersOppositeCharacter();
-
+    //testRegisterAdversary();
+    //testRegisterPlayer();
+    //testis2CardinalTilesAway();
+    //testisOnLevelPlane();
+    //testIsValidMove();
+    //testRunRuleCheckerPlayer();
+    //testCallRuleCheckerPlayer();
+    //testCheckPlayerActiveStatus();
+    //testIsExitUnlocked();
+    //testKeyTileIsLandedOnAndExitLandedOnAfter();
+    //testEncountersOppositeCharacter();
   }
+
 
   @Test
   public static void testParseMoveDoAction() {
-    assertEquals(true, gm.parseMoveStatusAndDoAction(GameStatus.INVALID, new Position(2000, 2), level1.getPlayerObjectFromName("Carl") ));
+    assertEquals(true, gm.parseMoveStatusAndDoAction(GameStatus.INVALID, new Position(2000, 2), level1.getPlayerObjectFromName("Carl")));
+    Position ghostPos = level1.getAdversaryObjectFromName("scary").getCharacterPosition();
+    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, ghostPos, level1.getPlayerObjectFromName("Carl"));
+    assertEquals(null, level1.getPlayerObjectFromName("Carl"));
   }
 
   @Test
@@ -85,7 +69,7 @@ public class StateTesting {
     assertEquals(true, gm.checkPlayerActiveStatus(bob));
     // checking active status after Player has been expelled
     IAdversary evil = new Ghost("evil");
-    level1.addAdversary(evil, new Position(bob.getCharacterPosition().getRow() - 1, bob.getCharacterPosition().getCol()));
+    level1.addCharacter(evil, new Position(bob.getCharacterPosition().getRow() - 1, bob.getCharacterPosition().getCol()));
     gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, evil.getCharacterPosition(), bob);
     assertEquals(false, gm.checkPlayerActiveStatus(bob));
   }
@@ -93,9 +77,9 @@ public class StateTesting {
   @Test
   public static void testEncountersOppositeCharacter() {
     Player selfEliminator = new Player("selfEliminator455");
-    level1.addPlayer(selfEliminator, new Position(4,4));
+    level1.addCharacter(selfEliminator, new Position(4,4));
     IAdversary boo = new Ghost("boo!");
-    level1.addAdversary(boo, new Position(4,5));
+    level1.addCharacter(boo, new Position(4,5));
     level1.moveCharacter(selfEliminator, boo.getCharacterPosition());
     RuleCheckerPlayer selfElimRCP = new RuleCheckerPlayer(level1, selfEliminator);
     assertEquals(GameStatus.PLAYER_SELF_ELIMINATES, selfElimRCP.encountersOppositeCharacter());
@@ -123,20 +107,20 @@ public class StateTesting {
   public static void testRunRuleCheckerPlayer() {
     Player ruleChecker = new Player("ruleChecker444");
     RuleCheckerPlayer ruleChecker444 = new RuleCheckerPlayer(level1, ruleChecker);
-    level1.addPlayer(ruleChecker, new Position (3,3));
+    level1.addCharacter(ruleChecker, new Position (3,3));
     assertEquals(GameStatus.VALID, ruleChecker444.runRuleChecker(new Position(3,4)));
   }
 
   @Test public static void testis2CardinalTilesAway() {
       RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, level1.getPlayerObjectFromName("Bob"));
-      level1.addPlayer(level1.getPlayerObjectFromName("Bob"), new Position (5,5));
+      level1.addCharacter(level1.getPlayerObjectFromName("Bob"), new Position (5,5));
       assertEquals(false, ruleCheckerp1.is2CardinalTilesAway(new Position (0,0)));
   }
 
   @Test public static void testIsValidMove() {
     Player validMover = new Player("ValidMover223");
     RuleCheckerPlayer ruleCheckerValid = new RuleCheckerPlayer(level1, validMover);
-    level1.addPlayer(validMover, new Position (5,7));
+    level1.addCharacter(validMover, new Position (5,7));
     assertEquals(true, ruleCheckerValid.isValidMove(new Position (5,8)));
     assertEquals(false, ruleCheckerValid.isValidMove(new Position(40,400)));
   }
@@ -150,12 +134,12 @@ public class StateTesting {
   public static void testKeyTileIsLandedOnAndExitLandedOnAfter() {
     Player keyFinder = new Player("KeyFinder229");
     RuleCheckerPlayer ruleCheckerKey = new RuleCheckerPlayer(level1, keyFinder);
-    level1.addPlayer(keyFinder, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
+    level1.addCharacter(keyFinder, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
     level1.moveCharacter(keyFinder, level1.getKeyPositionInLevel());
     assertEquals(GameStatus.KEY_FOUND, ruleCheckerKey.keyTileIsLandedOn());
 
     Player exitLander = new Player("exitlander777");
-    level1.addPlayer(exitLander, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
+    level1.addCharacter(exitLander, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
     level1.moveCharacter(exitLander, level1.getExitPositionInLevel());
     RuleCheckerPlayer exitLanderRCP = new RuleCheckerPlayer(level1, exitLander);
     level1.openExitTile();
@@ -167,13 +151,8 @@ public class StateTesting {
     room1.addDoor(new Position(2, 9));
     room1.addDoor(new Position(7, 6));
 
-    //adding key and exit
-    level1.addKey(new Position(5, 27));
-    level1.addExit(new Position(17, 18));
-
     //Room 2
-    room2.addDoor(new Position(0, 0));
-
+    room2.addDoor(new Position(0, 2));
     room2.addDoor(new Position(6, 0));
     room2.addDoor(new Position(8, 9));
 
@@ -204,39 +183,54 @@ public class StateTesting {
     level1.addRoom(room5);
     level1.addRoom(room6);
 
-    h1.addAWaypoint(new Position(2, 20));
-    h1.connectHallwayWaypoints();
+    //adding key and exit
+    level1.addObject(new Position(5, 27), "*");
+    level1.addObject(new Position(17, 18), "●");
 
-    h2.addAWaypoint(new Position(11, 6));
-    h2.addAWaypoint(new Position(11, 15));
-    h2.connectHallwayWaypoints();
+    ArrayList<Position> h1Waypoints = new ArrayList<>();
+    h1Waypoints.add(new Position(2, 20));
+    Hallway h1 = new Hallway(new Position(2, 9), new Position(4, 20), h1Waypoints);
 
-    h3.addAWaypoint(new Position(21, 6));
-    h3.connectHallwayWaypoints();
+    ArrayList<Position> h2Waypoints = new ArrayList<>();
+    h2Waypoints.add(new Position(11, 6));
+    h2Waypoints.add(new Position(11, 15));
+    h2Waypoints.add(new Position(14, 15));
+    h2Waypoints.add(new Position(14, 17));
+    Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 17), h2Waypoints);
 
-    h4.addAWaypoint(new Position(4, 37));
-    h4.addAWaypoint(new Position(38, 37));
-    h4.addAWaypoint(new Position(38, 0));
-    h4.addAWaypoint(new Position(26, 0));
-    h4.connectHallwayWaypoints();
+    ArrayList<Position> h3Waypoints = new ArrayList<>();
+    h3Waypoints.add(new Position(21, 6));
+    Hallway h3 = new Hallway(new Position(21, 15), new Position(23, 6), h3Waypoints);
 
-    h5.addAWaypoint(new Position(25, 29));
-    h5.addAWaypoint(new Position(25, 32));
-    h5.connectHallwayWaypoints();
+    ArrayList<Position> h4Waypoints = new ArrayList<>();
+    h4Waypoints.add(new Position(4, 37));
+    h4Waypoints.add(new Position(38, 37));
+    h4Waypoints.add(new Position(38, 0));
+    h4Waypoints.add(new Position(26, 0));
 
-    h6.addAWaypoint(new Position(7, 24));
-    h6.addAWaypoint(new Position(10, 24));
-    h6.addAWaypoint(new Position(10, 19));
-    h6.connectHallwayWaypoints();
+    Hallway h4 = new Hallway(new Position(4, 35), new Position(26, 2), h4Waypoints);
 
-    h7.addAWaypoint(new Position(28, 11));
-    h7.addAWaypoint(new Position(33, 11));
-    h7.connectHallwayWaypoints();
+    ArrayList<Position> h5Waypoints = new ArrayList<>();
+    h5Waypoints.add(new Position(25,29));
+    h5Waypoints.add(new Position(25, 32));
+    Hallway h5 = new Hallway(new Position(8, 29), new Position(30, 32), h5Waypoints);
 
-    h8.addAWaypoint(new Position(23, 27));
-    h8.addAWaypoint(new Position(27, 27));
-    h8.addAWaypoint(new Position(27, 29));
-    h8.connectHallwayWaypoints();
+    ArrayList<Position> h6Waypoints = new ArrayList<>();
+    h6Waypoints.add(new Position(7,24));
+    h6Waypoints.add(new Position(10,24));
+    h6Waypoints.add(new Position(10,19));
+    Hallway h6 = new Hallway(new Position(7, 25), new Position(7,19), h6Waypoints);
+
+    ArrayList<Position> h7Waypoints = new ArrayList<>();
+    h7Waypoints.add(new Position(28, 11));
+    h7Waypoints.add(new Position(33, 11));
+    Hallway h7 = new Hallway(new Position(28, 8), new Position(33, 27), h7Waypoints);
+
+    ArrayList<Position> h8Waypoints = new ArrayList<>();
+    h8Waypoints.add(new Position(23, 27));
+    h8Waypoints.add(new Position(27, 27));
+    h8Waypoints.add(new Position(27, 29));
+    Hallway h8 = new Hallway(new Position(23, 24), new Position(30, 29), h8Waypoints);
 
     level1.addHallway(h1);
     level1.addHallway(h2);
@@ -247,6 +241,17 @@ public class StateTesting {
     level1.addHallway(h7);
     level1.addHallway(h8);
 
+    //register players and add them to the board
+    gm.registerPlayer("Bob");
+    gm.registerPlayer("Carl");
+    gm.registerPlayer("Santiago");
+    gm.registerPlayer("Anu");
+
+    //register adversaries and add them to the board
+    gm.registerAdversary("scary", "ghost");
+    gm.registerAdversary("bloody", "zombie");
+
+    System.out.println(level1.renderLevel());
   }
 
 }

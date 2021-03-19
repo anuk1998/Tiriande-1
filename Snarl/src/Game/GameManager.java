@@ -1,10 +1,14 @@
 package Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Random;
 
 public class GameManager {
+    String[] avatars = {"@", "¤", "$", "~"};
+    ArrayList<String> playerAvatars = new ArrayList<>(Arrays.asList(avatars));
     LinkedHashMap<String, Player> allPlayers = new LinkedHashMap<>();
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
     ArrayList<Level> allLevels = new ArrayList<Level>();
@@ -133,7 +137,7 @@ public class GameManager {
                 currentLevel.openExitTile();
                 return true;
             case PLAYER_SELF_ELIMINATES:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
                 return true;
             case PLAYER_EXPELLED:
@@ -141,11 +145,11 @@ public class GameManager {
                 currentLevel.moveCharacter(c, destination);
                 return true;
             case PLAYER_EXITED:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 return true;
             case LEVEL_WON:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 resurrectPlayers();
                 System.out.print("Congrats!! Players have won the level!");
@@ -176,6 +180,19 @@ public class GameManager {
     }
 
     /**
+     * Randomly chooses the avatar for that new player from a list of avatars.
+     *
+     * @param newPlayer the current player we're registering
+     */
+    public void assignPlayerAvatar(Player newPlayer) {
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(playerAvatars.size());
+        String randomAvatar = playerAvatars.get(randomIndex);
+        newPlayer.setAvatar(randomAvatar);
+        playerAvatars.remove(randomAvatar);
+    }
+
+    /**
      * Registers a player with a given unique name and add them to the level.
      * Not called anywhere for Milestone 5 because we don't know user entry point yet.
      *
@@ -187,10 +204,11 @@ public class GameManager {
         }
         else if (allPlayers.size() < 4) {
             Player newPlayer = new Player(name);
+            assignPlayerAvatar(newPlayer);
             allPlayers.put(name, newPlayer);
             allCharacters.add(newPlayer);
-            Position randomPos = currentLevel.pickRandomPositionForCharacter(newPlayer);
-            currentLevel.addPlayer(newPlayer, randomPos);
+            Position randomPos = currentLevel.pickRandomPositionForCharacterInLevel();
+            currentLevel.addCharacter(newPlayer, randomPos);
             System.out.println("Player " + name + " has been registered at position: [" + newPlayer.getCharacterPosition().getRow() + ", " +
                     newPlayer.getCharacterPosition().getCol() + "]");
         }
@@ -215,10 +233,8 @@ public class GameManager {
             adversary = new Ghost(name);
         }
         this.allCharacters.add(adversary);
-        Position pickedPos = currentLevel.pickRandomPositionForCharacter(adversary);
-        currentLevel.addAdversary(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
+        Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
+        currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
         System.out.println("New adversary " + name + " of type: " + type + " has been registered.");
     }
-
-
 }

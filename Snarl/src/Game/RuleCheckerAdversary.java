@@ -19,4 +19,7 @@ public class RuleCheckerAdversary implements IRuleChecker {
     public boolean isValidMove(Position destPoint) {
         return false;
     }
+    
+    @Override
+    public boolean isTileTraversable(Position tile) { return false;}
 }

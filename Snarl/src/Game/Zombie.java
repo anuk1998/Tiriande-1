@@ -24,5 +24,10 @@ public class Zombie implements IAdversary {
         this.advPosition = new Position(p.getRow(), p.getCol());
     }
 
+    @Override
+    public String getAvatar(){
+        return "Z";
+    }
+
 }
 

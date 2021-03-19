@@ -3,7 +3,6 @@ package Game;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,14 +14,6 @@ class LevelTesting {
   static Room room4 = new Room(new Position(2, 25), 7, 11);
   static Room room5 = new Room(new Position(23, 2), 14, 7);
   static Room room6 = new Room(new Position(30,27), 7,7);
-  static Hallway h1 = new Hallway(new Position(2, 9), new Position(4, 20));
-  static Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 15));
-  static Hallway h3 = new Hallway(new Position(21, 15), new Position(23, 6));
-  static Hallway h4 = new Hallway(new Position(4, 35), new Position(26, 2));
-  static Hallway h5 = new Hallway(new Position(8, 29), new Position(30, 32));
-  static Hallway h6 = new Hallway(new Position(7, 25), new Position(7,19));
-  static Hallway h7 = new Hallway(new Position(28, 8), new Position(33, 27));
-  static Hallway h8 = new Hallway(new Position(23, 24), new Position(30, 29));
   static Player p1 = new Player("1");
   static Player p2 = new Player("2");
   static Player p3 = new Player("3");
@@ -34,9 +25,7 @@ class LevelTesting {
   public static void main(String[] args) throws Exception {
     createInitialGameState();
     testGetIsKeyFoundBefore(); // will be false, key hasn't been found yet
-    testGetKeyPosition();
     testGetDoorPositions();
-    testGetExitPosition();
     testGetKeyPositionInLevel();
     testGetExitPositionInLevel();
 
@@ -47,18 +36,12 @@ class LevelTesting {
     testGetIsKeyFound();
     testGetExitTileInLevelAfterUnlocked();
 
-    testGetStartPositionHallway();
-    testGetEndPositionHallway();
-    testGetHallwayWaypoints();
     invalidRoom();
     invalidDoorPlacement();
     testGetRowPosition();
     testGetColPosition();
     testGetDoorPositions();
     testGetTileInRoom();
-    testgetAllRoomsInLevel();
-    testgetLevelRows();
-    testgetLevelCols();
     testRoomGetNumOfRows();
     testRoomGetNumOfCols();
     testGetRoomOriginInLevel();
@@ -75,16 +58,16 @@ class LevelTesting {
   private static void createModifiedAfterObjectGameState() {
     System.out.println("MODIFIED AFTER OBJECT INTERACTION GAMESTATE:\n\n\n");
     //expels player 2 from board
-    level1.moveAdversary(a2, p4.getCharacterPosition());
+    level1.moveCharacter(a2, p4.getCharacterPosition());
     level1.expelPlayer(p4);
     // this moves player 2 to the key tile
-    level1.movePlayer(p2, new Position(5, 27));
+    level1.moveCharacter(p2, new Position(5, 27));
     System.out.println(level1.renderLevel());
     System.out.println("");
     // this moves player 2 off of the key tile, and the rendered level shows that the
     // key is no longer on the board (because it's been found & collected), and the level exit
     // once a filled-in circle, is now a hollow circle, symbolizing that it is unlocked
-    level1.movePlayer(p2, new Position(5, 28));
+    level1.moveCharacter(p2, new Position(5, 28));
     System.out.println(level1.renderLevel());
     System.out.println("");
   }
@@ -93,16 +76,16 @@ class LevelTesting {
     System.out.println();
     System.out.println("INTERMEDIATE GAMESTATE:");
     System.out.println();
-    level1.movePlayer(p1, new Position(2,13));
-    level1.movePlayer(p3, new Position(15,20));
-    level1.movePlayer(p4, new Position(30,4));
+    level1.moveCharacter(p1, new Position(2,13));
+    level1.moveCharacter(p3, new Position(15,20));
+    level1.moveCharacter(p4, new Position(30,4));
     //move adversaries around
-    level1.moveAdversary(a1, new Position(21,17));
+    level1.moveCharacter(a1, new Position(21,17));
     //move adversary 2 right next to a player
-    level1.moveAdversary(a2, new Position(30,3));
+    level1.moveCharacter(a2, new Position(30,3));
 
     //moves player 2 right next to key in level
-    level1.movePlayer(p2, new Position(level1.getKeyPositionInLevel().getRow(), level1.getKeyPositionInLevel().getCol() - 1));
+    level1.moveCharacter(p2, new Position(level1.getKeyPositionInLevel().getRow(), level1.getKeyPositionInLevel().getCol() - 1));
     System.out.print(level1.renderLevel());
   }
 
@@ -114,11 +97,11 @@ class LevelTesting {
     room1.addDoor(new Position(2, 9));
     room1.addDoor(new Position(7,6));
 
-    room4.addKey(new Position(3, 2));
+    level1.addObject(new Position(3, 2), "*");
 
     //Room 2
     room2.addDoor(new Position(0, 0));
-    room2.addExit(new Position(2, 3));
+    level1.addObject(new Position(2, 3), "●");
     room2.addDoor(new Position(6,0));
     room2.addDoor(new Position(8,9));
 
@@ -149,39 +132,50 @@ class LevelTesting {
     level1.addRoom(room5);
     level1.addRoom(room6);
 
-    h1.addAWaypoint(new Position(2, 20));
-    h1.connectHallwayWaypoints();
 
-    h2.addAWaypoint(new Position(11, 6));
-    h2.addAWaypoint(new Position(11, 15));
-    h2.connectHallwayWaypoints();
+  //adding hallways
+    ArrayList<Position> h1Waypoints = new ArrayList<>();
+    h1Waypoints.add(new Position(2, 20));
+    Hallway h1 = new Hallway(new Position(2, 9), new Position(4, 20),
+            h1Waypoints);
 
-    h3.addAWaypoint(new Position(21,6));
-    h3.connectHallwayWaypoints();
+    ArrayList<Position> h2Waypoints = new ArrayList<>();
+    h2Waypoints.add(new Position(11, 6));
+    h2Waypoints.add(new Position(11, 15));
+    Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 15), h2Waypoints);
 
-    h4.addAWaypoint(new Position(4, 37));
-    h4.addAWaypoint(new Position(38, 37));
-    h4.addAWaypoint(new Position(38, 0));
-    h4.addAWaypoint(new Position(26, 0));
-    h4.connectHallwayWaypoints();
+    ArrayList<Position> h3Waypoints = new ArrayList<>();
+    h3Waypoints.add(new Position(21,6));
+    Hallway h3 = new Hallway(new Position(21, 15), new Position(23, 6), h3Waypoints);
 
-    h5.addAWaypoint(new Position(25,29));
-    h5.addAWaypoint(new Position(25, 32));
-    h5.connectHallwayWaypoints();
+    ArrayList<Position> h4Waypoints = new ArrayList<>();
+    h4Waypoints.add(new Position(4, 37));
+    h4Waypoints.add(new Position(38, 37));
+    h4Waypoints.add(new Position(38, 0));
+    h4Waypoints.add(new Position(26, 0));
+    Hallway h4 = new Hallway(new Position(4, 35), new Position(26, 2), h4Waypoints);
 
-    h6.addAWaypoint(new Position(7,24));
-    h6.addAWaypoint(new Position(10,24));
-    h6.addAWaypoint(new Position(10,19));
-    h6.connectHallwayWaypoints();
+    ArrayList<Position> h5Waypoints = new ArrayList<>();
+    h5Waypoints.add(new Position(25,29));
+    h5Waypoints.add(new Position(25, 32));
+    Hallway h5 = new Hallway(new Position(8, 29), new Position(30, 32), h5Waypoints);
 
-    h7.addAWaypoint(new Position(28, 11));
-    h7.addAWaypoint(new Position(33, 11));
-    h7.connectHallwayWaypoints();
+    ArrayList<Position> h6Waypoints = new ArrayList<>();
+    h6Waypoints.add(new Position(7,24));
+    h6Waypoints.add(new Position(10,24));
+    h6Waypoints.add(new Position(10,19));
+    Hallway h6 = new Hallway(new Position(7, 25), new Position(7,19), h6Waypoints);
 
-    h8.addAWaypoint(new Position(23, 27));
-    h8.addAWaypoint(new Position(27, 27));
-    h8.addAWaypoint(new Position(27, 29));
-    h8.connectHallwayWaypoints();
+    ArrayList<Position> h7Waypoints = new ArrayList<>();
+    h7Waypoints.add(new Position(28, 11));
+    h7Waypoints.add(new Position(33, 11));
+    Hallway h7 = new Hallway(new Position(28, 8), new Position(33, 27), h7Waypoints);
+
+    ArrayList<Position> h8Waypoints = new ArrayList<>();
+    h8Waypoints.add(new Position(23, 27));
+    h8Waypoints.add(new Position(27, 27));
+    h8Waypoints.add(new Position(27, 29));
+    Hallway h8 = new Hallway(new Position(23, 24), new Position(30, 29), h8Waypoints);
 
     level1.addHallway(h1);
     level1.addHallway(h2);
@@ -193,14 +187,14 @@ class LevelTesting {
     level1.addHallway(h8);
 
     //add players to level
-    level1.addPlayer(p1, new Position(2, 4));
-    level1.addPlayer(p2, new Position(6, 1));
-    level1.addPlayer(p3, new Position(5, 5));
-    level1.addPlayer(p4, new Position(7, 2));
+    level1.addCharacter(p1, new Position(2, 4));
+    level1.addCharacter(p2, new Position(6, 1));
+    level1.addCharacter(p3, new Position(5, 5));
+    level1.addCharacter(p4, new Position(7, 2));
 
     //add adversaries to the level
-    level1.addAdversary(a1, new Position(32,29));
-    level1.addAdversary(a2, new Position(34,32));
+    level1.addCharacter(a1, new Position(32,29));
+    level1.addCharacter(a2, new Position(34,32));
     System.out.print(level1.renderLevel());
   }
 
@@ -233,11 +227,6 @@ class LevelTesting {
   }
 
   @Test
-  public static void testGetKeyPosition() {
-    assertEquals(new Position(3,2), room4.getKeyPosition());
-  }
-
-  @Test
   public static void testGetIsKeyFound() {
     assertEquals("■", level1.getTileInLevel(level1.getKeyPositionInLevel()));
   }
@@ -265,12 +254,6 @@ class LevelTesting {
   }
 
   @Test
-  public static void testGetExitPosition() {
-    Position result = new Position(2, 3);
-    assertEquals(result, room2.getExitPosition());
-  }
-
-  @Test
   public static void testGetExitPositionInLevel() {
     assertEquals(new Position(17, 18), level1.getExitPositionInLevel());
   }
@@ -279,85 +262,6 @@ class LevelTesting {
   public static void testGetKeyPositionInLevel() {
     assertEquals(new Position(5, 27), level1.getKeyPositionInLevel());
   }
-
-  @Test
-  public static void testGetStartPositionHallway() {
-    assertEquals(new Position(2,9), h1.getStartPositionOfHallway());
-    assertEquals(new Position(7,6), h2.getStartPositionOfHallway());
-    assertEquals(new Position(21,15), h3.getStartPositionOfHallway());
-    assertEquals(new Position(4,35), h4.getStartPositionOfHallway());
-    assertEquals(new Position(8,29),h5.getStartPositionOfHallway());
-    assertEquals(new Position(7,25),h6.getStartPositionOfHallway());
-  }
-
-  @Test
-  public static void testGetEndPositionHallway() {
-    assertEquals(new Position(4,20), h1.getEndPositionOfHallway());
-    assertEquals(new Position(15,15), h2.getEndPositionOfHallway());
-    assertEquals(new Position(23,6), h3.getEndPositionOfHallway());
-    assertEquals(new Position(26,2), h4.getEndPositionOfHallway());
-    assertEquals(new Position(30,32), h5.getEndPositionOfHallway());
-    assertEquals(new Position(7,19), h6.getEndPositionOfHallway());
-  }
-
-  @Test
-  public static void testGetHallwayWaypoints() {
-    ArrayList<Position> waypoints = new ArrayList<Position>();
-    waypoints.add(new Position(2,20));
-    assertEquals(waypoints, h1.getWaypoints());
-
-    waypoints.clear();
-    waypoints.add(new Position(11,6));
-    waypoints.add(new Position(11,15));
-    assertEquals(waypoints, h2.getWaypoints());
-
-    waypoints.clear();
-    waypoints.add(new Position(21,6));
-    assertEquals(waypoints, h3.getWaypoints());
-
-
-    waypoints.clear();
-    waypoints.add(new Position(4,37));
-    waypoints.add(new Position(38,37));
-    waypoints.add(new Position(38,0));
-    waypoints.add(new Position(26,0));
-    assertEquals(waypoints, h4.getWaypoints());
-
-    waypoints.clear();
-    waypoints.add(new Position(25,29));
-    waypoints.add(new Position(25,32));
-    assertEquals(waypoints, h5.getWaypoints());
-
-    waypoints.clear();
-    waypoints.add(new Position(7,24));
-    waypoints.add(new Position(10,24));
-    waypoints.add(new Position(10,19));
-    assertEquals(waypoints, h6.getWaypoints());
-
-  }
-
-  @Test
-  public static void testgetAllRoomsInLevel() {
-    LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
-    allRooms.add(room1);
-    allRooms.add(room2);
-    allRooms.add(room3);
-    allRooms.add(room4);
-    allRooms.add(room5);
-    allRooms.add(room6);
-    assertEquals(allRooms, level1.getAllRooms());
-  }
-
-  @Test
-  public static void testgetLevelRows() {
-    assertEquals(40, level1.getLevelNumOfRows());
-  }
-
-  @Test
-  public static void testgetLevelCols() {
-    assertEquals(40, level1.getLevelNumOfCols());
-  }
-
 
 
   @Test
