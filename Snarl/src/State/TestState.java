@@ -150,7 +150,7 @@ public class TestState {
       JSONArray playerPosJSON = playerObj.getJSONArray("position");
       Position playerPos = new Position(playerPosJSON.getInt(0), playerPosJSON.getInt(1));
       Player newPlayer = new Player(playerName);
-      level.addPlayer(newPlayer, playerPos);
+      level.addCharacter(newPlayer, playerPos);
     }
   }
 
@@ -175,7 +175,7 @@ public class TestState {
       }
       else if (type.equals("ghost")) {
         IAdversary newGhost = new Ghost(adversaryName);
-        level.addAdversary(newGhost, adversaryPos);
+        level.addCharacter(newGhost, adversaryPos);
       }
     }
   }

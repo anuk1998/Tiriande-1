@@ -178,7 +178,7 @@ public class TestLevel {
       case "*":
       case "●":
       case "O":
-      case "#":
+      case "■":
       case ".":
         type = "room";
         break;

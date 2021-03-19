@@ -97,11 +97,11 @@ class LevelTesting {
     room1.addDoor(new Position(2, 9));
     room1.addDoor(new Position(7,6));
 
-    level1.addKey(new Position(3, 2));
+    level1.addObject(new Position(3, 2), "*");
 
     //Room 2
     room2.addDoor(new Position(0, 0));
-    level1.addExit(new Position(2, 3));
+    level1.addObject(new Position(2, 3), "●");
     room2.addDoor(new Position(6,0));
     room2.addDoor(new Position(8,9));
 
@@ -187,14 +187,14 @@ class LevelTesting {
     level1.addHallway(h8);
 
     //add players to level
-    level1.addPlayer(p1, new Position(2, 4));
-    level1.addPlayer(p2, new Position(6, 1));
-    level1.addPlayer(p3, new Position(5, 5));
-    level1.addPlayer(p4, new Position(7, 2));
+    level1.addCharacter(p1, new Position(2, 4));
+    level1.addCharacter(p2, new Position(6, 1));
+    level1.addCharacter(p3, new Position(5, 5));
+    level1.addCharacter(p4, new Position(7, 2));
 
     //add adversaries to the level
-    level1.addAdversary(a1, new Position(32,29));
-    level1.addAdversary(a2, new Position(34,32));
+    level1.addCharacter(a1, new Position(32,29));
+    level1.addCharacter(a2, new Position(34,32));
     System.out.print(level1.renderLevel());
   }
 

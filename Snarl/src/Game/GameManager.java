@@ -137,7 +137,7 @@ public class GameManager {
                 currentLevel.openExitTile();
                 return true;
             case PLAYER_SELF_ELIMINATES:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
                 return true;
             case PLAYER_EXPELLED:
@@ -208,7 +208,7 @@ public class GameManager {
             allPlayers.put(name, newPlayer);
             allCharacters.add(newPlayer);
             Position randomPos = currentLevel.pickRandomPositionForCharacterInLevel();
-            currentLevel.addPlayer(newPlayer, randomPos);
+            currentLevel.addCharacter(newPlayer, randomPos);
             System.out.println("Player " + name + " has been registered at position: [" + newPlayer.getCharacterPosition().getRow() + ", " +
                     newPlayer.getCharacterPosition().getCol() + "]");
         }
@@ -234,7 +234,7 @@ public class GameManager {
         }
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
-        currentLevel.addAdversary(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
+        currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
         System.out.println("New adversary " + name + " of type: " + type + " has been registered.");
     }
 }

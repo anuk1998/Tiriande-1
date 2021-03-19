@@ -16,12 +16,28 @@ public class Level {
   HashMap<String, ArrayList<Hallway>> roomsAndTheirHallways = new HashMap<String, ArrayList<Hallway>>();
   HashMap<String, Room> positionsAndTheirRooms = new HashMap<>();
 
-    public Level() {
-      levelNumOfRows = 40;
-      levelNumOfCols = 40;
-      levelPlane = new String[levelNumOfRows][levelNumOfCols];
-      makeLevel();
+  public Level() {
+    levelNumOfRows = 40;
+    levelNumOfCols = 40;
+    levelPlane = new String[levelNumOfRows][levelNumOfCols];
+    makeLevel();
+  }
+
+  /**
+   *
+   * Methods that construct the Level.
+   *
+   */
+
+  // Constructs the 2D String array of the level, populating all entries with '.'
+  //    and constructs the set containing all level positions
+  public void makeLevel() {
+    for (int i = 0; i < this.levelNumOfRows; i++) {
+      for (int j = 0; j < this.levelNumOfCols; j++) {
+        this.levelPlane[i][j] = " ";
+      }
     }
+  }
 
   // Adds a Room to the levelPlane 2D array
   public void addRoom(Room r) throws ArrayIndexOutOfBoundsException {

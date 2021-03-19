@@ -27,7 +27,7 @@ public class StateTesting {
     createInitialGameBoard();
 
     //testIsLastLevel();
-    //testParseMoveDoAction();
+    testParseMoveDoAction();
     //testRegisterAdversary();
     //testRegisterPlayer();
     //testis2CardinalTilesAway();
@@ -41,9 +41,13 @@ public class StateTesting {
     //testEncountersOppositeCharacter();
   }
 
+
   @Test
   public static void testParseMoveDoAction() {
-    assertEquals(true, gm.parseMoveStatusAndDoAction(GameStatus.INVALID, new Position(2000, 2), level1.getPlayerObjectFromName("Carl") ));
+    assertEquals(true, gm.parseMoveStatusAndDoAction(GameStatus.INVALID, new Position(2000, 2), level1.getPlayerObjectFromName("Carl")));
+    Position ghostPos = level1.getAdversaryObjectFromName("scary").getCharacterPosition();
+    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, ghostPos, level1.getPlayerObjectFromName("Carl"));
+    assertEquals(null, level1.getPlayerObjectFromName("Carl"));
   }
 
   @Test
@@ -65,7 +69,7 @@ public class StateTesting {
     assertEquals(true, gm.checkPlayerActiveStatus(bob));
     // checking active status after Player has been expelled
     IAdversary evil = new Ghost("evil");
-    level1.addAdversary(evil, new Position(bob.getCharacterPosition().getRow() - 1, bob.getCharacterPosition().getCol()));
+    level1.addCharacter(evil, new Position(bob.getCharacterPosition().getRow() - 1, bob.getCharacterPosition().getCol()));
     gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, evil.getCharacterPosition(), bob);
     assertEquals(false, gm.checkPlayerActiveStatus(bob));
   }
@@ -73,9 +77,9 @@ public class StateTesting {
   @Test
   public static void testEncountersOppositeCharacter() {
     Player selfEliminator = new Player("selfEliminator455");
-    level1.addPlayer(selfEliminator, new Position(4,4));
+    level1.addCharacter(selfEliminator, new Position(4,4));
     IAdversary boo = new Ghost("boo!");
-    level1.addAdversary(boo, new Position(4,5));
+    level1.addCharacter(boo, new Position(4,5));
     level1.moveCharacter(selfEliminator, boo.getCharacterPosition());
     RuleCheckerPlayer selfElimRCP = new RuleCheckerPlayer(level1, selfEliminator);
     assertEquals(GameStatus.PLAYER_SELF_ELIMINATES, selfElimRCP.encountersOppositeCharacter());
@@ -103,20 +107,20 @@ public class StateTesting {
   public static void testRunRuleCheckerPlayer() {
     Player ruleChecker = new Player("ruleChecker444");
     RuleCheckerPlayer ruleChecker444 = new RuleCheckerPlayer(level1, ruleChecker);
-    level1.addPlayer(ruleChecker, new Position (3,3));
+    level1.addCharacter(ruleChecker, new Position (3,3));
     assertEquals(GameStatus.VALID, ruleChecker444.runRuleChecker(new Position(3,4)));
   }
 
   @Test public static void testis2CardinalTilesAway() {
       RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, level1.getPlayerObjectFromName("Bob"));
-      level1.addPlayer(level1.getPlayerObjectFromName("Bob"), new Position (5,5));
+      level1.addCharacter(level1.getPlayerObjectFromName("Bob"), new Position (5,5));
       assertEquals(false, ruleCheckerp1.is2CardinalTilesAway(new Position (0,0)));
   }
 
   @Test public static void testIsValidMove() {
     Player validMover = new Player("ValidMover223");
     RuleCheckerPlayer ruleCheckerValid = new RuleCheckerPlayer(level1, validMover);
-    level1.addPlayer(validMover, new Position (5,7));
+    level1.addCharacter(validMover, new Position (5,7));
     assertEquals(true, ruleCheckerValid.isValidMove(new Position (5,8)));
     assertEquals(false, ruleCheckerValid.isValidMove(new Position(40,400)));
   }
@@ -130,12 +134,12 @@ public class StateTesting {
   public static void testKeyTileIsLandedOnAndExitLandedOnAfter() {
     Player keyFinder = new Player("KeyFinder229");
     RuleCheckerPlayer ruleCheckerKey = new RuleCheckerPlayer(level1, keyFinder);
-    level1.addPlayer(keyFinder, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
+    level1.addCharacter(keyFinder, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
     level1.moveCharacter(keyFinder, level1.getKeyPositionInLevel());
     assertEquals(GameStatus.KEY_FOUND, ruleCheckerKey.keyTileIsLandedOn());
 
     Player exitLander = new Player("exitlander777");
-    level1.addPlayer(exitLander, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
+    level1.addCharacter(exitLander, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
     level1.moveCharacter(exitLander, level1.getExitPositionInLevel());
     RuleCheckerPlayer exitLanderRCP = new RuleCheckerPlayer(level1, exitLander);
     level1.openExitTile();
@@ -180,8 +184,8 @@ public class StateTesting {
     level1.addRoom(room6);
 
     //adding key and exit
-    level1.addKey(new Position(5, 27));
-    level1.addExit(new Position(17, 18));
+    level1.addObject(new Position(5, 27), "*");
+    level1.addObject(new Position(17, 18), "●");
 
     ArrayList<Position> h1Waypoints = new ArrayList<>();
     h1Waypoints.add(new Position(2, 20));
@@ -247,8 +251,7 @@ public class StateTesting {
     gm.registerAdversary("scary", "ghost");
     gm.registerAdversary("bloody", "zombie");
 
-    System.out.print(level1.renderLevel());
-
+    System.out.println(level1.renderLevel());
   }
 
 }
