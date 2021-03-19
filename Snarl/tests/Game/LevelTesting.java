@@ -14,14 +14,6 @@ class LevelTesting {
   static Room room4 = new Room(new Position(2, 25), 7, 11);
   static Room room5 = new Room(new Position(23, 2), 14, 7);
   static Room room6 = new Room(new Position(30,27), 7,7);
-  static Hallway h1 = new Hallway(new Position(2, 9), new Position(4, 20));
-  static Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 15));
-  static Hallway h3 = new Hallway(new Position(21, 15), new Position(23, 6));
-  static Hallway h4 = new Hallway(new Position(4, 35), new Position(26, 2));
-  static Hallway h5 = new Hallway(new Position(8, 29), new Position(30, 32));
-  static Hallway h6 = new Hallway(new Position(7, 25), new Position(7,19));
-  static Hallway h7 = new Hallway(new Position(28, 8), new Position(33, 27));
-  static Hallway h8 = new Hallway(new Position(23, 24), new Position(30, 29));
   static Player p1 = new Player("1");
   static Player p2 = new Player("2");
   static Player p3 = new Player("3");
@@ -66,16 +58,16 @@ class LevelTesting {
   private static void createModifiedAfterObjectGameState() {
     System.out.println("MODIFIED AFTER OBJECT INTERACTION GAMESTATE:\n\n\n");
     //expels player 2 from board
-    level1.moveAdversary(a2, p4.getCharacterPosition());
+    level1.moveCharacter(a2, p4.getCharacterPosition());
     level1.expelPlayer(p4);
     // this moves player 2 to the key tile
-    level1.movePlayer(p2, new Position(5, 27));
+    level1.moveCharacter(p2, new Position(5, 27));
     System.out.println(level1.renderLevel());
     System.out.println("");
     // this moves player 2 off of the key tile, and the rendered level shows that the
     // key is no longer on the board (because it's been found & collected), and the level exit
     // once a filled-in circle, is now a hollow circle, symbolizing that it is unlocked
-    level1.movePlayer(p2, new Position(5, 28));
+    level1.moveCharacter(p2, new Position(5, 28));
     System.out.println(level1.renderLevel());
     System.out.println("");
   }
@@ -84,16 +76,16 @@ class LevelTesting {
     System.out.println();
     System.out.println("INTERMEDIATE GAMESTATE:");
     System.out.println();
-    level1.movePlayer(p1, new Position(2,13));
-    level1.movePlayer(p3, new Position(15,20));
-    level1.movePlayer(p4, new Position(30,4));
+    level1.moveCharacter(p1, new Position(2,13));
+    level1.moveCharacter(p3, new Position(15,20));
+    level1.moveCharacter(p4, new Position(30,4));
     //move adversaries around
-    level1.moveAdversary(a1, new Position(21,17));
+    level1.moveCharacter(a1, new Position(21,17));
     //move adversary 2 right next to a player
-    level1.moveAdversary(a2, new Position(30,3));
+    level1.moveCharacter(a2, new Position(30,3));
 
     //moves player 2 right next to key in level
-    level1.movePlayer(p2, new Position(level1.getKeyPositionInLevel().getRow(), level1.getKeyPositionInLevel().getCol() - 1));
+    level1.moveCharacter(p2, new Position(level1.getKeyPositionInLevel().getRow(), level1.getKeyPositionInLevel().getCol() - 1));
     System.out.print(level1.renderLevel());
   }
 

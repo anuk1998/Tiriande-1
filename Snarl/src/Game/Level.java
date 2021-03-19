@@ -59,7 +59,7 @@ public class Level {
     public void addHallway(Hallway hallway) {
       listOfHallwaysInLevel.add(hallway);
       for (Position hallwayPos : hallway.getAllHallwayPositions()) {
-        this.levelPlane[hallwayPos.getRow()][hallwayPos.getCol()] = "X";
+        this.levelPlane[hallwayPos.getRow()][hallwayPos.getCol()] = "x";
       }
       // adds that hallway to its room's list of connected hallways
       for (Room r : startAndEndRooms(hallway)) {
@@ -145,7 +145,7 @@ public class Level {
     public void makeLevel() {
       for (int i = 0; i < this.levelNumOfRows; i++) {
         for (int j = 0; j < this.levelNumOfCols; j++) {
-          this.levelPlane[i][j] = ".";
+          this.levelPlane[i][j] = " ";
         }
       }
     }
