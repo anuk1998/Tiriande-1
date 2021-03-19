@@ -59,7 +59,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     @Override
     public boolean isTileTraversable(Position tile) {
-        return !this.currentLevel.getTileInLevel(tile).equals(" ") && !this.currentLevel.getTileInLevel(tile).equals("#") &&
+        return !this.currentLevel.getTileInLevel(tile).equals(" ") && !this.currentLevel.getTileInLevel(tile).equals("■") &&
                 !isOccupiedByAnotherPlayer(tile);
     }
 
@@ -72,6 +72,17 @@ public class RuleCheckerPlayer implements IRuleChecker {
     private boolean isOccupiedByAnotherPlayer(Position tile) {
         String symbol = this.currentLevel.getTileInLevel(tile);
         return symbol.equals("@") || symbol.equals("¤") || symbol.equals("$") || symbol.equals("~");
+    }
+
+    /**
+     * Checks if the requested destination is occupied by an Adversary.
+     *
+     * @param destination the goal destination
+     * @return a boolean representing if that tile has an adversary on it
+     */
+    private boolean isOccupiedByAdversary(Position destination) {
+        String goalTile = this.currentLevel.getTileInLevel(destination);
+        return goalTile.equals("G") || goalTile.equals("Z");
     }
 
     /**
@@ -96,11 +107,11 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public boolean is2CardinalTilesAway(Position destPoint) {
         boolean withinReach = false;
         ArrayList<Position> cardinalTiles = new ArrayList<Position>();
-        ArrayList<Position> adjTiles = currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition(), null);
+        ArrayList<Position> adjTiles = currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition());
 
         for (Position adjacent : adjTiles) {
             cardinalTiles.add(adjacent);
-            for (Position adjacentOfAdjacent: currentLevel.getAllAdjacentTiles(adjacent, null)) {
+            for (Position adjacentOfAdjacent: currentLevel.getAllAdjacentTiles(adjacent)) {
                 if (!cardinalTiles.contains(adjacentOfAdjacent)) {
                     cardinalTiles.add(adjacentOfAdjacent);
                 }
@@ -157,17 +168,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     public boolean isLastLevel() {
         return true;
-    }
-
-    /**
-     * Checks if the requested destination is occupied by an Adversary.
-     *
-     * @param destination the goal destination
-     * @return a boolean representing if that tile has an adversary on it
-     */
-    private boolean isOccupiedByAdversary(Position destination) {
-        String goalTile = this.currentLevel.getTileInLevel(destination);
-        return goalTile.equals("G") || goalTile.equals("Z");
     }
 
     /**

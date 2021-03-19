@@ -60,18 +60,16 @@ public class TestLevel {
     try {
       JSONArray keyPositionObject = objects.getJSONObject(0).getJSONArray("position");
       Position keyPosition = new Position(keyPositionObject.getInt(0), keyPositionObject.getInt(1));
-      level.addKey(keyPosition);
+      level.addObject(keyPosition, "*");
       JSONArray exitPositionObject = objects.getJSONObject(1).getJSONArray("position");
       Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
-      level.addExit(exitPosition);
+      level.addObject(exitPosition, "●");
     }
     catch (Exception e) {
       JSONArray exitPositionObject = objects.getJSONObject(0).getJSONArray("position");
       Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
-      level.addExit(exitPosition);
+      level.addObject(exitPosition, "●");
     }
-
-
   }
 
   // builds each room JSON object into our Room representation
@@ -219,9 +217,9 @@ public class TestLevel {
       for (int j = 0; j < innerArray.length(); j++) {
         int num = innerArray.getInt(j);
         if (num == 0) {
-          roomObj.setTileInRoom(i, j, "#");
-        } else if (num == 1) {
           roomObj.setTileInRoom(i, j, "■");
+        } else if (num == 1) {
+          roomObj.setTileInRoom(i, j, ".");
         } else if (num == 2) {
           roomObj.addDoor(new Position(i, j));
         }

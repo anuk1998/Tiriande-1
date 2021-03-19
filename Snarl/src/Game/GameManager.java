@@ -145,11 +145,11 @@ public class GameManager {
                 currentLevel.moveCharacter(c, destination);
                 return true;
             case PLAYER_EXITED:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 return true;
             case LEVEL_WON:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 resurrectPlayers();
                 System.out.print("Congrats!! Players have won the level!");

@@ -1,19 +1,20 @@
 package Game;
+
 import java.util.*;
 
 public class Level {
-    int levelNumOfRows;
-    int levelNumOfCols;
-    String[][] levelPlane;
-    LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
-    Position keyLevelPosition;
-    Position exitLevelPosition;
-    Set<Player> activePlayers = new HashSet<Player>();
-    Set<IAdversary> adversaries = new HashSet<IAdversary>();
-    HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
-    Set<Hallway> listOfHallwaysInLevel = new HashSet<>();
-    HashMap<String, ArrayList<Hallway>> roomsAndTheirHallways = new HashMap<String, ArrayList<Hallway>>();
-    HashMap<String, Room> positionsAndTheirRooms = new HashMap<>();
+  int levelNumOfRows;
+  int levelNumOfCols;
+  String[][] levelPlane;
+  LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
+  Position keyLevelPosition;
+  Position exitLevelPosition;
+  Set<Player> activePlayers = new HashSet<Player>();
+  Set<IAdversary> adversaries = new HashSet<IAdversary>();
+  HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
+  Set<Hallway> listOfHallwaysInLevel = new HashSet<>();
+  HashMap<String, ArrayList<Hallway>> roomsAndTheirHallways = new HashMap<String, ArrayList<Hallway>>();
+  HashMap<String, Room> positionsAndTheirRooms = new HashMap<>();
 
     public Level() {
       levelNumOfRows = 40;
@@ -22,313 +23,307 @@ public class Level {
       makeLevel();
     }
 
-    // adds a Room to the levelPlane 2D array
-    public void addRoom(Room r) throws ArrayIndexOutOfBoundsException {
-      try {
-        int roomRows = r.getNumOfRows();
-        int roomCols = r.getNumOfCols();
-        int startPosRow = r.getRoomOriginInLevel().getRow();
-        int startPosCol = r.getRoomOriginInLevel().getCol();
-
-        int roomRowIndex = 0;
-        for (int i = startPosRow; i < startPosRow + roomRows; i++) {
-          int roomColIndex = 0;
-          for (int j = startPosCol; j < startPosCol + roomCols; j++) {
-            String tile = r.getTileInRoom(new Position(roomRowIndex, roomColIndex));
-            levelPlane[i][j] = tile;
-            this.allRooms.add(r);
-            this.positionsAndTheirRooms.put(new Position(i, j).toString(), r);
-            roomColIndex++;
-          }
-          roomRowIndex++;
+  // Adds a Room to the levelPlane 2D array
+  public void addRoom(Room r) throws ArrayIndexOutOfBoundsException {
+    try {
+      for (Position posInRoom : r.getListOfAllPositions()) {
+        int scaledLevelRow = posInRoom.getRow() + r.getRoomOriginInLevel().getRow();
+        int scaledLevelCol = posInRoom.getCol() + r.getRoomOriginInLevel().getCol();
+        // if position is a door, add it to map of doors in level
+        if (r.getDoorPositions().contains(posInRoom)) {
+          this.listOfDoorsInLevel.put(new Position(scaledLevelRow, scaledLevelCol).toString(), r);
         }
-        for (Position doorPos : r.getDoorPositions()) {
-          Position scaledPos = new Position(doorPos.getRow() + r.getRoomOriginInLevel().getRow(),
-                  doorPos.getCol() + r.getRoomOriginInLevel().getCol());
-          this.listOfDoorsInLevel.put(scaledPos.toString(), r);
-        }
-        this.allRooms.add(r);
-        this.roomsAndTheirHallways.put(r.getRoomOriginInLevel().toString(), new ArrayList<>());
+        // add tile to the level board
+        this.levelPlane[scaledLevelRow][scaledLevelCol] = r.getTileInRoom(posInRoom);
+        // add position to map of positions and rooms
+        this.positionsAndTheirRooms.put(new Position(scaledLevelRow, scaledLevelCol).toString(), r);
       }
-      catch (ArrayIndexOutOfBoundsException e) {
-        throw new ArrayIndexOutOfBoundsException("The given room dimensions are invalid.");
-      }
+      this.allRooms.add(r);
+      this.roomsAndTheirHallways.put(r.getRoomOriginInLevel().toString(), new ArrayList<>());
     }
-
-    // adds a hallway to the levelPlane 2D array
-    public void addHallway(Hallway hallway) {
-      listOfHallwaysInLevel.add(hallway);
-      for (Position hallwayPos : hallway.getAllHallwayPositions()) {
-        this.levelPlane[hallwayPos.getRow()][hallwayPos.getCol()] = "x";
-      }
-      // adds that hallway to its room's list of connected hallways
-      for (Room r : startAndEndRooms(hallway)) {
-        this.roomsAndTheirHallways.get(r.getRoomOriginInLevel().toString()).add(hallway);
-      }
+    catch (ArrayIndexOutOfBoundsException e) {
+      throw new ArrayIndexOutOfBoundsException("The given room dimensions are invalid.");
     }
+  }
 
-    public ArrayList<Hallway> getConnectedHallways(Room r) {
-      return this.roomsAndTheirHallways.get(r.getRoomOriginInLevel().toString());
+  // Adds a hallway to the levelPlane 2D array
+  public void addHallway(Hallway hallway) {
+    listOfHallwaysInLevel.add(hallway);
+    for (Position hallwayPos : hallway.getAllHallwayPositions()) {
+      this.levelPlane[hallwayPos.getRow()][hallwayPos.getCol()] = "x";
     }
-
-    public Room getBelongingRoom(Position p) {
-      return this.positionsAndTheirRooms.get(p.toString());
+    // This part only relevant for testing harness
+    // adds that hallway to its room's list of connected hallways
+    for (Room r : startAndEndRooms(hallway)) {
+      this.roomsAndTheirHallways.get(r.getRoomOriginInLevel().toString()).add(hallway);
     }
+  }
 
-    // returns the Hallway that the given point belongs to
-    public Hallway getHallwayFromPoint(Position p) {
-      Hallway hallway = null;
-      for (Hallway h : this.listOfHallwaysInLevel) {
-        for (Position pos : h.getAllHallwayPositions()) {
-          if (p.equals(pos)) {
-            hallway = h;
-          }
-        }
-      }
-      return hallway;
-    }
-
-    public ArrayList<Position> getAllAdjacentTiles(Position pos, Room room) {
-      ArrayList<Position> adjacentTiles = new ArrayList<Position>();
-      int row = pos.getRow();
-      int col = pos.getCol();
-
-      if (room != null) {
-        int scaledRow = row - room.getRoomOriginInLevel().getRow();
-        int scaledCol = col - room.getRoomOriginInLevel().getCol();
-
-        if (scaledRow >= room.getNumOfRows() || scaledCol >= room.getNumOfCols()) {
-          return null;
-        }
-      }
-
-      Position[] adjacentsToCheck = {
-              new Position(row - 1, col),
-              new Position(row, col - 1),
-              new Position(row, col + 1),
-              new Position(row + 1, col)};
-
-      for (Position adjacentTile : adjacentsToCheck) {
-        try {
-          String tile = this.levelPlane[adjacentTile.getRow()][adjacentTile.getCol()];
-          if (tile.equals(".") || tile.equals("|") || tile.equals("x")) {
-            adjacentTiles.add(adjacentTile);
-          }
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
-          continue;
-        }
-      }
-      return adjacentTiles;
-    }
-
-    // gets the levelNumOfRows field
-    public int getLevelNumOfRows() {
-      return this.levelNumOfRows;
-    }
-
-    // gets the levelNumOfCols field
-    public int getLevelNumOfCols() {
-      return this.levelNumOfCols;
-    }
-
-    public Set<Player> getActivePlayers() {
-      return this.activePlayers;
-    }
-
-    public Set<IAdversary> getAdversaries() {
-      return this.adversaries;
-    }
-
-    // constructs the 2D String array of the level, populating all entries with '.'
-    //    and constructs the set containing all level positions
-    public void makeLevel() {
-      for (int i = 0; i < this.levelNumOfRows; i++) {
-        for (int j = 0; j < this.levelNumOfCols; j++) {
-          this.levelPlane[i][j] = " ";
-        }
-      }
-    }
-
-    // adds the key on the levelPlane based on the given position
-    public void addKey(Position p) throws ArrayIndexOutOfBoundsException {
-      try {
-        this.levelPlane[p.getRow()][p.getCol()] = "*";
+  // Adds an object to the level depending on whether it is a key or exit
+  public void addObject(Position p, String symbol) {
+    try {
+      this.levelPlane[p.getRow()][p.getCol()] = symbol;
+      if (symbol.equals("*")) {
         keyLevelPosition = new Position(p.getRow(), p.getCol());
-      }
-      catch (ArrayIndexOutOfBoundsException e) {
-        throw new ArrayIndexOutOfBoundsException("Given coordinate for key is beyond bounds of the room.");
-      }
-    }
-
-    // adds the exit on the levelPlane based on the given position
-    public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
-      try {
-        this.levelPlane[p.getRow()][p.getCol()] = "●";
+      } else {
         exitLevelPosition = new Position(p.getRow(), p.getCol());
       }
+    }
+    catch (ArrayIndexOutOfBoundsException e) {
+      throw new ArrayIndexOutOfBoundsException("Given coordinate for object is beyond bounds of the level.");
+    }
+  }
+
+  // Places a new character on the board at the given location
+  public void addCharacter(ICharacter character, Position placeLocation) {
+    levelPlane[placeLocation.getRow()][placeLocation.getCol()] = character.getAvatar();
+    character.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
+    if (character instanceof Player) {
+      this.activePlayers.add((Player) character);
+    }
+    else if(character instanceof IAdversary) {
+      this.adversaries.add((IAdversary) character);
+    }
+  }
+
+  // Generates a random valid position for characters to start on when registered to the game
+  public Position pickRandomPositionForCharacterInLevel() {
+    Random rand = new Random();
+    int randomIndexRow = rand.nextInt(this.levelNumOfRows);
+    int randomIndexCol = rand.nextInt(this.levelNumOfCols);
+    String randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
+
+    while (!randomTile.equals(".") && !randomTile.equals("|") && !randomTile.equals("●")) {
+      randomIndexRow = rand.nextInt(this.levelNumOfRows);
+      randomIndexCol = rand.nextInt(this.levelNumOfCols);
+      randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
+    }
+    return new Position(randomIndexRow, randomIndexCol);
+  }
+
+  // Draws the levelPlane
+  public String renderLevel() {
+    StringBuilder levelASCII = new StringBuilder();
+    for (int i = 0; i < levelNumOfRows; i++) {
+      for (int j = 0; j < levelNumOfCols; j++) {
+        if (j == levelNumOfCols - 1) {
+          levelASCII.append(levelPlane[i][j]).append("\n");
+        } else {
+          levelASCII.append(levelPlane[i][j]).append(" ");
+        }
+      }
+    }
+    return levelASCII.toString();
+  }
+
+  /**
+   *
+   * Methods that change the game state.
+   *
+   */
+
+  // Moves the given character to the given destination on the level plane
+  public void moveCharacter(ICharacter character, Position movePosition) {
+    restoreCharacterTile(character);
+    this.levelPlane[movePosition.getRow()][movePosition.getCol()] = character.getAvatar();
+    character.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
+  }
+
+  // When moving or eliminating a character, this method converts the character's current position back
+  //  to the tile type that it was before the character moved onto it
+  public void restoreCharacterTile(ICharacter character) {
+    if (isInHallway(character)) {
+      this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "x";
+    }
+    else if (isOnADoor(character)) {
+      this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "|";
+    }
+    else if (character.getCharacterPosition().toString().equals(exitLevelPosition.toString())) {
+      this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "●";
+    }
+    else {
+      this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = ".";
+    }
+  }
+
+  // Helper method for moveCharacter, checks if character is in a hallway
+  private boolean isInHallway(ICharacter character) {
+    Position charPos = character.getCharacterPosition();
+    for (Hallway hallway : listOfHallwaysInLevel) {
+      if (hallway.getAllHallwayPositions().contains(charPos)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Helper method for moveCharacter, checks if character is on a door
+  private boolean isOnADoor(ICharacter character) {
+    String charPosStr = character.getCharacterPosition().toString();
+    for (String doorPos : listOfDoorsInLevel.keySet()) {
+      if (charPosStr.equals(doorPos)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Expels the given player from the level
+  public void expelPlayer(Player p) {
+    this.activePlayers.remove(p);
+    p.setIsExpelled(true);
+  }
+
+  // Helper method for expelPlayer when called in GameManager, returns the player at a given position
+  // for the case when a player is expelled by an adversary on an adversary move
+  public Player playerAtGivenPosition(Position p) {
+    for (Player player : this.activePlayers) {
+      if (player.getCharacterPosition().toString().equals(p.toString())) {
+        return player;
+      }
+    }
+    return null;
+  }
+
+  // Changes a closed exit tile to an open exit tile when the key is found by a player
+  public void openExitTile() {
+    levelPlane[exitLevelPosition.getRow()][exitLevelPosition.getCol()] = ("O");
+  }
+
+  // Method that handles when a player successfully passes through the exit by removing them from active players list
+  public void playerPassedThroughExit(ICharacter c) {
+    this.getActivePlayers().remove(c);
+  }
+
+  /**
+   *
+   * Getter methods for Level fields.
+   *
+   */
+
+  // Returns the number of rows there are in the level board
+  public int getLevelNumOfRows() {
+    return this.levelNumOfRows;
+  }
+
+  // Returns the number of columns there are in the level board
+  public int getLevelNumOfCols() {
+    return this.levelNumOfCols;
+  }
+
+  // Returns a list of all currently active players in this Level
+  public Set<Player> getActivePlayers() {
+    return this.activePlayers;
+  }
+
+  // Returns the list of adversaries in this Level
+  public Set<IAdversary> getAdversaries() {
+    return this.adversaries;
+  }
+
+  // Returns the position of the key tile in the level
+  public Position getKeyPositionInLevel() {
+    return this.keyLevelPosition;
+  }
+
+  // Returns the position of the exit tile in the level
+  public Position getExitPositionInLevel() {
+    return this.exitLevelPosition;
+  }
+
+  /**
+   *
+   * Helpful methods to retrieve information about the Level and its components.
+   *
+   */
+
+  // Returns what kind of tile is at the given position
+  public String getTileInLevel(Position tilePosition) {
+    return levelPlane[tilePosition.getRow()][tilePosition.getCol()];
+  }
+
+  // Returns a list of tiles that are immediately adjacent to the given position (left, right, up, and down)
+  //  (A room object is given optionally for the testRoom testing harness, otherwise, no room is given)
+  public ArrayList<Position> getAllAdjacentTiles(Position pos) {
+    int row = pos.getRow();
+    int col = pos.getCol();
+
+    ArrayList<Position> adjacentTiles = new ArrayList<>(
+            Arrays.asList(
+                    new Position(row - 1, col), new Position(row, col - 1),
+                    new Position(row + 1, col), new Position(row, col + 1)));
+
+    for (Position adjacentTile : adjacentTiles) {
+      try {
+        // 'tile' is dummy value that is just here to ensure that the adjacent tile is within the bounds of the level
+        String tile = this.levelPlane[adjacentTile.getRow()][adjacentTile.getCol()];
+        adjacentTiles.add(adjacentTile);
+      }
       catch (ArrayIndexOutOfBoundsException e) {
-        throw new ArrayIndexOutOfBoundsException("Given coordinate for exit is beyond bounds of the room.");
+        // if the position is NOT within the bounds of the level, this error is thrown & caught, and the position is simply removed from the list
+        adjacentTiles.remove(adjacentTile);
       }
     }
+    return adjacentTiles;
+  }
 
-    // returns the position of the key tile in the level
-    public Position getKeyPositionInLevel() {
-      return this.keyLevelPosition;
+  /**
+   *
+   * Testing harness-specific methods.
+   *
+   */
+
+  // helper method for testing harness (and used in addHallway), returns the start and end room objects of a hallway
+  public ArrayList<Room> startAndEndRooms(Hallway h) {
+    return new ArrayList<>(
+            Arrays.asList(listOfDoorsInLevel.get(h.getStartPositionOfHallway().toString()),
+                    listOfDoorsInLevel.get(h.getEndPositionOfHallway().toString())));
+  }
+
+  // Returns the Room that the given point belongs to, if it's not in a room, returns null
+  public Room getBelongingRoom(Position p) {
+    try {
+      return this.positionsAndTheirRooms.get(p.toString());
     }
-
-    // returns the position of the exit tile in the level
-    public Position getExitPositionInLevel() {
-      return this.exitLevelPosition;
-    }
-
-    // changes a closed exit tile to an open exit tile when the key is found by a player
-    public void openExitTile() {
-      Position exitPos = getExitPositionInLevel();
-      levelPlane[exitPos.getRow()][exitPos.getCol()] = ("O");
-    }
-
-    // method that handles when a player successfully passes through the exit
-    public void playerPassedThroughExit(ICharacter c) {
-      this.levelPlane[c.getCharacterPosition().getRow()][c.getCharacterPosition().getCol()] = "O";
-      this.getActivePlayers().remove(c);
-    }
-
-    // places new players on the board at the given location if valid (will check validity
-    //    when we implement RuleChecker interface)
-    public void addPlayer(Player player, Position placeLocation) {
-        levelPlane[placeLocation.getRow()][placeLocation.getCol()] = player.getAvatar();
-        player.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
-        this.activePlayers.add(player);
-    }
-
-    // places new adversaries on the board at the given location if valid (will check validity
-    //    when we implement RuleChecker interface)
-    public void addAdversary(IAdversary a, Position placeLocation) {
-        levelPlane[placeLocation.getRow()][placeLocation.getCol()] = a.getAvatar();
-        a.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
-        this.adversaries.add(a);
-    }
-
-    public Position pickRandomPositionForCharacterInLevel() {
-      Random rand = new Random();
-      int randomIndexRow = rand.nextInt(this.levelNumOfRows);
-      int randomIndexCol = rand.nextInt(this.levelNumOfCols);
-      String randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
-
-      while (randomTile.equals(" ") || randomTile.equals("G") || randomTile.equals("Z") || randomTile.equals("#")
-              || randomTile.equals("*") || randomTile.equals("O") || randomTile.equals("@") || randomTile.equals("$")
-              || randomTile.equals("¤") || randomTile.equals("~") || randomTile.equals("x")) {
-        randomIndexRow = rand.nextInt(this.levelNumOfRows);
-        randomIndexCol = rand.nextInt(this.levelNumOfCols);
-        randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
-      }
-
-      return new Position(randomIndexRow, randomIndexCol);
-    }
-
-    public void moveCharacter(ICharacter character, Position movePosition) {
-      if (isInHallway(character)) {
-        this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "x";
-      }
-      else if (isOnADoor(character)) {
-        this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "|";
-      }
-      else if (character.getCharacterPosition().toString().equals(exitLevelPosition.toString())) {
-        this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "●";
-      }
-      else {
-        this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = ".";
-      }
-      this.levelPlane[movePosition.getRow()][movePosition.getCol()] = character.getAvatar();
-      character.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
-    }
-
-    private boolean isInHallway(ICharacter character) {
-      Position charPos = character.getCharacterPosition();
-      for (Hallway hallway : listOfHallwaysInLevel) {
-        for (Position pos : hallway.getAllHallwayPositions()) {
-          if (charPos.toString().equals(pos.toString())) {
-            return true;
-          }
-        }
-      }
-      return false;
-    }
-
-    private boolean isOnADoor(ICharacter character) {
-      String charPosStr = character.getCharacterPosition().toString();
-      for (String doorPos : listOfDoorsInLevel.keySet()) {
-        if (charPosStr.equals(doorPos)) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    public Player getPlayerObjectFromName(String name) {
-      for (Player p: getActivePlayers()) {
-        if (p.getName().equals(name)) {
-          return p;
-        }
-      }
+    catch (Exception e) {
       return null;
     }
+  }
 
-    public ArrayList<Room> startAndEndRooms(Hallway h) {
-      ArrayList<Room> startAndEndRoomList = new ArrayList<Room>();
-      Room startRoom = listOfDoorsInLevel.get(h.getStartPositionOfHallway().toString());
-      Room endRoom = listOfDoorsInLevel.get(h.getEndPositionOfHallway().toString());
-      startAndEndRoomList.add(startRoom);
-      startAndEndRoomList.add(endRoom);
-      return startAndEndRoomList;
-    }
+  // Returns a list of Hallways connected to the given room
+  public ArrayList<Hallway> getConnectedHallways(Room r) {
+    return this.roomsAndTheirHallways.get(r.getRoomOriginInLevel().toString());
+  }
 
-    // returns what kind of tile is at the given position
-    public String getTileInLevel(Position tilePosition) {
-      return levelPlane[tilePosition.getRow()][tilePosition.getCol()];
-    }
-
-    public Player playerAtGivenPosition(Position p) {
-      for (Player player : this.activePlayers) {
-        if (player.getCharacterPosition().toString().equals(p.toString())) {
-          return player;
-        }
+  // returns the Hallway that the given point belongs to
+  public Hallway getHallwayFromPoint(Position p) {
+    for (Hallway h : this.listOfHallwaysInLevel) {
+      if (h.getAllHallwayPositions().contains(p)) {
+        return h;
       }
-      return null;
     }
+    return null;
+  }
 
-    public IAdversary adversaryAtGivenPosition(Position p) {
-      for (IAdversary adversary : this.adversaries) {
-        if (adversary.getCharacterPosition().toString().equals(p.toString())) {
-          return adversary;
-        }
+  // Returns the Player object based on the given unique name
+  public Player getPlayerObjectFromName(String name) {
+    for (Player p: getActivePlayers()) {
+      if (p.getName().equals(name)) {
+        return p;
       }
-      return null;
     }
+    return null;
+  }
 
-    // expels the given player from the level
-    public void expelPlayer(Player p) {
-      this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = adversaryAtGivenPosition(p.getCharacterPosition()).getAvatar();
-      this.activePlayers.remove(p);
-      p.setIsExpelled(true);
-    }
-
-    // draws the levelPlane
-    public String renderLevel() {
-      StringBuilder levelASCII = new StringBuilder();
-      for (int i = 0; i < levelNumOfRows; i++) {
-        for (int j = 0; j < levelNumOfCols; j++) {
-          if (j == levelNumOfCols - 1) {
-            levelASCII.append(levelPlane[i][j] + "\n");
-          } else {
-            levelASCII.append(levelPlane[i][j] + " ");
-          }
-        }
+  // Returns the Adversary object based on the given unique name
+  public IAdversary getAdversaryObjectFromName(String name) {
+    for (IAdversary a: getAdversaries()) {
+      if (a.getName().equals(name)) {
+        return a;
       }
-      return levelASCII.toString();
     }
-
+    return null;
+  }
 }
 
 

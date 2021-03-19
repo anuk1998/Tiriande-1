@@ -8,8 +8,7 @@ Giselle Briand and Anu Kandasamy
 
 ## Plan
 
-List areas of your code/design you'd like to improve with brief descriptions,
-anything that comes to mind. Tip: translate this list into Github Issues.
+The following is a list of things we believe we can realistically achieve refactoring-wise in the next week:
 
 * Clean up code/filter through unnecessary methods in `Level` class
 DONE * Move things from `Level` class into `GameManager`

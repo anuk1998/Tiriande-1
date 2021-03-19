@@ -171,7 +171,7 @@ public class TestState {
       Position adversaryPos = new Position(adversaryPosJSON.getInt(0), adversaryPosJSON.getInt(1));
       if (type.equals("zombie")) {
         IAdversary newZombie = new Zombie(adversaryName);
-        level.addAdversary(newZombie, adversaryPos);
+        level.addCharacter(newZombie, adversaryPos);
       }
       else if (type.equals("ghost")) {
         IAdversary newGhost = new Ghost(adversaryName);

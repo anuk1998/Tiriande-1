@@ -16,8 +16,8 @@ public class StateTesting {
   static Room room5 = new Room(new Position(23, 2), 14, 7);
   static Room room6 = new Room(new Position(30,27), 7,7);
   static Player p1 = new Player("Bob");
-  static IAdversary ghost = new Ghost("Scary Ghost");
-  static IAdversary zombie = new Ghost("Weird Zombie");
+  //static IAdversary ghost = new Ghost("Scary Ghost");
+  //static IAdversary zombie = new Ghost("Weird Zombie");
   static Level[] lev = {level1};
   static ArrayList<Level> listOfLevels = new ArrayList<Level>(Arrays.asList(lev));
   static GameManager gm = new GameManager(listOfLevels);
@@ -148,8 +148,7 @@ public class StateTesting {
     room1.addDoor(new Position(7, 6));
 
     //Room 2
-    room2.addDoor(new Position(0, 0));
-
+    room2.addDoor(new Position(0, 2));
     room2.addDoor(new Position(6, 0));
     room2.addDoor(new Position(8, 9));
 
@@ -191,7 +190,9 @@ public class StateTesting {
     ArrayList<Position> h2Waypoints = new ArrayList<>();
     h2Waypoints.add(new Position(11, 6));
     h2Waypoints.add(new Position(11, 15));
-    Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 15), h2Waypoints);
+    h2Waypoints.add(new Position(14, 15));
+    h2Waypoints.add(new Position(14, 17));
+    Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 17), h2Waypoints);
 
     ArrayList<Position> h3Waypoints = new ArrayList<>();
     h3Waypoints.add(new Position(21, 6));
@@ -243,8 +244,8 @@ public class StateTesting {
     gm.registerPlayer("Anu");
 
     //register adversaries and add them to the board
-    gm.registerAdversary(ghost.getName(), "ghost");
-    gm.registerAdversary(zombie.getName(), "zombie");
+    gm.registerAdversary("scary", "ghost");
+    gm.registerAdversary("bloody", "zombie");
 
     System.out.print(level1.renderLevel());
 

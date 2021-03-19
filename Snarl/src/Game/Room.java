@@ -16,40 +16,8 @@ public class Room {
         this.numOfRows = rows;
         this.numOfCols = cols;
         room = new String[numOfRows][numOfCols];
-        makeRoom();
         collectEdges();
-    }
-
-    public int getNumOfRows() {
-        return this.numOfRows;
-    }
-
-    public int getNumOfCols() {
-        return this.numOfCols;
-    }
-
-    public Position getRoomOriginInLevel() {
-        return this.roomPositionInLevel;
-    }
-
-    public String getTileInRoom(Position tilePosition) {
-        return room[tilePosition.getRow()][tilePosition.getCol()];
-    }
-
-    // used for Testing tasks
-    public void setTileInRoom(int row, int col, String tile) {
-        this.room[row][col] = tile;
-    }
-
-    public void makeRoom() {
-        for (int i = 0; i < this.numOfRows; i++) {
-            for (int j = 0; j < this.numOfCols; j++) {
-                Position tempPos = new Position(i, j);
-                this.room[i][j] = ".";
-//                this.room[i][j] = "■";
-                listOfAllPositions.add(tempPos);
-            }
-        }
+        makeRoom();
     }
 
     private void collectEdges() {
@@ -72,19 +40,57 @@ public class Room {
         }
     }
 
+    public void makeRoom() {
+        for (int i = 0; i < this.numOfRows; i++) {
+            for (int j = 0; j < this.numOfCols; j++) {
+                Position tempPos = new Position(i, j);
+                if (this.listOfEdgePositions.contains(tempPos)) {
+                    this.room[i][j] = "■";
+                } else {
+                    this.room[i][j] = ".";
+                }
+                listOfAllPositions.add(tempPos);
+            }
+        }
+    }
+
     public void addDoor(Position p) throws IllegalArgumentException{
         if (this.listOfEdgePositions.contains(p)) {
             room[p.getRow()][p.getCol()] = "|";
             this.listOfDoorsInRoom.add(p);
         }
-        
         else {
             throw new IllegalArgumentException("Given coordinate for a door is not a room coordinate on the room's boundary.");
         }
     }
 
+    public int getNumOfRows() {
+        return this.numOfRows;
+    }
+
+    public int getNumOfCols() {
+        return this.numOfCols;
+    }
+
+    public Position getRoomOriginInLevel() {
+        return this.roomPositionInLevel;
+    }
+
     public ArrayList<Position> getDoorPositions() {
         return this.listOfDoorsInRoom;
+    }
+
+    public ArrayList<Position> getListOfAllPositions() {
+        return this.listOfAllPositions;
+    }
+
+    public String getTileInRoom(Position tilePosition) {
+        return room[tilePosition.getRow()][tilePosition.getCol()];
+    }
+
+    // used for Testing tasks
+    public void setTileInRoom(int row, int col, String tile) {
+        this.room[row][col] = tile;
     }
 
 
