@@ -59,7 +59,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     @Override
     public boolean isTileTraversable(Position tile) {
-        return !this.currentLevel.getTileInLevel(tile).equals(".") && !this.currentLevel.getTileInLevel(tile).equals("#") &&
+        return !this.currentLevel.getTileInLevel(tile).equals(" ") && !this.currentLevel.getTileInLevel(tile).equals("#") &&
                 !isOccupiedByAnotherPlayer(tile);
     }
 
@@ -71,7 +71,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     private boolean isOccupiedByAnotherPlayer(Position tile) {
         String symbol = this.currentLevel.getTileInLevel(tile);
-        return symbol.equals("@") || symbol.equals("¤") || symbol.equals("+") || symbol.equals("~");
+        return symbol.equals("@") || symbol.equals("¤") || symbol.equals("$") || symbol.equals("~");
     }
 
     /**

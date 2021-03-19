@@ -3,7 +3,6 @@ package Game;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -45,9 +44,6 @@ class LevelTesting {
     testGetIsKeyFound();
     testGetExitTileInLevelAfterUnlocked();
 
-    testGetStartPositionHallway();
-    testGetEndPositionHallway();
-    testGetHallwayWaypoints();
     invalidRoom();
     invalidDoorPlacement();
     testGetRowPosition();
@@ -144,39 +140,50 @@ class LevelTesting {
     level1.addRoom(room5);
     level1.addRoom(room6);
 
-    h1.addAWaypoint(new Position(2, 20));
-    h1.connectHallwayWaypoints();
 
-    h2.addAWaypoint(new Position(11, 6));
-    h2.addAWaypoint(new Position(11, 15));
-    h2.connectHallwayWaypoints();
+  //adding hallways
+    ArrayList<Position> h1Waypoints = new ArrayList<>();
+    h1Waypoints.add(new Position(2, 20));
+    Hallway h1 = new Hallway(new Position(2, 9), new Position(4, 20),
+            h1Waypoints);
 
-    h3.addAWaypoint(new Position(21,6));
-    h3.connectHallwayWaypoints();
+    ArrayList<Position> h2Waypoints = new ArrayList<>();
+    h2Waypoints.add(new Position(11, 6));
+    h2Waypoints.add(new Position(11, 15));
+    Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 15), h2Waypoints);
 
-    h4.addAWaypoint(new Position(4, 37));
-    h4.addAWaypoint(new Position(38, 37));
-    h4.addAWaypoint(new Position(38, 0));
-    h4.addAWaypoint(new Position(26, 0));
-    h4.connectHallwayWaypoints();
+    ArrayList<Position> h3Waypoints = new ArrayList<>();
+    h3Waypoints.add(new Position(21,6));
+    Hallway h3 = new Hallway(new Position(21, 15), new Position(23, 6), h3Waypoints);
 
-    h5.addAWaypoint(new Position(25,29));
-    h5.addAWaypoint(new Position(25, 32));
-    h5.connectHallwayWaypoints();
+    ArrayList<Position> h4Waypoints = new ArrayList<>();
+    h4Waypoints.add(new Position(4, 37));
+    h4Waypoints.add(new Position(38, 37));
+    h4Waypoints.add(new Position(38, 0));
+    h4Waypoints.add(new Position(26, 0));
+    Hallway h4 = new Hallway(new Position(4, 35), new Position(26, 2), h4Waypoints);
 
-    h6.addAWaypoint(new Position(7,24));
-    h6.addAWaypoint(new Position(10,24));
-    h6.addAWaypoint(new Position(10,19));
-    h6.connectHallwayWaypoints();
+    ArrayList<Position> h5Waypoints = new ArrayList<>();
+    h5Waypoints.add(new Position(25,29));
+    h5Waypoints.add(new Position(25, 32));
+    Hallway h5 = new Hallway(new Position(8, 29), new Position(30, 32), h5Waypoints);
 
-    h7.addAWaypoint(new Position(28, 11));
-    h7.addAWaypoint(new Position(33, 11));
-    h7.connectHallwayWaypoints();
+    ArrayList<Position> h6Waypoints = new ArrayList<>();
+    h6Waypoints.add(new Position(7,24));
+    h6Waypoints.add(new Position(10,24));
+    h6Waypoints.add(new Position(10,19));
+    Hallway h6 = new Hallway(new Position(7, 25), new Position(7,19), h6Waypoints);
 
-    h8.addAWaypoint(new Position(23, 27));
-    h8.addAWaypoint(new Position(27, 27));
-    h8.addAWaypoint(new Position(27, 29));
-    h8.connectHallwayWaypoints();
+    ArrayList<Position> h7Waypoints = new ArrayList<>();
+    h7Waypoints.add(new Position(28, 11));
+    h7Waypoints.add(new Position(33, 11));
+    Hallway h7 = new Hallway(new Position(28, 8), new Position(33, 27), h7Waypoints);
+
+    ArrayList<Position> h8Waypoints = new ArrayList<>();
+    h8Waypoints.add(new Position(23, 27));
+    h8Waypoints.add(new Position(27, 27));
+    h8Waypoints.add(new Position(27, 29));
+    Hallway h8 = new Hallway(new Position(23, 24), new Position(30, 29), h8Waypoints);
 
     level1.addHallway(h1);
     level1.addHallway(h2);
@@ -264,61 +271,6 @@ class LevelTesting {
     assertEquals(new Position(5, 27), level1.getKeyPositionInLevel());
   }
 
-  @Test
-  public static void testGetStartPositionHallway() {
-    assertEquals(new Position(2,9), h1.getStartPositionOfHallway());
-    assertEquals(new Position(7,6), h2.getStartPositionOfHallway());
-    assertEquals(new Position(21,15), h3.getStartPositionOfHallway());
-    assertEquals(new Position(4,35), h4.getStartPositionOfHallway());
-    assertEquals(new Position(8,29),h5.getStartPositionOfHallway());
-    assertEquals(new Position(7,25),h6.getStartPositionOfHallway());
-  }
-
-  @Test
-  public static void testGetEndPositionHallway() {
-    assertEquals(new Position(4,20), h1.getEndPositionOfHallway());
-    assertEquals(new Position(15,15), h2.getEndPositionOfHallway());
-    assertEquals(new Position(23,6), h3.getEndPositionOfHallway());
-    assertEquals(new Position(26,2), h4.getEndPositionOfHallway());
-    assertEquals(new Position(30,32), h5.getEndPositionOfHallway());
-    assertEquals(new Position(7,19), h6.getEndPositionOfHallway());
-  }
-
-  @Test
-  public static void testGetHallwayWaypoints() {
-    ArrayList<Position> waypoints = new ArrayList<Position>();
-    waypoints.add(new Position(2,20));
-    assertEquals(waypoints, h1.getWaypoints());
-
-    waypoints.clear();
-    waypoints.add(new Position(11,6));
-    waypoints.add(new Position(11,15));
-    assertEquals(waypoints, h2.getWaypoints());
-
-    waypoints.clear();
-    waypoints.add(new Position(21,6));
-    assertEquals(waypoints, h3.getWaypoints());
-
-
-    waypoints.clear();
-    waypoints.add(new Position(4,37));
-    waypoints.add(new Position(38,37));
-    waypoints.add(new Position(38,0));
-    waypoints.add(new Position(26,0));
-    assertEquals(waypoints, h4.getWaypoints());
-
-    waypoints.clear();
-    waypoints.add(new Position(25,29));
-    waypoints.add(new Position(25,32));
-    assertEquals(waypoints, h5.getWaypoints());
-
-    waypoints.clear();
-    waypoints.add(new Position(7,24));
-    waypoints.add(new Position(10,24));
-    waypoints.add(new Position(10,19));
-    assertEquals(waypoints, h6.getWaypoints());
-
-  }
 
   @Test
   public static void testRoomGetNumOfCols() {

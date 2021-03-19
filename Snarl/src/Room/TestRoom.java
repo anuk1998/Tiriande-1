@@ -96,7 +96,7 @@ public class TestRoom {
                 if (num == 0) {
                     roomObj.setTileInRoom(i, j, "#");
                 } else if (num == 1) {
-                    roomObj.setTileInRoom(i, j, "■");
+                    roomObj.setTileInRoom(i, j, ".");
                 } else if (num == 2) {
                     roomObj.addDoor(new Position(i, j));
                 }

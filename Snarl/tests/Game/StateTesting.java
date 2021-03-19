@@ -3,7 +3,7 @@ package Game;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,50 +15,30 @@ public class StateTesting {
   static Room room4 = new Room(new Position(2, 25), 7, 11);
   static Room room5 = new Room(new Position(23, 2), 14, 7);
   static Room room6 = new Room(new Position(30,27), 7,7);
-  static Hallway h1 = new Hallway(new Position(2, 9), new Position(4, 20));
-  static Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 15));
-  static Hallway h3 = new Hallway(new Position(21, 15), new Position(23, 6));
-  static Hallway h4 = new Hallway(new Position(4, 35), new Position(26, 2));
-  static Hallway h5 = new Hallway(new Position(8, 29), new Position(30, 32));
-  static Hallway h6 = new Hallway(new Position(7, 25), new Position(7,19));
-  static Hallway h7 = new Hallway(new Position(28, 8), new Position(33, 27));
-  static Hallway h8 = new Hallway(new Position(23, 24), new Position(30, 29));
   static Player p1 = new Player("Bob");
-  static Player p2 = new Player("Rob");
-  static Player p3 = new Player("Jane");
-  static Player p4 = new Player("Alice");
   static IAdversary ghost = new Ghost("Scary Ghost");
   static IAdversary zombie = new Ghost("Weird Zombie");
-  static ArrayList<Level> listOfLevels = new ArrayList<Level>();
-  static GameManager gm;
+  static Level[] lev = {level1};
+  static ArrayList<Level> listOfLevels = new ArrayList<Level>(Arrays.asList(lev));
+  static GameManager gm = new GameManager(listOfLevels);
 
   public static void main(String[] args) {
-    createInitialGameBoard();
     listOfLevels.add(level1);
-    gm = new GameManager(listOfLevels);
-    //register players and add them to the board
-    gm.registerPlayer("Bob");
-    gm.registerPlayer("Carl");
-    gm.registerPlayer("Santiago");
+    createInitialGameBoard();
 
-    //register adversaries and add them to the board
-    gm.registerAdversary(ghost.getName(), "ghost");
-    gm.registerAdversary(zombie.getName(), "zombie");
-
-    testIsLastLevel();
-    testParseMoveDoAction();
-    testRegisterAdversary();
-    testRegisterPlayer();
-    testis2CardinalTilesAway();
-    testisOnLevelPlane();
-    testIsValidMove();
-    testRunRuleCheckerPlayer();
-    testCallRuleCheckerPlayer();
-    testCheckPlayerActiveStatus();
-    testIsExitUnlocked();
-    testKeyTileIsLandedOnAndExitLandedOnAfter();
-    testEncountersOppositeCharacter();
-
+    //testIsLastLevel();
+    //testParseMoveDoAction();
+    //testRegisterAdversary();
+    //testRegisterPlayer();
+    //testis2CardinalTilesAway();
+    //testisOnLevelPlane();
+    //testIsValidMove();
+    //testRunRuleCheckerPlayer();
+    //testCallRuleCheckerPlayer();
+    //testCheckPlayerActiveStatus();
+    //testIsExitUnlocked();
+    //testKeyTileIsLandedOnAndExitLandedOnAfter();
+    //testEncountersOppositeCharacter();
   }
 
   @Test
@@ -203,6 +183,10 @@ public class StateTesting {
     level1.addRoom(room4);
     level1.addRoom(room5);
     level1.addRoom(room6);
+
+    //adding key and exit
+    level1.addKey(new Position(5, 27));
+    level1.addExit(new Position(17, 18));
 
     h1.addAWaypoint(new Position(2, 20));
     h1.connectHallwayWaypoints();

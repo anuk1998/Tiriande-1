@@ -1,7 +1,6 @@
 package Game;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 public class Room {
     String[][] room;
@@ -46,7 +45,8 @@ public class Room {
         for (int i = 0; i < this.numOfRows; i++) {
             for (int j = 0; j < this.numOfCols; j++) {
                 Position tempPos = new Position(i, j);
-                this.room[i][j] = "■";
+                this.room[i][j] = ".";
+//                this.room[i][j] = "■";
                 listOfAllPositions.add(tempPos);
             }
         }
@@ -86,26 +86,6 @@ public class Room {
     public ArrayList<Position> getDoorPositions() {
         return this.listOfDoorsInRoom;
     }
-
-    public Position placeCharacterInRandomLocationInRoom(ICharacter c) {
-        Random rand = new Random();
-        int randomIndex = rand.nextInt(listOfAllPositions.size());
-        Position randomPos = listOfAllPositions.get(randomIndex);
-        String tile = this.room[randomPos.getRow()][randomPos.getCol()];
-
-        while (tile.equals("#") || tile.equals("*") || tile.equals("O")
-                || tile.equals("●") || tile.equals("P") || tile.equals("A")) {
-            randomIndex = rand.nextInt(listOfAllPositions.size());
-            randomPos = listOfAllPositions.get(randomIndex);
-            tile = this.room[randomPos.getRow()][randomPos.getCol()];
-        }
-        Position randomStartPosInRoom = new Position(this.roomPositionInLevel.getRow() + randomPos.getRow(),
-                this.roomPositionInLevel.getCol() + randomPos.getCol());
-
-        c.setCharacterPosition(randomStartPosInRoom);
-        return randomStartPosInRoom;
-    }
-
 
 
 }

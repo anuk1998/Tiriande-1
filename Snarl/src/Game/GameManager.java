@@ -7,7 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Random;
 
 public class GameManager {
-    String[] avatars = {"@", "¤", "+", "~"};
+    String[] avatars = {"@", "¤", "$", "~"};
     ArrayList<String> playerAvatars = new ArrayList<>(Arrays.asList(avatars));
     LinkedHashMap<String, Player> allPlayers = new LinkedHashMap<>();
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
@@ -207,7 +207,7 @@ public class GameManager {
             assignPlayerAvatar(newPlayer);
             allPlayers.put(name, newPlayer);
             allCharacters.add(newPlayer);
-            Position randomPos = currentLevel.pickRandomPositionForCharacter(newPlayer);
+            Position randomPos = currentLevel.pickRandomPositionForCharacterInLevel();
             currentLevel.addPlayer(newPlayer, randomPos);
             System.out.println("Player " + name + " has been registered at position: [" + newPlayer.getCharacterPosition().getRow() + ", " +
                     newPlayer.getCharacterPosition().getCol() + "]");
@@ -233,7 +233,7 @@ public class GameManager {
             adversary = new Ghost(name);
         }
         this.allCharacters.add(adversary);
-        Position pickedPos = currentLevel.pickRandomPositionForCharacter(adversary);
+        Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addAdversary(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
         System.out.println("New adversary " + name + " of type: " + type + " has been registered.");
     }

@@ -111,7 +111,7 @@ public class Level {
       for (Position adjacentTile : adjacentsToCheck) {
         try {
           String tile = this.levelPlane[adjacentTile.getRow()][adjacentTile.getCol()];
-          if (tile.equals("■") || tile.equals("|") || tile.equals("X")) {
+          if (tile.equals(".") || tile.equals("|") || tile.equals("x")) {
             adjacentTiles.add(adjacentTile);
           }
         }
@@ -153,7 +153,7 @@ public class Level {
     // adds the key on the levelPlane based on the given position
     public void addKey(Position p) throws ArrayIndexOutOfBoundsException {
       try {
-        levelPlane[p.getRow()][p.getCol()] = "*";
+        this.levelPlane[p.getRow()][p.getCol()] = "*";
         keyLevelPosition = new Position(p.getRow(), p.getCol());
       }
       catch (ArrayIndexOutOfBoundsException e) {
@@ -164,7 +164,7 @@ public class Level {
     // adds the exit on the levelPlane based on the given position
     public void addExit(Position p) throws ArrayIndexOutOfBoundsException{
       try {
-        levelPlane[p.getRow()][p.getCol()] = "●";
+        this.levelPlane[p.getRow()][p.getCol()] = "●";
         exitLevelPosition = new Position(p.getRow(), p.getCol());
       }
       catch (ArrayIndexOutOfBoundsException e) {
@@ -210,40 +210,60 @@ public class Level {
         this.adversaries.add(a);
     }
 
-    //TODO: REFACTOR THIS SO IT'S POTENTIALLY ALL IN LEVEL AND NOT IN ROOM CLASS
-    public Position pickRandomPositionForCharacter(ICharacter character) {
+    public Position pickRandomPositionForCharacterInLevel() {
       Random rand = new Random();
-      int randomIndex = rand.nextInt(allRooms.size());
+      int randomIndexRow = rand.nextInt(this.levelNumOfRows);
+      int randomIndexCol = rand.nextInt(this.levelNumOfCols);
+      String randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
 
-      ArrayList<Room> allRoomsList = new ArrayList<>(allRooms);
-      Room randomRoom = allRoomsList.get(randomIndex);
+      while (randomTile.equals(" ") || randomTile.equals("G") || randomTile.equals("Z") || randomTile.equals("#")
+              || randomTile.equals("*") || randomTile.equals("O") || randomTile.equals("@") || randomTile.equals("$")
+              || randomTile.equals("¤") || randomTile.equals("~") || randomTile.equals("x")) {
+        randomIndexRow = rand.nextInt(this.levelNumOfRows);
+        randomIndexCol = rand.nextInt(this.levelNumOfCols);
+        randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
+      }
 
-      Position randomPos = randomRoom.placeCharacterInRandomLocationInRoom(character);
-      character.setCharacterPosition(new Position(randomPos.getRow(), randomPos.getCol()));
-      return randomPos;
+      return new Position(randomIndexRow, randomIndexCol);
     }
 
     public void moveCharacter(ICharacter character, Position movePosition) {
-      if (character instanceof Player) {
-        movePlayer((Player) character, movePosition);
+      if (isInHallway(character)) {
+        this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "x";
       }
-      else if (character instanceof IAdversary) {
-        moveAdversary((IAdversary) character, movePosition);
+      else if (isOnADoor(character)) {
+        this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "|";
       }
+      else if (character.getCharacterPosition().toString().equals(exitLevelPosition.toString())) {
+        this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "●";
+      }
+      else {
+        this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = ".";
+      }
+      this.levelPlane[movePosition.getRow()][movePosition.getCol()] = character.getAvatar();
+      character.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
     }
 
-    // Moves existing player to the given position if valid, will be checking validity in later milestone
-    public void movePlayer(Player p, Position movePosition) {
-      this.levelPlane[p.getCharacterPosition().getRow()][p.getCharacterPosition().getCol()] = "■";
-      this.levelPlane[movePosition.getRow()][movePosition.getCol()] = p.getAvatar();
-      p.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
+    private boolean isInHallway(ICharacter character) {
+      Position charPos = character.getCharacterPosition();
+      for (Hallway hallway : listOfHallwaysInLevel) {
+        for (Position pos : hallway.getAllHallwayPositions()) {
+          if (charPos.toString().equals(pos.toString())) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
-    // Moves an existing adversary to the given position if valid, will be checking validity in later milestone
-    public void moveAdversary(IAdversary a, Position movePosition) {
-      this.levelPlane[a.getCharacterPosition().getRow()][a.getCharacterPosition().getCol()] = "■";
-      this.levelPlane[movePosition.getRow()][movePosition.getCol()] = a.getAvatar();
-      a.setCharacterPosition(new Position(movePosition.getRow(), movePosition.getCol()));
+    private boolean isOnADoor(ICharacter character) {
+      String charPosStr = character.getCharacterPosition().toString();
+      for (String doorPos : listOfDoorsInLevel.keySet()) {
+        if (charPosStr.equals(doorPos)) {
+          return true;
+        }
+      }
+      return false;
     }
 
     public Player getPlayerObjectFromName(String name) {

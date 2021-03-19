@@ -104,18 +104,18 @@ public class TestLevel {
     Position fromPos = new Position(from.getInt(0), from.getInt(1));
     Position toPos = new Position(to.getInt(0), to.getInt(1));
 
-    // makes a Hallway object of our data representation
-    Hallway newHallway = new Hallway(fromPos, toPos);
-
+    ArrayList<Position> waypointsList = new ArrayList<>();
     // parses through all the listed waypoints and adds them to the hallway's list of waypoints
     for (int i=0; i<waypoints.length(); i++) {
       int waypointRow = waypoints.getJSONArray(i).getInt(0);
       int waypointCol = waypoints.getJSONArray(i).getInt(1);
       Position waypoint = new Position(waypointRow, waypointCol);
-      newHallway.addAWaypoint(waypoint);
+      waypointsList.add(waypoint);
     }
-    // sends hallway to be fully connected/constructed on the board and added to the level plane
-    newHallway.connectHallwayWaypoints();
+
+    // makes a Hallway object of our data representation
+    Hallway newHallway = new Hallway(fromPos, toPos, waypointsList);
+
     level.addHallway(newHallway);
   }
 
@@ -173,7 +173,7 @@ public class TestLevel {
   private static String putTypeField(String tile, JSONObject output) throws JSONException {
     String type = "";
     switch (tile) {
-      case "X":
+      case "x":
         type = "hallway";
         break;
       case "|":
@@ -181,7 +181,7 @@ public class TestLevel {
       case "●":
       case "O":
       case "#":
-      case "■":
+      case ".":
         type = "room";
         break;
       default:
