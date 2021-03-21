@@ -5,7 +5,7 @@ public class Player implements ICharacter{
     String name;
     String avatar;
     boolean isExpelled;
-    ArrayList<String> inventory;
+
 
     public Player(String n) {
         this.name = n;

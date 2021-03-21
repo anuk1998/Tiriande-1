@@ -5,14 +5,24 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Random;
+import Common.IUser;
+import Common.IObserver;
+import Observer.LocalObserver;
+import User.LocalUser;
+import java.util.Scanner;
+
 
 public class GameManager {
     String[] avatars = {"@", "¤", "$", "~"};
     ArrayList<String> playerAvatars = new ArrayList<>(Arrays.asList(avatars));
     LinkedHashMap<String, Player> allPlayers = new LinkedHashMap<>();
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
-    ArrayList<Level> allLevels = new ArrayList<Level>();
+    //ArrayList<Level> allLevels = new ArrayList<Level>();
+    ArrayList<Player> exitedPlayers = new ArrayList<>();
+    ArrayList<Player> expelledPlayers = new ArrayList<>();
     Level currentLevel;
+    ArrayList<IObserver> observers = new ArrayList<>();
+    ArrayList<IUser> users = new ArrayList<>();
 
     public GameManager(ArrayList<Level> allLevels) {
         this.currentLevel = allLevels.get(0);
@@ -191,6 +201,7 @@ public class GameManager {
             case PLAYER_SELF_ELIMINATES:
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
+                expelledPlayers.add((Player) c);
                 return true;
             case PLAYER_EXPELLED:
                 currentLevel.expelPlayer(currentLevel.playerAtGivenPosition(destination));
@@ -200,6 +211,7 @@ public class GameManager {
             case PLAYER_EXITED:
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
+                exitedPlayers.add((Player) c);
                 return true;
             case LEVEL_WON:
                 currentLevel.restoreCharacterTile(c);
@@ -268,10 +280,13 @@ public class GameManager {
             Position randomPos = currentLevel.pickRandomPositionForCharacterInLevel();
             currentLevel.addCharacter(newPlayer, randomPos);
             System.out.println("Player " + name + " has been registered at position: [" + newPlayer.getCharacterPosition().getRow() + ", " +
-                    newPlayer.getCharacterPosition().getCol() + "]");
+                    newPlayer.getCharacterPosition().getCol() + "] with avatar: " + newPlayer.getAvatar());
         }
         else {
             System.out.println("Cannot register player " + name + ". Game has reached maximum participant count. Sorry!");
+            //If the number of players is at capacity, sign additional people up as observersf
+            IObserver observer = new LocalObserver(name);
+            addObserver(observer);
         }
     }
 
@@ -286,9 +301,13 @@ public class GameManager {
         IAdversary adversary = null;
         if (type.equalsIgnoreCase("zombie")) {
             adversary = new Zombie(name);
+            IUser user = new LocalUser(adversary.getName());
+            addUser(user);
         }
         else if (type.equalsIgnoreCase("ghost")) {
             adversary = new Ghost(name);
+            IUser user = new LocalUser(adversary.getName());
+            addUser(user);
         }
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();

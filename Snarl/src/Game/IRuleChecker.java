@@ -5,5 +5,6 @@ public interface IRuleChecker {
     GameStatus encountersOppositeCharacter();
     boolean isValidMove(Position destPoint);
     boolean isTileTraversable(Position tile);
+    boolean isCharactersCurrentPosition(Position destPoint);
 
 }
