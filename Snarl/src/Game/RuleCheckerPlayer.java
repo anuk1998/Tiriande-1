@@ -44,11 +44,23 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public boolean isValidMove(Position destPoint) {
         boolean valid = false;
         if (isOnLevelPlane(destPoint)) {
-            if (isTileTraversable(destPoint) && is2CardinalTilesAway(destPoint)) {
+            if (isTileTraversable(destPoint) &&
+                    (isCharactersCurrentPosition(destPoint) || is2CardinalTilesAway(destPoint))) {
                 valid = true;
             }
         }
         return valid;
+    }
+
+    /**
+     * Checks if the requested destination is the current player's current destination.
+     *
+     * @param destPoint the player's requested move
+     * @return a boolean indicating if it's the player's current position
+     */
+    @Override
+    public boolean isCharactersCurrentPosition(Position destPoint) {
+        return destPoint.toString().equals(this.player.getCharacterPosition().toString());
     }
 
     /**
@@ -111,7 +123,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
 
         for (Position adjacent : adjTiles) {
             cardinalTiles.add(adjacent);
-            for (Position adjacentOfAdjacent: currentLevel.getAllAdjacentTiles(adjacent)) {
+            for (Position adjacentOfAdjacent : currentLevel.getAllAdjacentTiles(adjacent)) {
                 if (!cardinalTiles.contains(adjacentOfAdjacent)) {
                     cardinalTiles.add(adjacentOfAdjacent);
                 }
@@ -122,6 +134,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
         }
         return withinReach;
     }
+
 
     /**
      * Returns the appropriate GameStatus for when a key tile is landed on.

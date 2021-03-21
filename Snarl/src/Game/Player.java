@@ -1,5 +1,4 @@
 package Game;
-import java.util.ArrayList;
 
 public class Player implements ICharacter{
     Position playerPosition;
@@ -10,7 +9,7 @@ public class Player implements ICharacter{
 
     public Player(String n) {
         this.name = n;
-        boolean isExpelled = false;
+        isExpelled = false;
     }
 
     public void setIsExpelled(boolean expel) {

@@ -22,4 +22,9 @@ public class RuleCheckerAdversary implements IRuleChecker {
     
     @Override
     public boolean isTileTraversable(Position tile) { return false;}
+
+    @Override
+    public boolean isCharactersCurrentPosition(Position destPoint) {
+        return false;
+    }
 }
