@@ -1,0 +1,134 @@
+package User;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+import Common.IUser;
+import Game.ICharacter;
+import Game.Level;
+import Game.Position;
+
+public class LocalUser implements IUser {
+  String userName;
+
+  public LocalUser(String userName) {
+    this.userName = userName;
+  }
+
+
+  @Override
+  public String getUserName() {
+    return this.userName;
+  }
+
+
+  @Override
+  public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
+    if (isPlayerActive) {
+      System.out.println(character.getName() + ", it is your turn to make a move. You are currently at position " +
+              character.getCharacterPosition().toString() + " in the level. Here is your view:");
+    } else {
+      System.out.println("Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position:");
+    }
+    System.out.println(callRenderView(currentLevel, character));
+  }
+
+
+  @Override
+  public String callRenderView(Level currentLevel, ICharacter character) {
+    ArrayList<Position> positionsInView = new ArrayList<>();
+    Position charPos = character.getCharacterPosition();
+    int viewArrayRowCount = 0;
+    int viewArrayColCount = 0;
+
+    for (int r=charPos.getRow()-2; r<=charPos.getRow()+2; r++) {
+      if (r > currentLevel.getLevelNumOfRows()-1 || r < 0) continue;
+      for (int c=charPos.getCol()-2; c<=charPos.getCol()+2; c++) {
+        if (c > currentLevel.getLevelNumOfCols()-1 || c < 0) continue;
+        positionsInView.add(new Position(r, c));
+      }
+      viewArrayColCount++;
+      viewArrayRowCount++;
+    }
+    String[][] view = new String[viewArrayRowCount][viewArrayColCount];
+    System.out.println("row # of view array: " + viewArrayRowCount);
+    System.out.println("col # of view array: " + viewArrayColCount);
+
+    int positionsInViewIndex = 0;
+    for (int i=0; i<view.length; i++) {
+      for (int j=0; j<view[i].length; j++) {
+        view[i][j] = currentLevel.getTileInLevel(positionsInView.get(positionsInViewIndex));
+        positionsInViewIndex++;
+      }
+    }
+
+    return renderView(view);
+  }
+
+  private String renderView(String[][] view) {
+    StringBuilder viewASCII = new StringBuilder();
+    for (String[] strings : view) {
+      for (int j = 0; j < strings.length; j++) {
+        if (j == strings.length - 1) {
+          viewASCII.append(strings[j]).append("\n");
+        } else {
+          viewASCII.append(strings[j]).append(" ");
+        }
+      }
+    }
+    return viewASCII.toString();
+  }
+
+  @Override
+  public Position getUserMove(Scanner scanner, ICharacter character) {
+    int rowPos = 0;
+    int colPos = 0;
+
+    System.out.println("Would you like to move your position? Please enter 'YES' or 'NO'.");
+    String response = scanner.nextLine();
+
+    while (!response.equalsIgnoreCase("no") && !response.equalsIgnoreCase("yes")) {
+      System.out.println("Invalid answer.");
+      System.out.println("Would you like to move your position? Please enter 'YES' or 'NO'.");
+      response = scanner.nextLine();
+    }
+
+    //player remains where they are and scanner connection is closed
+    if (response.equalsIgnoreCase("NO")) {
+      System.out.println("Okay, you will remain where you are.");
+      return character.getCharacterPosition();
+    }
+
+    System.out.print("Please enter your desired row: ");
+    rowPos = getMoveCoordinate(scanner, rowPos);
+    System.out.print("Please enter your desired column: ");
+    colPos = getMoveCoordinate(scanner, colPos);
+    Position move = new Position(rowPos, colPos);
+
+    return move;
+  }
+
+  /**
+   * Asks the user for a move for their turn via STDin.
+   *
+   * @param sc the Scanner instance
+   * @param pos the type of pos we want (either row or column)
+   * @return an integer representing a coordinate
+   */
+  private int getMoveCoordinate(Scanner sc, int pos) {
+    boolean isNotNumber = true;
+
+    while (isNotNumber) {
+      String posStr = sc.nextLine();
+      String posNoSpace = posStr.replaceAll("\\s+", "");
+      try {
+        pos = Integer.parseInt(posNoSpace);
+        isNotNumber = false;
+      }
+      catch (NumberFormatException e) {
+        System.out.println("Sorry, you entered an invalid value. Please enter a number.");
+      }
+    }
+    return pos;
+  }
+}

@@ -269,16 +269,20 @@ public class Level {
                     new Position(row - 1, col), new Position(row, col - 1),
                     new Position(row + 1, col), new Position(row, col + 1)));
 
+    ArrayList<Position> itemsToRemove = new ArrayList<>();
     for (Position adjacentTile : adjacentTiles) {
       try {
         // 'tile' is dummy value that is just here to ensure that the adjacent tile is within the bounds of the level
         String tile = this.levelPlane[adjacentTile.getRow()][adjacentTile.getCol()];
-        adjacentTiles.add(adjacentTile);
       }
       catch (ArrayIndexOutOfBoundsException e) {
         // if the position is NOT within the bounds of the level, this error is thrown & caught, and the position is simply removed from the list
-        adjacentTiles.remove(adjacentTile);
+        itemsToRemove.add(adjacentTile);
       }
+    }
+
+    for (Position item : itemsToRemove) {
+      adjacentTiles.remove(item);
     }
     return adjacentTiles;
   }
