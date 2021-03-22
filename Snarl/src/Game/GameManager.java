@@ -366,6 +366,7 @@ public class GameManager {
      */
     private void sendUpdatesToObservers(ICharacter character, Position requestedMove, GameStatus moveStatus,
                                         Level currentLevel, ArrayList<Player> exitedPlayers, ArrayList<Player> expelledPlayers) {
+
         for (IObserver observer : observers) {
             observer.sendUpdates(character, requestedMove, moveStatus, currentLevel, exitedPlayers, expelledPlayers);
         }
