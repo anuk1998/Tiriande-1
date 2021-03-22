@@ -284,11 +284,13 @@ public class GameManager {
         }
         else {
             System.out.println("Cannot register player " + name + ". Game has reached maximum participant count. Sorry!");
-            //If the number of players is at capacity, sign additional people up as observersf
-            IObserver observer = new LocalObserver(name);
-            addObserver(observer);
+            System.out.println("Would you like to register as an observer? Enter 'Y' for yes or 'N' for no.");
+            registerObservers();
+
         }
     }
+
+
 
     /**
      * Registers an adversary with a given unique name and add them to the level.
@@ -313,6 +315,43 @@ public class GameManager {
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
         System.out.println("New adversary " + name + " of type " + type + " has been registered.");
+    }
+
+    private void registerObservers() {
+        Scanner sc = new Scanner(System.in);
+        String wantsToMakeObserver = sc.nextLine();
+        while(!(wantsToMakeObserver.equalsIgnoreCase("Y") || wantsToMakeObserver.equalsIgnoreCase("N")) ) {
+            System.out.println("Sorry, invalid response. Please enter 'Y' for yes or 'N' for no");
+            wantsToMakeObserver = sc.nextLine();
+        }
+
+        if(wantsToMakeObserver.equalsIgnoreCase("N")) {
+            System.out.println("Okay, you will not be joining as an observer.");
+        }
+        else if(wantsToMakeObserver.equalsIgnoreCase("Y")) {
+            System.out.println("Please enter a username for your observer");
+            String observerName = sc.nextLine();
+            IObserver observer = new LocalObserver(observerName);
+            addObserver(observer);
+            System.out.println(observerName + " has been added to the game as an Observer.");
+        }
+
+//        //wants to register more observers
+//        System.out.println("Would you like to register another observer? Enter 'Y' for yes or 'N' for no");
+//        String wantsMoreObservers = sc.nextLine();
+//        while(!(wantsMoreObservers.equalsIgnoreCase("Y") || wantsMoreObservers.equalsIgnoreCase("N"))) {
+//            System.out.println("Sorry, invalid response. Please enter 'Y' for yes or 'N' for no");
+//            wantsMoreObservers = sc.nextLine();
+//        }
+//
+//        if(wantsMoreObservers.equalsIgnoreCase("Y")) {
+//            registerObservers();
+//        }
+//
+//        else {
+//            System.out.println("Okay, you have added " + this.observers.size() + " observers.");
+//        }
+
     }
 
     /**
