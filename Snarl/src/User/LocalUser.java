@@ -51,6 +51,8 @@ public class LocalUser implements IUser {
       viewArrayRowCount++;
     }
     String[][] view = new String[viewArrayRowCount][viewArrayColCount];
+    System.out.println("row # of view array: " + viewArrayRowCount);
+    System.out.println("col # of view array: " + viewArrayColCount);
 
     int positionsInViewIndex = 0;
     for (int i=0; i<view.length; i++) {

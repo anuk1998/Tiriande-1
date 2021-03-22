@@ -44,8 +44,8 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public boolean isValidMove(Position destPoint) {
         boolean valid = false;
         if (isOnLevelPlane(destPoint)) {
-            if (isTileTraversable(destPoint) &&
-                    (isCharactersCurrentPosition(destPoint) || is2CardinalTilesAway(destPoint))) {
+            if ((isTileTraversable(destPoint) && is2CardinalTilesAway(destPoint))
+                    || (isCharactersCurrentPosition(destPoint))) {
                 valid = true;
             }
         }
