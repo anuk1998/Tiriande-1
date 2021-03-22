@@ -1,20 +1,19 @@
 package Game;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Hallway {
-    ArrayList<Position> waypoints = new ArrayList<Position>();
-    ArrayList<Position> allHallwayPositions = new ArrayList<Position>();
     Position startPosition;
     Position endPosition;
+    ArrayList<Position> waypoints;
+    ArrayList<Position> allHallwayPositions = new ArrayList<Position>();
 
-    public Hallway(Position startPosition, Position endPosition) {
+    public Hallway(Position startPosition, Position endPosition, ArrayList<Position> waypoints) {
         this.startPosition = startPosition;
         this.endPosition = endPosition;
-    }
-
-    public void addAWaypoint(Position waypoint) {
-        this.waypoints.add(waypoint);
+        this.waypoints = waypoints;
+        connectHallwayWaypoints();
     }
 
     public ArrayList<Position> getWaypoints() {
@@ -32,7 +31,6 @@ public class Hallway {
     public Position getEndPositionOfHallway() {
         return this.endPosition;
     }
-
 
     //This method creates a list of all waypoints and door points (start/end positions),
     //then connects all the points in the Level plane in between that list using 'X's

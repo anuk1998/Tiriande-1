@@ -5,6 +5,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Scanner;
 
 import Game.Level;
@@ -44,7 +45,7 @@ public class TestRoom {
     }
 
     public static JSONArray typeIsRoom(JSONObject roomToMake, JSONArray JSONpoint) throws JSONException {
-        Game.Level level = new Level();
+        Level level = new Level();
 
         Position point = new Position(JSONpoint.getInt(0), JSONpoint.getInt(1));
         JSONArray origin = roomToMake.getJSONArray("origin");
@@ -58,10 +59,21 @@ public class TestRoom {
 
         Position extractedOrigin = new Position(originRow, originCol);
         Room roomObj = new Room(extractedOrigin, rows, columns);
-        roomObj.createRoomFromJSON(layout);
+        createRoomFromJSON(layout, roomObj);
         level.addRoom(roomObj);
 
-        ArrayList<Position> adjacentTiles = level.getAllAdjacentTiles(point, roomObj);
+        ArrayList<Position> adjacentTiles;
+        int row = point.getRow();
+        int col = point.getCol();
+        int scaledRow = row - roomObj.getRoomOriginInLevel().getRow();
+        int scaledCol = col - roomObj.getRoomOriginInLevel().getCol();
+
+        if (scaledRow >= roomObj.getNumOfRows() || scaledCol >= roomObj.getNumOfCols()) {
+            adjacentTiles = null;
+        }
+        else {
+            adjacentTiles = level.getAllAdjacentTiles(point);
+        }
 
         JSONArray outputArray = new JSONArray();
         if (adjacentTiles == null) {
@@ -73,10 +85,13 @@ public class TestRoom {
         else {
             JSONArray innerArray = new JSONArray();
             for (Position tile : adjacentTiles) {
-                JSONArray tempArray = new JSONArray();
-                tempArray.put(tile.getRow());
-                tempArray.put(tile.getCol());
-                innerArray.put(tempArray);
+                String tileStr = level.getTileInLevel(tile);
+                if (tileStr.equals(".") || tileStr.equals("|") || tileStr.equals("x")) {
+                    JSONArray tempArray = new JSONArray();
+                    tempArray.put(tile.getRow());
+                    tempArray.put(tile.getCol());
+                    innerArray.put(tempArray);
+                }
             }
             outputArray.put("Success: Traversable points from ");
             outputArray.put(JSONpoint);
@@ -86,6 +101,22 @@ public class TestRoom {
             outputArray.put(innerArray);
         }
         return outputArray;
+    }
+
+    public static void createRoomFromJSON(JSONArray inputArray, Room roomObj) throws JSONException {
+        for (int i=0; i<inputArray.length(); i++) {
+            JSONArray innerArray = inputArray.getJSONArray(i);
+            for (int j = 0; j < innerArray.length(); j++) {
+                int num = innerArray.getInt(j);
+                if (num == 0) {
+                    roomObj.setTileInRoom(i, j, "■");
+                } else if (num == 1) {
+                    roomObj.setTileInRoom(i, j, ".");
+                } else if (num == 2) {
+                    roomObj.addDoor(new Position(i, j));
+                }
+            }
+        }
     }
 
 }

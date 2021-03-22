@@ -1,10 +1,14 @@
 package Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Random;
 
 public class GameManager {
+    String[] avatars = {"@", "¤", "$", "~"};
+    ArrayList<String> playerAvatars = new ArrayList<>(Arrays.asList(avatars));
     LinkedHashMap<String, Player> allPlayers = new LinkedHashMap<>();
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
     ArrayList<Level> allLevels = new ArrayList<Level>();
@@ -48,7 +52,7 @@ public class GameManager {
      * @return Returns true if the Player has been expelled/are no longer active, false if the Player is
      *         still active or if the character is an Adversary (i.e. ghost, zombie)
      */
-    private boolean checkPlayerActiveStatus(ICharacter character) {
+    public boolean checkPlayerActiveStatus(ICharacter character) {
         if (character instanceof Player) {
             return !((Player) character).getIsExpelled();
         }
@@ -65,7 +69,6 @@ public class GameManager {
     public GameStatus callRuleChecker(ICharacter character, Position requestedMove) {
         GameStatus moveStatus = GameStatus.DEFAULT;
         if (character instanceof Player) {
-            System.out.println("Player " + character.getName() + " position in callRuleChecker: " + character.getCharacterPosition());
             RuleCheckerPlayer rcPlayer = new RuleCheckerPlayer(currentLevel, (Player)character);
             moveStatus = rcPlayer.runRuleChecker(requestedMove);
         }
@@ -95,29 +98,13 @@ public class GameManager {
     /**
      * Renders the view for the given character before they request a move.
      * Currently only accounts for players, whose maximum tile view is 2 on all sides.
-     * Not implemented for Milestone 5, as per Piazza post @684
+     * Not implemented for Milestone 5, as per Piazza post @684.
      *
      * @param character the character whose turn it is
      */
     private String callRenderView(ICharacter character) {
-        //if (character instanceof )
         return "";
     }
-    /*
-    public String renderLevel() {
-      StringBuilder levelASCII = new StringBuilder();
-      for (int i = 0; i < levelNumOfRows; i++) {
-        for (int j = 0; j < levelNumOfCols; j++) {
-          if (j == levelNumOfCols - 1) {
-            levelASCII.append(levelPlane[i][j] + "\n");
-          } else {
-            levelASCII.append(levelPlane[i][j] + " ");
-          }
-        }
-      }
-      return levelASCII.toString();
-    }
-     */
 
     /**
      * The purpose of this function is to collect the user's desired move position.
@@ -150,7 +137,7 @@ public class GameManager {
                 currentLevel.openExitTile();
                 return true;
             case PLAYER_SELF_ELIMINATES:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
                 return true;
             case PLAYER_EXPELLED:
@@ -158,11 +145,11 @@ public class GameManager {
                 currentLevel.moveCharacter(c, destination);
                 return true;
             case PLAYER_EXITED:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 return true;
             case LEVEL_WON:
-                currentLevel.moveCharacter(c, destination);
+                currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 resurrectPlayers();
                 System.out.print("Congrats!! Players have won the level!");
@@ -181,7 +168,8 @@ public class GameManager {
     }
 
     /**
-     * Resurrects all expelled players once the level has been won by players.
+     * Resurrects all expelled players once the level has been won by players, so that they can all
+     * move onto the next level.
      */
     private void resurrectPlayers() {
         for (Player player : this.allPlayers.values()) {
@@ -192,24 +180,37 @@ public class GameManager {
     }
 
     /**
-     * Registers a player with a given unique name and add them to the level.
+     * Randomly chooses the avatar for that new player from a list of avatars.
      *
+     * @param newPlayer the current player we're registering
+     */
+    public void assignPlayerAvatar(Player newPlayer) {
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(playerAvatars.size());
+        String randomAvatar = playerAvatars.get(randomIndex);
+        newPlayer.setAvatar(randomAvatar);
+        playerAvatars.remove(randomAvatar);
+    }
+
+    /**
+     * Registers a player with a given unique name and add them to the level.
      * Not called anywhere for Milestone 5 because we don't know user entry point yet.
+     *
+     * @param name the name of player to register
      */
     public void registerPlayer(String name) {
         if (allPlayers.containsKey(name)) {
             System.out.println("Cannot register Player with name `" + name + "`. Name already has been taken. Please pick again.");
         }
-
-
         else if (allPlayers.size() < 4) {
-            System.out.println("registering a player by the name " + name);
             Player newPlayer = new Player(name);
+            assignPlayerAvatar(newPlayer);
             allPlayers.put(name, newPlayer);
             allCharacters.add(newPlayer);
-            Position randomPos = currentLevel.pickRandomPositionForCharacter(newPlayer);
-            currentLevel.addPlayer(newPlayer, randomPos);
-            System.out.println("Player " + name + " has been registered.");
+            Position randomPos = currentLevel.pickRandomPositionForCharacterInLevel();
+            currentLevel.addCharacter(newPlayer, randomPos);
+            System.out.println("Player " + name + " has been registered at position: [" + newPlayer.getCharacterPosition().getRow() + ", " +
+                    newPlayer.getCharacterPosition().getCol() + "]");
         }
         else {
             System.out.println("Cannot register player " + name + ". Game has reached maximum participant count. Sorry!");
@@ -218,38 +219,22 @@ public class GameManager {
 
     /**
      * Registers an adversary with a given unique name and add them to the level.
-     *
      * Not called anywhere for Milestone 5 because we don't know user entry point yet.
+     *
+     * @param name the name of adversary to register
+     * @param type which type of adversary it is
      */
     public void registerAdversary(String name, String type) {
-
+        IAdversary adversary = null;
         if (type.equalsIgnoreCase("Zombie")) {
-            IAdversary adversary = new Zombie(name);
-            this.allCharacters.add(adversary);
-            currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
+            adversary = new Zombie(name);
         }
         else if(type.equalsIgnoreCase("Ghost")) {
-            IAdversary adversary = new Ghost(name);
-            this.allCharacters.add(adversary);
-            currentLevel.addAdversary(adversary, currentLevel.pickRandomPositionForCharacter(adversary));
+            adversary = new Ghost(name);
         }
-
+        this.allCharacters.add(adversary);
+        Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
+        currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
         System.out.println("New adversary " + name + " of type: " + type + " has been registered.");
-
-    }
-
-
-
-    public Level getCurrentLevel() {
-        return this.currentLevel;
     }
 }
-
-// TO DO
-// 2) update players on changes to the game state as they happen
-// 3) request moves from players/users
-// 4) decide where a level is coming from
-// 5) registering different types of adversaries
-
-// 3) Register players to the game
-// 4) Add Javadocs to all methods
