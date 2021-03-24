@@ -236,6 +236,8 @@ public class GameManager {
     /**
      * Resurrects all expelled players once the level has been won by players, so that they can all
      * move onto the next level.
+     *
+     * CURRENTLY NOT USED.
      */
     private void resurrectPlayers() {
         for (Player player : this.allPlayers.values()) {
@@ -284,12 +286,9 @@ public class GameManager {
         }
         else {
             System.out.println("Cannot register player " + name + ". Game has reached maximum participant count. Sorry!");
-            System.out.println("Would you like to register as an observer? Enter 'Y' for yes or 'N' for no.");
             registerObservers();
-
         }
     }
-
 
 
     /**
@@ -319,6 +318,7 @@ public class GameManager {
 
     private void registerObservers() {
         Scanner sc = new Scanner(System.in);
+        System.out.println("Would you like to register as an observer? Enter 'Y' for yes or 'N' for no.");
         String wantsToMakeObserver = sc.nextLine();
         while(!(wantsToMakeObserver.equalsIgnoreCase("Y") || wantsToMakeObserver.equalsIgnoreCase("N")) ) {
             System.out.println("Sorry, invalid response. Please enter 'Y' for yes or 'N' for no");
@@ -335,23 +335,6 @@ public class GameManager {
             addObserver(observer);
             System.out.println(observerName + " has been added to the game as an Observer.");
         }
-
-//        //wants to register more observers
-//        System.out.println("Would you like to register another observer? Enter 'Y' for yes or 'N' for no");
-//        String wantsMoreObservers = sc.nextLine();
-//        while(!(wantsMoreObservers.equalsIgnoreCase("Y") || wantsMoreObservers.equalsIgnoreCase("N"))) {
-//            System.out.println("Sorry, invalid response. Please enter 'Y' for yes or 'N' for no");
-//            wantsMoreObservers = sc.nextLine();
-//        }
-//
-//        if(wantsMoreObservers.equalsIgnoreCase("Y")) {
-//            registerObservers();
-//        }
-//
-//        else {
-//            System.out.println("Okay, you have added " + this.observers.size() + " observers.");
-//        }
-
     }
 
     /**
