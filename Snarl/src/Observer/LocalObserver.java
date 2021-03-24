@@ -39,22 +39,37 @@ public class LocalObserver implements IObserver {
 
   @Override
   public String constructListOfActivePlayersUpdate(Level currentLevel) {
-    return "Active Players: " + currentLevel.getActivePlayers();
+    ArrayList<String> activePlayerNames = new ArrayList<>();
+    for(Player p: currentLevel.getActivePlayers()) {
+      activePlayerNames.add(p.getName());
+    }
+    return "Active Players: " + activePlayerNames;
   }
 
   @Override
   public String constructListOfExpelledPlayersUpdate(ArrayList<Player> expelledPlayers) {
-    return "Expelled Players: " + expelledPlayers;
+    ArrayList<String> expelledPlayerNames = new ArrayList<>();
+    for(Player p: expelledPlayers) {
+      expelledPlayerNames.add(p.getName());
+    }
+    return "Expelled Players: " + expelledPlayerNames;
   }
 
   @Override
   public String constructListOfExitedPlayersUpdate(ArrayList<Player> exitedPlayers) {
-    System.out.println("foo");
-    return "Exited Players: " + exitedPlayers;
+    ArrayList<String> exitedPlayerNames = new ArrayList<>();
+    for(Player p: exitedPlayers) {
+      exitedPlayerNames.add(p.getName());
+    }
+    return "Exited Players: " + exitedPlayerNames;
   }
 
   @Override
   public String constructListOfAdversariesUpdate(Level currentLevel) {
-    return "Adversaries: " + currentLevel.getAdversaries();
+    ArrayList<String> adversaryPlayerNames = new ArrayList<>();
+    for(IAdversary a: currentLevel.getAdversaries()) {
+      adversaryPlayerNames.add(a.getName());
+    }
+    return "Adversaries: " + adversaryPlayerNames;
   }
 }
