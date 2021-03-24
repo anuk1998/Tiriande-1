@@ -54,17 +54,6 @@ public class LocalUser implements IUser {
       colIndexList.add(c);
     }
 
-    /// DEBUG
-    System.out.println("row # of view array: " + viewArrayRowCount);
-    System.out.println("col # of view array: " + viewArrayColCount);
-    System.out.println("Collected valid row/col positions:");
-    for (int r : rowIndexList) {
-      for (int c : colIndexList) {
-        System.out.println(new Position (r, c).toString());
-      }
-    }
-    ////////////////////////
-
     String[][] view = new String[viewArrayRowCount][viewArrayColCount];
 
     int viewArrayRowIndex = 0;
@@ -76,31 +65,6 @@ public class LocalUser implements IUser {
       }
       viewArrayRowIndex++;
     }
-
-//    for (int r=charPos.getRow()-2; r<=charPos.getRow()+2; r++) {
-//      if (r > currentLevel.getLevelNumOfRows()-1 || r < 0) continue;
-//      for (int c=charPos.getCol()-2; c<=charPos.getCol()+2; c++) {
-//        if (c > currentLevel.getLevelNumOfCols()-1 || c < 0) continue;
-//        positionsInView.add(new Position(r, c));
-//      }
-//      viewArrayColCount++;
-//      viewArrayRowCount++;
-//    }
-
-    ////// debug
-//    System.out.println("PositionsInView:");
-//    for (Position p : positionsInView) {
-//      System.out.println(p.toString());
-//    }
-    //////
-
-//    int positionsInViewIndex = 0;
-//    for (int i=0; i<view.length; i++) {
-//      for (int j=0; j<view[i].length; j++) {
-//        view[i][j] = currentLevel.getTileInLevel(positionsInView.get(positionsInViewIndex));
-//        positionsInViewIndex++;
-//      }
-//    }
 
     return renderView(view);
   }
