@@ -26,13 +26,13 @@ public class RuleCheckerPlayer implements IRuleChecker {
             if (isOccupiedByAdversary(destination)) {
                 status = encountersOppositeCharacter();
             } else if (currentLevel.getKeyPositionInLevel().equals(destination)) {
-                status = keyTileIsLandedOn();
+                status = GameStatus.KEY_FOUND;
             } else if (currentLevel.getExitPositionInLevel().equals(destination)) {
                 status = exitTileIsLandedOn();
             }
         }
         return status;
-        }
+    }
 
     /**
      * Determines whether a given destination Position is a valid move by a player.
@@ -135,16 +135,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
         return withinReach;
     }
 
-
-    /**
-     * Returns the appropriate GameStatus for when a key tile is landed on.
-     *
-     * @return a GameStatus that signifies that the level key has been found
-     */
-    public GameStatus keyTileIsLandedOn() {
-        return GameStatus.KEY_FOUND;
-    }
-
     /**
      * Returns the appropriate GameStatus for when a exit tile is landed on depending on whether
      * it is locked or unlocked.
@@ -156,7 +146,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
         if (isLastLevel() && currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.GAME_WON;
         }
-        //if it is the last player exiting through the exit tile
+        // if it is the last player exiting through the exit tile
         else if (currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.LEVEL_WON;
         }

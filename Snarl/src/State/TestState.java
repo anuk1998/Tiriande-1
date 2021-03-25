@@ -264,7 +264,7 @@ public class TestState {
    * @return the updated JSONArray after executing the valid move
    * @throws JSONException if malformed JSON is given
    */
-  private static JSONObject updateStateObject(Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
+  public static JSONObject updateStateObject(Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
     JSONArray newPlayersList = new JSONArray();
     // make a new list of players based on the list of active players in Level
     for (Player activePlayer : level.getActivePlayers()) {

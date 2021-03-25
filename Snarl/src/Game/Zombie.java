@@ -20,6 +20,11 @@ public class Zombie implements IAdversary {
     }
 
     @Override
+    public String getType() {
+        return "zombie";
+    }
+
+    @Override
     public void setCharacterPosition(Position p) {
         this.advPosition = new Position(p.getRow(), p.getCol());
     }

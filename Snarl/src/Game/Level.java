@@ -201,6 +201,16 @@ public class Level {
     return null;
   }
 
+  // Returns an adversary at the given position
+  public IAdversary adversaryAtGivenPosition(Position p) {
+    for (IAdversary adversary : adversaries) {
+      if (adversary.getCharacterPosition().toString().equals(p.toString())) {
+        return adversary;
+      }
+    }
+    return null;
+  }
+
   // Changes a closed exit tile to an open exit tile when the key is found by a player
   public void openExitTile() {
     levelPlane[exitLevelPosition.getRow()][exitLevelPosition.getCol()] = ("O");

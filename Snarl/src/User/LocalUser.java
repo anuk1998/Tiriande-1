@@ -30,12 +30,10 @@ public class LocalUser implements IUser {
     } else {
       System.out.println("Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position:");
     }
-    System.out.println(callRenderView(currentLevel, character));
+    System.out.println(renderView(currentLevel, character));
   }
 
-
-  @Override
-  public String callRenderView(Level currentLevel, ICharacter character) {
+  public String[][] makeView(Level currentLevel, ICharacter character) {
     Position charPos = character.getCharacterPosition();
     int viewArrayRowCount = 0;
     int viewArrayColCount = 0;
@@ -66,10 +64,16 @@ public class LocalUser implements IUser {
       viewArrayRowIndex++;
     }
 
-    return renderView(view);
+    return view;
   }
 
-  private String renderView(String[][] view) {
+  @Override
+  public String renderView(Level currentLevel, ICharacter character) {
+    String[][] view = makeView(currentLevel, character);
+    return outputView(view);
+  }
+
+  public String outputView(String[][] view) {
     StringBuilder viewASCII = new StringBuilder();
     for (String[] strings : view) {
       for (int j = 0; j < strings.length; j++) {

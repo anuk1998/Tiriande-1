@@ -26,12 +26,11 @@ public interface IUser {
   /**
    * Renders the view for the given character before they request a move.
    * Currently only accounts for players, whose maximum tile view is 2 on all sides.
-   * Not implemented for Milestone 5, as per Piazza post @684.
    *
    * @param character the character whose turn it is
    * @param currentLevel the level the game is currently on
    */
-   String callRenderView(Level currentLevel, ICharacter character);
+   String renderView(Level currentLevel, ICharacter character);
 
   /**
    * The purpose of this function is to collect the user's desired move position.

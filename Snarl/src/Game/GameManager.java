@@ -17,7 +17,6 @@ public class GameManager {
     ArrayList<String> playerAvatars = new ArrayList<>(Arrays.asList(avatars));
     LinkedHashMap<String, Player> allPlayers = new LinkedHashMap<>();
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
-    //ArrayList<Level> allLevels = new ArrayList<Level>();
     ArrayList<Player> exitedPlayers = new ArrayList<>();
     ArrayList<Player> expelledPlayers = new ArrayList<>();
     Level currentLevel;
@@ -302,13 +301,13 @@ public class GameManager {
         IAdversary adversary = null;
         if (type.equalsIgnoreCase("zombie")) {
             adversary = new Zombie(name);
-            IUser user = new LocalUser(adversary.getName());
-            addUser(user);
+            // IUser user = new LocalUser(name);
+            //addUser(user);
         }
         else if (type.equalsIgnoreCase("ghost")) {
             adversary = new Ghost(name);
-            IUser user = new LocalUser(adversary.getName());
-            addUser(user);
+            // IUser user = new LocalUser(name);
+            // addUser(user);
         }
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
@@ -352,5 +351,35 @@ public class GameManager {
         for (IObserver observer : observers) {
             observer.sendUpdates(character, requestedMove, moveStatus, currentLevel, exitedPlayers, expelledPlayers);
         }
+    }
+
+    /**
+     * Returns an IUser instance based on the given name.
+     *
+     * @param name the name of the IUser to be found.
+     * @return an IUser instance
+     */
+    public IUser getUserFromName(String name) {
+        for (IUser user: users) {
+            if (user.getUserName().equals(name)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns a Player object based on a given avatar.
+     *
+     * @param avatar a String avatar that represents a player on the level board
+     * @return a Player object or null if no player exists for that avatar
+     */
+    public Player getPlayerFromAvatar(String avatar) {
+        for (Player p : allPlayers.values()) {
+            if (p.getAvatar().equals(avatar)) {
+                return p;
+            }
+        }
+        return null;
     }
 }
