@@ -1,6 +1,9 @@
 package Game;
 
 import java.util.ArrayList;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import User.LocalUser;
 
 public class UserTesting {
   static Level level1 = new Level();
@@ -17,7 +20,33 @@ public class UserTesting {
     listOfLevels.add(level1);
     System.out.println(level1.renderLevel());
     GameManager gm = new GameManager(listOfLevels);
-    gm.startGame();
+    //gm.startGame();
+    testRenderView();
+  }
+
+  @Test
+  public static void testRenderView() {
+    LocalUser testUser = new LocalUser("RenderViewCorrectly");
+    String [][] testArray = new String[5][4];
+    for(int i = 0; i < testArray.length; i++) {
+      for(int j = 0; j < testArray[0].length; j++) {
+        testArray[i][j] = ".";
+      }
+    }
+    testArray[0][0] = "■";
+    testArray[0][1] = "■";
+    testArray[0][2] = "|";
+    testArray[0][3] = "■";
+    testArray[2][1] = "O";
+    testArray[3][2] = "Z";
+    assertEquals("■ ■ | ■\n" + ". . . .\n" +
+            ". O . .\n" + ". . Z .\n" + ". . . .\n", testUser.outputView(testArray));
+
+  }
+
+  @Test
+  public static void testCallRenderView(){
+
   }
 
   public static void createInitialGameBoard() {

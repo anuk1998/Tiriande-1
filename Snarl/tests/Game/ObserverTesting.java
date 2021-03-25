@@ -1,6 +1,9 @@
 package Game;
 
 import java.util.ArrayList;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import Observer.LocalObserver;
 
 public class ObserverTesting {
 
@@ -11,14 +14,22 @@ public class ObserverTesting {
   static Room room4 = new Room(new Position(2, 25), 7, 11);
   static Room room5 = new Room(new Position(23, 2), 14, 7);
   static Room room6 = new Room(new Position(30, 27), 7, 7);
+  static ArrayList<Level> listOfLevels = new ArrayList<>();
+
 
   public static void main(String[]args) {
     createInitialGameBoard();
-    ArrayList<Level> listOfLevels = new ArrayList<>();
-    listOfLevels.add(level1);
-    System.out.println(level1.renderLevel());
-    GameManager gm = new GameManager(listOfLevels);
-    gm.startGame();
+    //ArrayList<Level> listOfLevels = new ArrayList<>();
+    //listOfLevels.add(level1);
+    //System.out.println(level1.renderLevel());
+    //GameManager gm = new GameManager(listOfLevels);
+    //gm.startGame();
+
+  }
+
+  @Test
+  public void testGetActivePlayers() {
+    LocalObserver testObserver = new LocalObserver("foo");
   }
 
   public static void createInitialGameBoard() {
@@ -113,9 +124,21 @@ public class ObserverTesting {
     level1.addHallway(h7);
     level1.addHallway(h8);
 
-    //adding key and exit
+    //adding key and exit// joo
     level1.addObject(new Position(5, 27), "*");
     level1.addObject(new Position(6, 27), "●");
+
+    //initialize gameManager
+    ArrayList<Level> listOfLevels = new ArrayList<>();
+    listOfLevels.add(level1);
+    GameManager gm = new GameManager(listOfLevels);
+
+    //register players for observer testing purposes
+    gm.registerPlayer("Anu");
+    gm.registerPlayer("Giselle");
+    gm.registerPlayer("Harry Potter");
+    gm.registerPlayer("Hermione Granger");
+
   }
 
 
