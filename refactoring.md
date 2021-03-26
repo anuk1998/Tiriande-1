@@ -54,6 +54,7 @@ made level void tiles ` ` (blank), and changed the hallway tile representation t
 by a `■`. In addition to adding a wall symbol, we also made it so that our room representation automatically added wall tiles around the edge of the room
 upon creation, rather than us manually adding wall tiles from the testing harnesses.
 
+
 As a result of these ASCII and wall representation changes, an example of a randomly-generated level from our
 representation looks like this:
 

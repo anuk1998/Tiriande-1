@@ -58,12 +58,19 @@ public class TestLevel {
     // places the key and exit at their respective given positions
     JSONArray objects = levelObject.getJSONArray("objects");
     try {
-      JSONArray keyPositionObject = objects.getJSONObject(0).getJSONArray("position");
-      Position keyPosition = new Position(keyPositionObject.getInt(0), keyPositionObject.getInt(1));
-      level.addObject(keyPosition, "*");
-      JSONArray exitPositionObject = objects.getJSONObject(1).getJSONArray("position");
-      Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
-      level.addObject(exitPosition, "●");
+      for (int i=0; i<objects.length(); i++) {
+        JSONObject object = objects.getJSONObject(i);
+        if (object.get("type").equals("key")) {
+          JSONArray keyPositionObject = object.getJSONArray("position");
+          Position keyPosition = new Position(keyPositionObject.getInt(0), keyPositionObject.getInt(1));
+          level.addObject(keyPosition, "*");
+        }
+        else {
+          JSONArray exitPositionObject = object.getJSONArray("position");
+          Position exitPosition = new Position(exitPositionObject.getInt(0), exitPositionObject.getInt(1));
+          level.addObject(exitPosition, "●");
+        }
+      }
     }
     catch (Exception e) {
       JSONArray exitPositionObject = objects.getJSONObject(0).getJSONArray("position");

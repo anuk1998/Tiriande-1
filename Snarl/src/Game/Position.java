@@ -30,7 +30,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return (this.getRow() + "," + this.getCol());
+        return "[" + this.getRow() + "," + this.getCol() + "]";
     }
 
 }

@@ -9,6 +9,7 @@ public class Level {
   LinkedHashSet<Room> allRooms = new LinkedHashSet<Room>();
   Position keyLevelPosition;
   Position exitLevelPosition;
+  boolean exitLocked = true;
   Set<Player> activePlayers = new HashSet<Player>();
   Set<IAdversary> adversaries = new HashSet<IAdversary>();
   HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
@@ -155,7 +156,8 @@ public class Level {
       this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "|";
     }
     else if (character.getCharacterPosition().toString().equals(exitLevelPosition.toString())) {
-      this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "●";
+      if (exitLocked) this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "●";
+      else this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "O";
     }
     else {
       this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = ".";
@@ -201,9 +203,22 @@ public class Level {
     return null;
   }
 
+  // Returns an adversary at the given position
+  public IAdversary adversaryAtGivenPosition(Position p) {
+    for (IAdversary adversary : adversaries) {
+      if (adversary.getCharacterPosition().toString().equals(p.toString())) {
+        return adversary;
+      }
+    }
+    return null;
+  }
+
   // Changes a closed exit tile to an open exit tile when the key is found by a player
   public void openExitTile() {
-    levelPlane[exitLevelPosition.getRow()][exitLevelPosition.getCol()] = ("O");
+    exitLocked = false;
+    if (playerAtGivenPosition(exitLevelPosition) == null) {
+      levelPlane[exitLevelPosition.getRow()][exitLevelPosition.getCol()] = ("O");
+    }
   }
 
   // Method that handles when a player successfully passes through the exit by removing them from active players list
@@ -247,6 +262,11 @@ public class Level {
     return this.exitLevelPosition;
   }
 
+  // Returns if the level exit is locked or not
+  public boolean getExitLocked() {
+    return this.exitLocked;
+  }
+
   /**
    *
    * Helpful methods to retrieve information about the Level and its components.
@@ -269,16 +289,20 @@ public class Level {
                     new Position(row - 1, col), new Position(row, col - 1),
                     new Position(row + 1, col), new Position(row, col + 1)));
 
+    ArrayList<Position> itemsToRemove = new ArrayList<>();
     for (Position adjacentTile : adjacentTiles) {
       try {
         // 'tile' is dummy value that is just here to ensure that the adjacent tile is within the bounds of the level
         String tile = this.levelPlane[adjacentTile.getRow()][adjacentTile.getCol()];
-        adjacentTiles.add(adjacentTile);
       }
       catch (ArrayIndexOutOfBoundsException e) {
         // if the position is NOT within the bounds of the level, this error is thrown & caught, and the position is simply removed from the list
-        adjacentTiles.remove(adjacentTile);
+        itemsToRemove.add(adjacentTile);
       }
+    }
+
+    for (Position item : itemsToRemove) {
+      adjacentTiles.remove(item);
     }
     return adjacentTiles;
   }

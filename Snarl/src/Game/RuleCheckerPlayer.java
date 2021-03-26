@@ -26,13 +26,13 @@ public class RuleCheckerPlayer implements IRuleChecker {
             if (isOccupiedByAdversary(destination)) {
                 status = encountersOppositeCharacter();
             } else if (currentLevel.getKeyPositionInLevel().equals(destination)) {
-                status = keyTileIsLandedOn();
+                status = GameStatus.KEY_FOUND;
             } else if (currentLevel.getExitPositionInLevel().equals(destination)) {
                 status = exitTileIsLandedOn();
             }
         }
         return status;
-        }
+    }
 
     /**
      * Determines whether a given destination Position is a valid move by a player.
@@ -44,11 +44,23 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public boolean isValidMove(Position destPoint) {
         boolean valid = false;
         if (isOnLevelPlane(destPoint)) {
-            if (isTileTraversable(destPoint) && is2CardinalTilesAway(destPoint)) {
+            if ((isTileTraversable(destPoint) && is2CardinalTilesAway(destPoint))
+                    || (isCharactersCurrentPosition(destPoint))) {
                 valid = true;
             }
         }
         return valid;
+    }
+
+    /**
+     * Checks if the requested destination is the current player's current destination.
+     *
+     * @param destPoint the player's requested move
+     * @return a boolean indicating if it's the player's current position
+     */
+    @Override
+    public boolean isCharactersCurrentPosition(Position destPoint) {
+        return destPoint.toString().equals(this.player.getCharacterPosition().toString());
     }
 
     /**
@@ -111,7 +123,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
 
         for (Position adjacent : adjTiles) {
             cardinalTiles.add(adjacent);
-            for (Position adjacentOfAdjacent: currentLevel.getAllAdjacentTiles(adjacent)) {
+            for (Position adjacentOfAdjacent : currentLevel.getAllAdjacentTiles(adjacent)) {
                 if (!cardinalTiles.contains(adjacentOfAdjacent)) {
                     cardinalTiles.add(adjacentOfAdjacent);
                 }
@@ -121,15 +133,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
             withinReach = true;
         }
         return withinReach;
-    }
-
-    /**
-     * Returns the appropriate GameStatus for when a key tile is landed on.
-     *
-     * @return a GameStatus that signifies that the level key has been found
-     */
-    public GameStatus keyTileIsLandedOn() {
-        return GameStatus.KEY_FOUND;
     }
 
     /**
@@ -143,7 +146,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
         if (isLastLevel() && currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.GAME_WON;
         }
-        //if it is the last player exiting through the exit tile
+        // if it is the last player exiting through the exit tile
         else if (currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.LEVEL_WON;
         }

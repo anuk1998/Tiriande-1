@@ -1,0 +1,60 @@
+[
+  [ "Ron Weasley", "Harry Potter"],
+  {
+    "type": "level",
+    "rooms": [
+      {
+        "type": "room",
+        "origin": [ 3, 4 ],
+        "layout": [
+          [ 0, 0, 0, 0, 0 ],
+          [ 0, 1, 1, 1, 0 ],
+          [ 0, 1, 1, 1, 0 ],
+          [ 0, 1, 1, 1, 2 ],
+          [ 0, 0, 0, 0, 0 ]
+        ],
+        "bounds": { "rows": 5, "columns": 5 }
+      },
+      {
+        "type": "room",
+        "origin": [ 10, 8 ],
+        "layout": [
+          [ 0, 0, 0, 2, 0 ],
+          [ 0, 1, 1, 1, 0 ],
+          [ 0, 1, 1, 1, 0 ],
+          [ 0, 1, 1, 1, 0 ],
+          [ 0, 0, 0, 0, 0 ]
+        ],
+        "bounds": { "rows": 5, "columns": 5 }
+      }
+    ],
+    "objects": [
+      { "type": "exit", "position": [ 4, 5 ] },
+      { "type": "key", "position": [ 6, 6 ] }
+    ],
+    "hallways": [
+      {
+        "type": "hallway",
+        "to": [ 10, 11 ],
+        "from": [ 6, 8 ],
+        "waypoints": [ [ 6, 11 ] ]
+      }
+    ]
+  },
+  10,
+  [  [ 6, 7 ],[ 5, 7 ], [ 12, 10 ] ],
+  [
+    [
+      { "type": "move", "to": [ 6, 6 ] },
+      { "type": "move", "to": [ 6, 5 ] },
+      { "type": "move", "to": [ 5, 5 ] },
+      { "type": "move", "to": [ 4, 5]}
+    ],
+    [
+      { "type": "move", "to": [ 4, 7 ] },
+      { "type": "move", "to": [ 4, 6 ] },
+      { "type": "move", "to": null },
+      { "type": "move", "to": [ 4, 5 ] }
+    ]
+  ]
+]
