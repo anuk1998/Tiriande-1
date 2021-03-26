@@ -14,22 +14,86 @@ public class ObserverTesting {
   static Room room4 = new Room(new Position(2, 25), 7, 11);
   static Room room5 = new Room(new Position(23, 2), 14, 7);
   static Room room6 = new Room(new Position(30, 27), 7, 7);
-  static ArrayList<Level> listOfLevels = new ArrayList<>();
 
 
   public static void main(String[]args) {
     createInitialGameBoard();
+    //Testing the whole game with Scanner
+
     //ArrayList<Level> listOfLevels = new ArrayList<>();
     //listOfLevels.add(level1);
     //System.out.println(level1.renderLevel());
     //GameManager gm = new GameManager(listOfLevels);
-    //gm.startGame();
+    //gm.startGame()
+
+    //Individual method testing
+
+    //testGetActivePlayers();
+    //testGetAdversaries();
+    //testGetExpelledPlayers();
+    //testGetExitedPlayers();
+    //testGetMoveStatusUpdate();
+  }
+
+  @Test
+  public static void testGetActivePlayers() {
+    LocalObserver testObserver = new LocalObserver("foo");
+    String output = "Active Players: ";
+    ArrayList<String> outputArray = new ArrayList<>();
+    outputArray.add("Hermione Granger");
+    outputArray.add("Giselle");
+    outputArray.add("Harry Potter");
+    outputArray.add("Anu");
+    assertEquals(output + outputArray, testObserver.constructListOfActivePlayersUpdate(level1));
+  }
+
+  @Test
+  public static void testGetAdversaries() {
+    LocalObserver testObserver = new LocalObserver("foo");
+    String output = "Adversaries: ";
+    ArrayList<String> outputArray = new ArrayList<>();
+    outputArray.add("supermeanie");
+    outputArray.add("meanie");
+    assertEquals(output + outputArray, testObserver.constructListOfAdversariesUpdate(level1));
+  }
+
+  @Test
+  public static void testGetExpelledPlayers() {
+    LocalObserver testObserver = new LocalObserver("foo");
+
+    String output = "Expelled Players: ";
+    ArrayList<String> outputArray = new ArrayList<>();
+    outputArray.add("Harry Potter");
+
+    ArrayList<Player> paramArray = new ArrayList<>();
+    paramArray.add(level1.getPlayerObjectFromName("Harry Potter"));
+
+    assertEquals(output + outputArray, testObserver.constructListOfExpelledPlayersUpdate(paramArray));
 
   }
 
   @Test
-  public void testGetActivePlayers() {
+  public static void testGetMoveStatusUpdate() {
     LocalObserver testObserver = new LocalObserver("foo");
+    ICharacter currentCharacter = level1.getPlayerObjectFromName("Anu");
+    Position move = new Position(4,5);
+    GameStatus moveStatus = GameStatus.VALID;
+    assertEquals("Player Anu made a move to position [4,5], with a move status of VALID", testObserver.constructMoveStatusUpdate(currentCharacter, move, moveStatus));
+  }
+
+  @Test
+  public static void testGetExitedPlayers() {
+    LocalObserver testObserver = new LocalObserver("foo");
+
+    String output = "Exited Players: ";
+    ArrayList<String> outputArray = new ArrayList<>();
+    outputArray.add("Giselle");
+
+    ArrayList<Player> paramArray = new ArrayList<>();
+    paramArray.add(level1.getPlayerObjectFromName("Giselle"));
+
+    assertEquals(output + outputArray, testObserver.constructListOfExitedPlayersUpdate(paramArray));
+
   }
 
   public static void createInitialGameBoard() {
@@ -138,6 +202,10 @@ public class ObserverTesting {
     gm.registerPlayer("Giselle");
     gm.registerPlayer("Harry Potter");
     gm.registerPlayer("Hermione Granger");
+
+    //register adversaries for observer testing purposes
+    gm.registerAdversary("meanie", "ghost");
+    gm.registerAdversary("supermeanie", "zombie");
 
   }
 

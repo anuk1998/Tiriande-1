@@ -16,13 +16,14 @@ public class UserTesting {
 
   public static void main(String[] args) {
     createInitialGameBoard();
-    ArrayList<Level> listOfLevels = new ArrayList<>();
-    listOfLevels.add(level1);
-    System.out.println(level1.renderLevel());
-    GameManager gm = new GameManager(listOfLevels);
+    //ArrayList<Level> listOfLevels = new ArrayList<>();
+    //listOfLevels.add(level1);
+    //GameManager gm = new GameManager(listOfLevels);
     //gm.startGame();
-    testRenderView();
+    //testRenderView();
+
   }
+
 
   @Test
   public static void testRenderView() {
@@ -41,11 +42,6 @@ public class UserTesting {
     testArray[3][2] = "Z";
     assertEquals("■ ■ | ■\n" + ". . . .\n" +
             ". O . .\n" + ". . Z .\n" + ". . . .\n", testUser.outputView(testArray));
-
-  }
-
-  @Test
-  public static void testCallRenderView(){
 
   }
 
@@ -144,5 +140,8 @@ public class UserTesting {
     //adding key and exit
     level1.addObject(new Position(5, 27), "*");
     level1.addObject(new Position(6, 27), "●");
+
+    ICharacter newPlayer = new Player("ILoveCoding");
+    level1.addCharacter(newPlayer, new Position(4,5));
   }
 }
