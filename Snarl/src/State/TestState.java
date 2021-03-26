@@ -20,6 +20,7 @@ import Game.Player;
 import Level.TestLevel;
 
 public class TestState {
+
   public static void main(String[] args) throws JSONException {
     StringBuilder input_as_string = new StringBuilder();
     String text;

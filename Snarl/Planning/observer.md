@@ -41,7 +41,7 @@ interface Observer {
     
     /**
     * Constructs a rendered visual view of the state of the given Level.
-    *
+    * 
     * @param currentLevel: the Level that needs to be rendered
     * @return a String representation of the Level 2D array to be sent
     */
@@ -54,7 +54,7 @@ interface Observer {
     * @param moveStatus: the type of move the charater requested
     * @return a String representation of the GameStatus update to be sent
     */
-    String constructMoveStausUpdate(ICharacter currentCharacter, GameStatus moveStatus);
+    String constructMoveStatusUpdate(ICharacter currentCharacter, GameStatus moveStatus);
     
     /**
     * Constructs the list of active players in the level

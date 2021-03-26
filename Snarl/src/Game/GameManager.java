@@ -22,17 +22,22 @@ public class GameManager {
      * This method kick-starts the Snarl game.
      */
     public void startGame() {
+
         boolean gameStillGoing = true;
         int index = 0;
+
         while (gameStillGoing) {
             ICharacter character = (ICharacter)allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
             broadcastTurn(character, playerIsActive);
+
+            //while player is still alive
             if (playerIsActive) {
                 Position requestedMove = getUserMove(character); // will be more legitimately implemented at a later milestone
                 GameStatus moveStatus = callRuleChecker(character, requestedMove);
                 gameStillGoing = parseMoveStatusAndDoAction(moveStatus, requestedMove, character);
             }
+
             // check if we're on the last character in the list and if so, loop back to the beginning
             if (index == allCharacters.size() - 1) {
                 index = 0;
