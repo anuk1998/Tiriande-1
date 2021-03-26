@@ -189,14 +189,14 @@ public class StateTesting {
 
     ArrayList<Position> h1Waypoints = new ArrayList<>();
     h1Waypoints.add(new Position(2, 20));
-    Hallway h1 = new Hallway(new Position(2, 9), new Position(4, 20), h1Waypoints);
+    Hallway h1 = new Hallway(new Position(4, 20), new Position(2, 9), h1Waypoints);
 
     ArrayList<Position> h2Waypoints = new ArrayList<>();
-    h2Waypoints.add(new Position(11, 6));
-    h2Waypoints.add(new Position(11, 15));
-    h2Waypoints.add(new Position(14, 15));
     h2Waypoints.add(new Position(14, 17));
-    Hallway h2 = new Hallway(new Position(7, 6), new Position(15, 17), h2Waypoints);
+    h2Waypoints.add(new Position(14, 15));
+    h2Waypoints.add(new Position(11, 15));
+    h2Waypoints.add(new Position(11, 6));
+    Hallway h2 = new Hallway(new Position(15, 17), new Position(7, 6), h2Waypoints);
 
     ArrayList<Position> h3Waypoints = new ArrayList<>();
     h3Waypoints.add(new Position(21, 6));

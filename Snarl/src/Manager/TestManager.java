@@ -480,8 +480,8 @@ public class TestManager {
     outputArray.put(state);
     outputArray.put(managerUpdates);
 
+    // output the resulting JSONArray
     System.out.println(outputArray.toString());
-    System.out.println(level.renderLevel());
   }
 
   /**
