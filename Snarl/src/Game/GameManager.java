@@ -43,7 +43,7 @@ public class GameManager {
             if (playerIsActive) {
                 Position requestedMove = currentUser.getUserMove(sc, character);
                 GameStatus moveStatus = callRuleChecker(character, requestedMove);
-                gameStillGoing = parseMoveStatusAndDoAction(moveStatus, requestedMove, character);
+                gameStillGoing = parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character);
                 sendUpdatesToObservers(character, requestedMove, moveStatus, this.currentLevel, exitedPlayers, expelledPlayers);
             }
             // check if we're on the last character in the list and if so, loop back to the beginning
@@ -185,48 +185,54 @@ public class GameManager {
      * @param c: the current character whose move it is
      * @return a boolean indicating if the game is still in play
      */
-    public boolean parseMoveStatusAndDoAction(GameStatus moveStatus, Position destination, ICharacter c) {
+    public boolean parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c) {
         switch (moveStatus) {
-            case VALID:
+            case "VALID":
                 currentLevel.moveCharacter(c, destination);
                 return true;
-            case INVALID:
+            case "INVALID":
                 System.out.println("Requested move was invalid. You miss your turn.");
                 return true;
-            case KEY_FOUND:
+            case "KEY_FOUND":
                 currentLevel.moveCharacter(c, destination);
                 currentLevel.openExitTile();
                 return true;
-            case PLAYER_SELF_ELIMINATES:
+            case "PLAYER_SELF_ELIMINATES":
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
                 expelledPlayers.add((Player) c);
                 return true;
-            case PLAYER_EXPELLED:
+            case "PLAYER_EXPELLED":
                 currentLevel.expelPlayer(currentLevel.playerAtGivenPosition(destination));
                 expelledPlayers.add(currentLevel.playerAtGivenPosition(destination));
                 currentLevel.moveCharacter(c, destination);
                 return true;
-            case PLAYER_EXITED:
+            case "PLAYER_EXITED":
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 exitedPlayers.add((Player) c);
                 return true;
-            case LEVEL_WON:
+            case "LEVEL_WON":
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 exitedPlayers.add((Player) c);
                 resurrectPlayers();
-                System.out.print("Congrats!! Players have won the level!");
+                //System.out.print("Congrats!! Players have won the level!");
                 return false; // THIS CAN CHANGE TO TRUE ONCE WE'RE DEALING WITH MORE THAN ONE LEVEL
-            case GAME_WON:
-                System.out.print("Congrats!! Players have won the game!");
+            case "GAME_WON":
+                currentLevel.restoreCharacterTile(c);
+                currentLevel.playerPassedThroughExit(c);
+                exitedPlayers.add((Player) c);
+                //System.out.print("Congrats!! Players have won the game!");
                 return false;
-            case GAME_LOST:
-                System.out.print("Sorry :( Players have lost the game! Play again?");
+            case "GAME_LOST":
+                currentLevel.restoreCharacterTile(c);
+                currentLevel.expelPlayer((Player) c);
+                expelledPlayers.add((Player) c);
+                //System.out.print("Sorry :( Players have lost the game! Play again?");
                 return false;
             default:
-                System.out.print("Default case.Should never get here.");
+                //System.out.print("Default case.Should never get here.");
         }
         // will never get here
         return false;
@@ -280,8 +286,8 @@ public class GameManager {
 
             Position randomPos = currentLevel.pickRandomPositionForCharacterInLevel();
             currentLevel.addCharacter(newPlayer, randomPos);
-            System.out.println("Player " + name + " has been registered at position: [" + newPlayer.getCharacterPosition().getRow() + ", " +
-                    newPlayer.getCharacterPosition().getCol() + "] with avatar: " + newPlayer.getAvatar());
+            // System.out.println("Player " + name + " has been registered at position: [" + newPlayer.getCharacterPosition().getRow() + ", " +
+            //        newPlayer.getCharacterPosition().getCol() + "] with avatar: " + newPlayer.getAvatar());
         }
         else {
             System.out.println("Cannot register player " + name + ". Game has reached maximum participant count. Sorry!");
@@ -312,7 +318,7 @@ public class GameManager {
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
-        System.out.println("New adversary " + name + " of type " + type + " has been registered.");
+        //System.out.println("New adversary " + name + " of type " + type + " has been registered.");
     }
 
     private void registerObservers() {

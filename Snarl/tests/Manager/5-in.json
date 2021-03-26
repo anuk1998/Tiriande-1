@@ -1,0 +1,75 @@
+[
+  [ "Coolcat198", "Jim", "Joe"],
+  {
+    "rooms": [
+      { "type" : "room",
+        "origin" : [3, 2],
+        "bounds" : { "rows" : 3,
+          "columns" : 7 },
+        "layout" : [
+          [0, 0, 0, 0, 0, 2, 0],
+          [0, 1, 1, 1, 1, 1, 0],
+          [0, 0, 2, 0, 0, 0, 0]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [9, 2],
+        "bounds" : { "rows" : 5,
+          "columns" : 3 },
+        "layout" : [
+          [0, 2, 0],
+          [0, 1, 0],
+          [0, 1, 0],
+          [0, 1, 0],
+          [0, 0, 0]
+        ]
+      },
+      { "type" : "room",
+        "origin" : [12, 6],
+        "bounds" : { "rows" : 3,
+          "columns" : 4 },
+        "layout" : [
+          [0, 2, 0, 0],
+          [0, 1, 1, 0],
+          [0, 0, 0, 0]
+        ]
+      }
+    ],
+    "hallways": [
+      {
+        "from": [3, 7],
+        "to": [12, 7],
+        "waypoints": [[1,7], [1,10], [10,10], [10,7]]
+      },
+      {
+        "from": [5, 4],
+        "to": [9, 3],
+        "waypoints": [[8,4], [8,3]]
+      }
+    ],
+    "objects": [
+      { "type": "key", "position": [4, 4] },
+      { "type": "exit", "position": [12, 3] }
+    ]
+  },
+  25,
+  [  [ 11, 3 ],[4, 6], [13,7],[ 13, 8]],
+  [
+    [
+      { "type": "move", "to": [ 12, 3 ] },
+      { "type": "move", "to": [ 11, 3 ] },
+      { "type": "move", "to": [ 12, 3 ] }
+    ],
+    [
+      { "type": "move", "to": [ 4, 5 ] },
+      { "type": "move", "to": [ 4, 4 ] },
+      { "type": "move", "to": [ 4, 3] }
+    ],
+
+    [
+      { "type": "move", "to": [ 12, 7 ] },
+      { "type": "move", "to": [ 13, 7 ] },
+      { "type": "move", "to": [ 13, 8] }
+    ]
+  ]
+]

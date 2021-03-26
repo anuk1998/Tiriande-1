@@ -38,7 +38,7 @@ public class TestManager {
       parseManagerJSONInput(jsonArrayInput);
     }
     catch (JSONException e) {
-      System.out.println("Invalid input rendered: " + e);
+      System.out.println("Invalid input rendered: " + Arrays.toString(e.getStackTrace()));
     }
   }
 
@@ -55,95 +55,13 @@ public class TestManager {
     JSONArray pointListArr = jsonArrayInput.getJSONArray(3);
     JSONArray actorMoveListListArr = jsonArrayInput.getJSONArray(4);
 
-    Level level = buildLevelFromJSONObject(levelObj);
+    Level level = new Level();
+    TestLevel.constructLevel(levelObj, level);
     GameManager manager = new GameManager(new ArrayList<>(Arrays.asList(level)));
 
     registerCharactersFromJSON(manager, level, nameListArr, pointListArr);
     playGame(manager, level, turnLimit, nameListArr, actorMoveListListArr);
     makeStateOutput(manager, level, levelObj);
-  }
-
-  /**
-   * Constructs the output State JSONObject and then forms the resulting JSONArray to be outputted.
-   *
-   * @param manager the GameManager instance
-   * @param level the Level data object being played
-   * @param levelObj the Level JSONObject given as input
-   */
-  private static void makeStateOutput(GameManager manager, Level level, JSONObject levelObj) throws JSONException {
-    JSONArray outputArray = new JSONArray();
-
-    JSONObject state = new JSONObject();
-    state.put("type", "state");
-    // Check if key has been found, if so, remove it from level object
-    if (!level.getTileInLevel(level.getKeyPositionInLevel()).equals("*")) {
-      JSONArray objects = levelObj.getJSONArray("objects");
-      int keyIndex = 0;
-      for (int i=0; i<objects.length(); i++) {
-        if (objects.getJSONObject(i).get("type").equals("key")) {
-          keyIndex = i;
-        }
-      }
-      objects.remove(keyIndex);
-    }
-    state.put("level", levelObj);
-
-    // add players list
-    JSONArray newPlayersList = new JSONArray();
-    for (Player activePlayer : level.getActivePlayers()) {
-      JSONObject newPlayerObj = new JSONObject();
-      // create and add to the player object
-      newPlayerObj.put("type", "player");
-      newPlayerObj.put("name", activePlayer.getName());
-      // make an inner JSON array and add to it to represent a position and place in new object
-      JSONArray newPosition = new JSONArray();
-      newPosition.put(activePlayer.getCharacterPosition().getRow());
-      newPosition.put(activePlayer.getCharacterPosition().getCol());
-      newPlayerObj.put("position", newPosition);
-      // add newly created player JSON object to final list of players
-      newPlayersList.put(newPlayerObj);
-    }
-    state.put("players", newPlayersList);
-
-    // add adversaries list
-    JSONArray adversariesList = new JSONArray();
-    for (IAdversary adversary : level.getAdversaries()) {
-      JSONObject newAdversaryObj = new JSONObject();
-      // create and add to the adversary object
-      newAdversaryObj.put("type", adversary.getType());
-      newAdversaryObj.put("name", adversary.getName());
-      // make an inner JSON array and add to it to represent a position and place in new object
-      JSONArray newPosition = new JSONArray();
-      newPosition.put(adversary.getCharacterPosition().getRow());
-      newPosition.put(adversary.getCharacterPosition().getCol());
-      newAdversaryObj.put("position", newPosition);
-      // add newly created adversary JSON object to final list of adversaries
-      adversariesList.put(newAdversaryObj);
-    }
-    state.put("adversaries", adversariesList);
-
-    // add the exit-locked field
-    boolean isExitLocked = level.getTileInLevel(level.getExitPositionInLevel()).equals("●");
-    state.put("exit-locked", isExitLocked);
-
-    outputArray.put(state);
-    outputArray.put(managerUpdates);
-
-    System.out.println(outputArray.toString(2));
-    System.out.println(level.renderLevel());
-  }
-
-  /**
-   * Builds the given level JSONObject into our level representation via a previous testing harness.
-   *
-   * @param levelJSONObject the parsed Level object
-   * @return the resulting Level representation
-   * @throws JSONException when invalid JSON
-   */
-  private static Level buildLevelFromJSONObject(JSONObject levelJSONObject) throws JSONException {
-    Level level = new Level();
-    TestLevel.constructLevel(levelJSONObject, level);
-    return level;
   }
 
   /**
@@ -179,9 +97,6 @@ public class TestManager {
       }
       level.moveCharacter(level.getPlayerObjectFromName(nameListArr.getString(i)), positionList.get(i));
     }
-
-    // TODO: remove this before submitting
-    System.out.println(level.renderLevel());
   }
 
   /**
@@ -206,35 +121,21 @@ public class TestManager {
 
       if (player != null) {
         makeUpdates(nameListArr, level, manager);
-
-        // TODO: ABSTRACT TO DIFFERENT METHOD
         try {
-          Position newMove = playerListOfMoves.get(0);
-          GameStatus result;
-          if (newMove == null) {
-            result = GameStatus.VALID;
-            makeMoveUpdate(player, null, result);
-            playerListOfMoves.remove(null);
-          }
-          else {
-            result = manager.callRuleChecker(player, newMove);
-            makeMoveUpdate(player, newMove, result);
-            playerListOfMoves.remove(newMove);
-            while (result == GameStatus.INVALID) {
-              newMove = playerListOfMoves.get(0);
-              result = manager.callRuleChecker(player, newMove);
-              makeMoveUpdate(player, newMove, result);
-              playerListOfMoves.remove(newMove);
-            }
-            gameStillGoing = manager.parseMoveStatusAndDoAction(result, newMove, player);
-          }
+          gameStillGoing = playMove(manager, player, playerListOfMoves, gameStillGoing);
         }
+        // if it reaches here, that means one of the player move lists has been exhausted
         catch (IndexOutOfBoundsException e) {
           break;
         }
       }
+      else {
+        nameListArr.remove(characterIndex);
+        listOfMovesForPlayers.remove(characterIndex);
+      }
 
-      if (characterIndex == nameListArr.length() - 1) {
+      // loop over all the active players and increment turn count once all players have made a move
+      if (characterIndex >= nameListArr.length() - 1) {
         characterIndex = 0;
         turn++;
       }
@@ -270,6 +171,43 @@ public class TestManager {
     }
 
     return convertedList;
+  }
+
+  /**
+   * Plays a given move from the list of moves for the given character whose turn it is. Parse the move,
+   * check its validity, and do action based on the move, all via the GameManager.
+   *
+   * @param manager the game manager instance
+   * @param player the player object whose turn it is
+   * @param playerListOfMoves the list of moves for that player
+   * @param gameStillGoing boolean representing if the game is still going on
+   * @return a boolean representing if the game is still going on, dependent on what the move status returns
+   * @throws JSONException when given invalid JSON
+   */
+  private static boolean playMove(GameManager manager, ICharacter player, ArrayList<Position> playerListOfMoves, boolean gameStillGoing) throws JSONException {
+    Position newMove = playerListOfMoves.get(0);
+    GameStatus result;
+    if (newMove == null) {
+      result = GameStatus.VALID;
+      makeMoveUpdate(player, null, result);
+      playerListOfMoves.remove(0);
+    }
+    else {
+      result = manager.callRuleChecker(player, newMove);
+      makeMoveUpdate(player, newMove, result);
+      playerListOfMoves.remove(0);
+      while (result == GameStatus.INVALID) {
+        newMove = playerListOfMoves.get(0);
+        result = manager.callRuleChecker(player, newMove);
+        makeMoveUpdate(player, newMove, result);
+        playerListOfMoves.remove(0);
+      }
+      // actually send the move to the game manager and have them perform whatever action that needs to be done
+      // based on what kind of move it is (result)
+      gameStillGoing = manager.parseMoveStatusAndDoAction(result.name(), newMove, player);
+    }
+
+    return gameStillGoing;
   }
 
   /**
@@ -326,7 +264,7 @@ public class TestManager {
     playerUpdate.put("objects", objectsList);
 
     // add actors field
-    JSONArray actorsList = detectActorsInView(layout, level, manager);
+    JSONArray actorsList = detectActorsInView(layout, level, player, manager);
     playerUpdate.put("actors", actorsList);
 
     return playerUpdate;
@@ -343,15 +281,9 @@ public class TestManager {
     for (String[] row : layout) {
       JSONArray rowArray = new JSONArray();
       for (String colTile : row) {
-        if (colTile.equals("|")) {
-          rowArray.put(2);
-        }
-        else if (colTile.equals("■") || colTile.equals(" ")){
-          rowArray.put(0);
-        }
-        else {
-          rowArray.put(1);
-        }
+        if (colTile.equals("|")) rowArray.put(2);
+        else if (colTile.equals("■") || colTile.equals(" ")) rowArray.put(0);
+        else rowArray.put(1);
       }
       layoutArray.put(rowArray);
     }
@@ -391,6 +323,7 @@ public class TestManager {
         }
       }
     }
+
     return objectsArray;
   }
 
@@ -399,40 +332,71 @@ public class TestManager {
    *
    * @param layout String[][] of the player's view
    * @param level the current Level being played
+   * @param player
    * @param manager the GameManager instance
    * @return a JSONArray representing the actors in view
    */
-  private static JSONArray detectActorsInView(String[][] layout, Level level, GameManager manager) throws JSONException {
+  private static JSONArray detectActorsInView(String[][] layout, Level level, ICharacter player, GameManager manager) throws JSONException {
+    Position playerPos = player.getCharacterPosition();
+    Position playerPosInLayout = getPlayerPosInLayout(layout, player);
+    int rowDiff = playerPos.getRow() - playerPosInLayout.getRow();
+    int colDiff = playerPos.getCol() - playerPosInLayout.getCol();
+
     JSONArray actorsArray = new JSONArray();
-    for (String[] row : layout) {
-      for (String colTile : row) {
+    for (int i=0; i<layout.length; i++) {
+      for (int j=0; j<layout[i].length; j++) {
+        String colTile = layout[i][j];
         if (colTile.equals("Z") || colTile.equals("G")) {
-          //TODO: FIND A WAY TO GET AN ADVERSARY OBJECT FROM THE ASCII AVATAR
-          /*
-          IAdversary adv = level.
+          Position advPosInLevel = new Position(i + rowDiff, j + colDiff);
+          IAdversary adv = level.adversaryAtGivenPosition(advPosInLevel);
+
           JSONObject actorObj = new JSONObject();
-          actorObj.put("type", "key");
+          actorObj.put("name", adv.getName());
+          actorObj.put("type", adv.getType());
 
           JSONArray actorPos = new JSONArray();
-          actorPos.put(.getRow());
-          actorPos.put(level.getKeyPositionInLevel().getCol());
-          actorObj.put("position", objectPos);
-           */
+          actorPos.put(adv.getCharacterPosition().getRow());
+          actorPos.put(adv.getCharacterPosition().getCol());
+          actorObj.put("position", actorPos);
+
+          actorsArray.put(actorObj);
         }
-        else if (colTile.equals("@") || colTile.equals("¤") || colTile.equals("$") || colTile.equals("~")) {
+        else if ((colTile.equals("@") || colTile.equals("¤") || colTile.equals("$") || colTile.equals("~"))
+                && !(colTile.equals(player.getAvatar()))) {
           JSONObject actorObj = new JSONObject();
-          Player player = manager.getPlayerFromAvatar(colTile);
-          actorObj.put("name", player.getName());
+          Player otherPlayer = manager.getPlayerFromAvatar(colTile);
+          actorObj.put("name", otherPlayer.getName());
           actorObj.put("type", "player");
 
           JSONArray actorPos = new JSONArray();
-          actorPos.put(player.getCharacterPosition().getRow());
-          actorPos.put(player.getCharacterPosition().getCol());
+          actorPos.put(otherPlayer.getCharacterPosition().getRow());
+          actorPos.put(otherPlayer.getCharacterPosition().getCol());
           actorObj.put("position", actorPos);
+
+          actorsArray.put(actorObj);
         }
       }
     }
     return actorsArray;
+  }
+
+  /**
+   * Turns the player's position in their view layout into a relative Position object.
+   *
+   * @param layout 2D String array of the player's local view
+   * @param player the player whose view we're observing
+   * @return a Position of the player's position in their view 2D array
+   */
+  private static Position getPlayerPosInLayout(String[][] layout, ICharacter player) {
+    String playerAvatar = player.getAvatar();
+    for (int i=0; i<layout.length; i++) {
+      for (int j=0; j<layout[i].length; j++) {
+        if (layout[i][j].equals(playerAvatar)) {
+          return new Position(i, j);
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -492,5 +456,105 @@ public class TestManager {
       default:
         return "Should never get here";
     }
+  }
+
+  /**
+   * Constructs the output State JSONObject and then forms the resulting JSONArray to be outputted.
+   *
+   * @param manager the GameManager instance
+   * @param level the Level data object being played
+   * @param levelObj the Level JSONObject given as input
+   */
+  private static void makeStateOutput(GameManager manager, Level level, JSONObject levelObj) throws JSONException {
+    JSONArray outputArray = new JSONArray();
+    JSONObject state = new JSONObject();
+    state.put("type", "state");
+
+    state.put("level", updateLevel(level, levelObj));
+    state.put("players", updatePlayersList(level));
+    state.put("adversaries", updateAdversariesList(level));
+
+    // add the exit-locked field
+    state.put("exit-locked", level.getExitLocked());
+
+    outputArray.put(state);
+    outputArray.put(managerUpdates);
+
+    System.out.println(outputArray.toString());
+    System.out.println(level.renderLevel());
+  }
+
+  /**
+   * Updates the given Level JSON Object to reflect any changes that may have happened throughout the game.
+   *
+   * @param level the level instance being played
+   * @param levelObj the given JSONObject
+   * @return the mutated level JSONObject
+   */
+  private static JSONObject updateLevel(Level level, JSONObject levelObj) throws JSONException {
+    // Check if key has been found, if so, remove it from level object
+    if (!level.getTileInLevel(level.getKeyPositionInLevel()).equals("*")) {
+      JSONArray objects = levelObj.getJSONArray("objects");
+      int keyIndex = 0;
+      for (int i=0; i<objects.length(); i++) {
+        if (objects.getJSONObject(i).get("type").equals("key")) {
+          keyIndex = i;
+        }
+      }
+      objects.remove(keyIndex);
+    }
+    return levelObj;
+  }
+
+  /**
+   * Constructs the list of active players for the resulting state object.
+   *
+   * @param level the level instance being played
+   * @return a JSONArray of active players when the test ends
+   * @throws JSONException when invalid JSON is given
+   */
+  private static JSONArray updatePlayersList(Level level) throws JSONException {
+    JSONArray newPlayersList = new JSONArray();
+    for (Player activePlayer : level.getActivePlayers()) {
+      JSONObject newPlayerObj = new JSONObject();
+      // create and add to the player object
+      newPlayerObj.put("type", "player");
+      newPlayerObj.put("name", activePlayer.getName());
+      // make an inner JSON array and add to it to represent a position and place in new object
+      JSONArray newPosition = new JSONArray();
+      newPosition.put(activePlayer.getCharacterPosition().getRow());
+      newPosition.put(activePlayer.getCharacterPosition().getCol());
+      newPlayerObj.put("position", newPosition);
+      // add newly created player JSON object to final list of players
+      newPlayersList.put(newPlayerObj);
+    }
+
+    return newPlayersList;
+  }
+
+  /**
+   * Constructs the list of adversaries in the level for the resulting state object.
+   *
+   * @param level the level instance being played
+   * @return a JSONArray of adversaries
+   * @throws JSONException when given invalid JSON
+   */
+  private static JSONArray updateAdversariesList(Level level) throws JSONException {
+    JSONArray adversariesList = new JSONArray();
+    for (IAdversary adversary : level.getAdversaries()) {
+      JSONObject newAdversaryObj = new JSONObject();
+      // create and add to the adversary object
+      newAdversaryObj.put("type", adversary.getType());
+      newAdversaryObj.put("name", adversary.getName());
+      // make an inner JSON array and add to it to represent a position and place in new object
+      JSONArray newPosition = new JSONArray();
+      newPosition.put(adversary.getCharacterPosition().getRow());
+      newPosition.put(adversary.getCharacterPosition().getCol());
+      newAdversaryObj.put("position", newPosition);
+      // add newly created adversary JSON object to final list of adversaries
+      adversariesList.put(newAdversaryObj);
+    }
+
+    return adversariesList;
   }
 }

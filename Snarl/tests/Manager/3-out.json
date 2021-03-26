@@ -1,0 +1,323 @@
+[
+  {"level": {
+    "rooms":[
+      {
+        "layout":[
+          [0,0,0,0,0],
+          [0,1,1,1,0],
+          [0,1,1,1,0],
+          [0,1,1,1,2],
+          [0,0,0,0,0]
+        ],
+        "origin":[3,4],
+        "bounds":{"columns":5,"rows":5},
+        "type":"room"
+      },
+      {
+        "layout":[
+          [0,0,0,2,0],
+          [0,1,1,1,0],
+          [0,1,1,1,0],
+          [0,1,1,1,0],
+          [0,0,0,0,0]
+        ],
+        "origin":[10,8],
+        "bounds":{"columns":5,"rows":5},
+        "type":"room"
+      }
+    ],
+    "hallways":[
+      {"from":[6,8],"to":[10,11],"type":"hallway","waypoints":[[6,11]]}
+    ],
+    "objects":[
+      {"position":[4,5],"type":"exit"}
+    ],
+    "type":"level"
+  },
+    "players":[],
+    "exit-locked":false,
+    "adversaries":[
+      {"name":"adv1","position":[12,10],"type":"zombie"}
+    ],
+    "type":"state"},
+  [
+    ["Ron Weasley",
+      {"layout":[
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,2,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Harry Potter","position":[5,7],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"},
+          {"position":[6,6],"type":"key"}
+        ],
+        "position":[6,7],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",
+      {"layout":[
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,2,1],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Ron Weasley","position":[6,7],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"},
+          {"position":[6,6],"type":"key"}
+        ],
+        "position":[5,7],
+        "type":"player-update"
+      }
+    ],
+    ["Ron Weasley",{"to":[6,6],"type":"move"},"Key"],
+    ["Ron Weasley",
+      {"layout":[
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Harry Potter","position":[5,7],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[6,6],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",
+      {"layout":[
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,2,1],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Ron Weasley","position":[6,6],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[5,7],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",{"to":[4,7],"type":"move"},"OK"],
+    ["Ron Weasley",
+      {"layout":[
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Harry Potter","position":[4,7],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[6,6],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,2,1]
+      ],
+        "actors":[
+          {"name":"Ron Weasley","position":[6,6],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[4,7],
+        "type":"player-update"
+      }
+    ],
+    ["Ron Weasley",{"to":[6,5],"type":"move"},"OK"],
+    ["Ron Weasley",
+      {"layout":[
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Harry Potter","position":[4,7],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[6,5],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,2,1]
+      ],
+        "actors":[
+          {"name":"Ron Weasley","position":[6,5],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[4,7],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",{"to":[4,6],"type":"move"},"OK"],
+    ["Ron Weasley",
+      {"layout":[
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Harry Potter","position":[4,6],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[6,5],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2]
+      ],
+        "actors":[
+          {"name":"Ron Weasley","position":[6,5],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[4,6],
+        "type":"player-update"
+      }
+    ],
+    ["Ron Weasley",{"to":[5,5],"type":"move"},"OK"],
+    ["Ron Weasley",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Harry Potter","position":[4,6],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[5,5],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2]
+      ],
+        "actors":[
+          {"name":"Ron Weasley","position":[5,5],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[4,6],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",{"to":null,"type":"move"},"OK"],
+    ["Ron Weasley",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Harry Potter","position":[4,6],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[5,5],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2]
+      ],
+        "actors":[
+          {"name":"Ron Weasley","position":[5,5],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[4,6],
+        "type":"player-update"
+      }
+    ],
+    ["Ron Weasley",{"to":[4,5],"type":"move"},"Exit"],
+    ["Harry Potter",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2]
+      ],
+        "actors":[],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[4,6],
+        "type":"player-update"
+      }
+    ],
+    ["Harry Potter",{"to":[4,5],"type":"move"},"Exit"]
+  ]
+]
