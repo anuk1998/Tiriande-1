@@ -48,7 +48,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public boolean isValidMove(Position destPoint) {
         boolean valid = false;
         if (isOnLevelPlane(destPoint)) {
-            if ((isTileTraversable(destPoint) && is2CardinalTilesAway(destPoint))
+            if ((isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 2))
                     || (isCharactersCurrentPosition(destPoint))) {
                 valid = true;
             }
@@ -120,7 +120,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * @param destPoint goal Position requested by player
      * @return true if destPoint is 2 units away, false if not
      */
-    public boolean is2CardinalTilesAway(Position destPoint) {
+    public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
         boolean withinReach = false;
         HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));
 

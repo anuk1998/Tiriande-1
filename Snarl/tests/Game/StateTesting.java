@@ -27,10 +27,10 @@ public class StateTesting {
     createInitialGameBoard();
 
     //testIsLastLevel();
-    testParseMoveDoAction();
+    //testParseMoveDoAction();
     //testRegisterAdversary();
     //testRegisterPlayer();
-    //testis2CardinalTilesAway();
+    testisNCardinalTilesAway();
     //testisOnLevelPlane();
     //testIsValidMove();
     //testRunRuleCheckerPlayer();
@@ -111,10 +111,16 @@ public class StateTesting {
     assertEquals(GameStatus.VALID, ruleChecker444.runRuleChecker(new Position(3,4)));
   }
 
-  @Test public static void testis2CardinalTilesAway() {
-      RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, level1.getPlayerObjectFromName("Bob"));
-      level1.addCharacter(level1.getPlayerObjectFromName("Bob"), new Position (5,5));
-      assertEquals(false, ruleCheckerp1.is2CardinalTilesAway(new Position (0,0)));
+  @Test public static void testisNCardinalTilesAway() {
+    Player bob = level1.getPlayerObjectFromName("Bob");
+    RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, bob);
+    Position bobsPos = bob.getCharacterPosition();
+    System.out.println("Bob's position: " + bobsPos);
+    assertEquals(false, ruleCheckerp1.isNCardinalTilesAway(new Position (100,100), 1));
+    assertEquals(true, ruleCheckerp1.isNCardinalTilesAway(new Position (bobsPos.getRow() - 1, bobsPos.getCol()), 1));
+    assertEquals(true, ruleCheckerp1.isNCardinalTilesAway(new Position (bobsPos.getRow(),bobsPos.getCol() + 2), 2));
+    assertEquals(true, ruleCheckerp1.isNCardinalTilesAway(new Position (bobsPos.getRow() + 2,bobsPos.getCol() + 2), 4));
+
   }
 
   @Test public static void testIsValidMove() {

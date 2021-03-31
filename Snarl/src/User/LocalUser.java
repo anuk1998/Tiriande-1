@@ -7,6 +7,8 @@ import Common.IUser;
 import Game.ICharacter;
 import Game.Level;
 import Game.Position;
+import Game.IAdversary;
+import Game.Player;
 
 public class LocalUser implements IUser {
   String userName;
@@ -23,7 +25,16 @@ public class LocalUser implements IUser {
 
 
   @Override
-  public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
+
+  public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive ){
+    //boolean beginningOfLevel
+    if(character instanceof IAdversary) {
+      System.out.println("List of player locations: " + getAllPlayerLocations((currentLevel)));
+//      if(beginningOfLevel) {
+//        System.out.println("Here is the initial level view: " + currentLevel.renderLevel());
+//        beginningOfLevel = false;
+//      }
+    }
     if (isPlayerActive) {
       System.out.println(character.getName() + ", it is your turn to make a move. You are currently at position " +
               character.getCharacterPosition().toString() + " in the level. Here is your view:");
@@ -31,6 +42,14 @@ public class LocalUser implements IUser {
       System.out.println("Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position:");
     }
     System.out.println(renderView(currentLevel, character));
+  }
+
+  public ArrayList<Position> getAllPlayerLocations(Level currentLevel) {
+    ArrayList<Position> playerLocations = new ArrayList<>();
+    for(Player p: currentLevel.getActivePlayers()) {
+      playerLocations.add(p.getCharacterPosition());
+    }
+    return playerLocations;
   }
 
   public String[][] makeView(Level currentLevel, ICharacter character) {

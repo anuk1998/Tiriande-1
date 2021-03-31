@@ -35,10 +35,12 @@ public class GameManager {
         registerParticipants(sc);
         boolean gameStillGoing = true;
         int index = 0;
+
         while (gameStillGoing) {
             ICharacter character = (ICharacter)allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
             IUser currentUser = getUserByName(character);
+
             currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
             if (playerIsActive) {
                 Position requestedMove = currentUser.getUserMove(sc, character);
