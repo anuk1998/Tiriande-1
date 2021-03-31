@@ -1,6 +1,10 @@
 package Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class RuleCheckerPlayer implements IRuleChecker {
     Level currentLevel;
@@ -118,20 +122,20 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     public boolean is2CardinalTilesAway(Position destPoint) {
         boolean withinReach = false;
-        ArrayList<Position> cardinalTiles = new ArrayList<Position>();
-        ArrayList<Position> adjTiles = currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition());
+        HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));
 
-        for (Position adjacent : adjTiles) {
-            cardinalTiles.add(adjacent);
-            for (Position adjacentOfAdjacent : currentLevel.getAllAdjacentTiles(adjacent)) {
-                if (!cardinalTiles.contains(adjacentOfAdjacent)) {
-                    cardinalTiles.add(adjacentOfAdjacent);
-                }
+        while (maxTilesAway > 1) {
+            HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);
+            for (Position adjacent : tempCardinalTiles) {
+                cardinalTiles.addAll(currentLevel.getAllAdjacentTiles(adjacent));
             }
+            maxTilesAway--;
         }
-        if (cardinalTiles.contains(destPoint)) {
-            withinReach = true;
+
+        for (Position pos : cardinalTiles) {
+            if (pos.toString().equals(destPoint.toString())) withinReach = true;
         }
+
         return withinReach;
     }
 

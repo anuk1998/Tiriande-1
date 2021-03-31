@@ -170,9 +170,13 @@ public class GameManager {
             moveStatus = rcPlayer.runRuleChecker(requestedMove);
         }
         else if (character instanceof IAdversary) {
-            RuleCheckerAdversary rcAdversary = new RuleCheckerAdversary(currentLevel, (IAdversary)character);
-            moveStatus = GameStatus.VALID; // TODO: remove this when RuleCheckerAdversary is implemented
-            //moveStatus = rcAdversary.runRuleChecker(requestedMove);
+            IRuleChecker rcAdversary;
+            if (((IAdversary) character).getType().equals("zombie")) {
+                rcAdversary = new RuleCheckerZombie(currentLevel, (IAdversary)character);
+            }
+            else rcAdversary = new RuleCheckerGhost(currentLevel, (IAdversary)character);
+
+            moveStatus = rcAdversary.runRuleChecker(requestedMove);
         }
         return moveStatus;
     }

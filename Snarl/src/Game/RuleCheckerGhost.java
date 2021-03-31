@@ -1,9 +1,12 @@
 package Game;
 
-public class RuleCheckerAdversary implements IRuleChecker {
+public class RuleCheckerGhost implements IRuleChecker {
+    Level currentLevel;
+    IAdversary adversary;
     
-    public RuleCheckerAdversary(Level currentLevel, IAdversary adversary) {
-        
+    public RuleCheckerGhost(Level currentLevel, IAdversary adversary) {
+        this.currentLevel = currentLevel;
+        this.adversary = adversary;
     }
     @Override
     public GameStatus runRuleChecker(Position destination) {
@@ -25,6 +28,6 @@ public class RuleCheckerAdversary implements IRuleChecker {
 
     @Override
     public boolean isCharactersCurrentPosition(Position destPoint) {
-        return false;
+        return destPoint.toString().equals(this.adversary.getCharacterPosition().toString());
     }
 }
