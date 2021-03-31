@@ -1,16 +1,15 @@
 package Game;
-import java.util.ArrayList;
 
 public class Player implements ICharacter{
     Position playerPosition;
     String name;
     String avatar;
     boolean isExpelled;
-    ArrayList<String> inventory;
+
 
     public Player(String n) {
         this.name = n;
-        boolean isExpelled = false;
+        isExpelled = false;
     }
 
     public void setIsExpelled(boolean expel) {

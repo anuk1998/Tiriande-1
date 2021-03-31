@@ -1,0 +1,488 @@
+[
+  {
+    "level":
+    {"rooms":[
+      {"layout":[
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2],
+        [0,0,0,0,0]
+      ],
+        "origin":[3,4],
+        "bounds":{"columns":5,"rows":5},
+        "type":"room"
+      },
+      {
+        "layout":[
+          [0,0,0,2,0],
+          [0,1,1,1,0],
+          [0,1,1,1,0],
+          [0,1,1,1,0],
+          [0,0,0,0,0]
+        ],
+        "origin":[10,8],
+        "bounds":{"columns":5,"rows":5},
+        "type":"room"
+      }
+    ],
+      "hallways":[
+        {"from":[6,8], "to":[10,11],"type":"hallway","waypoints":[[6,11]]}
+      ],
+      "objects":[
+        {"position":[4,5],"type":"exit"}
+      ],
+      "type":"level"
+    },
+    "players":[],
+    "exit-locked":false,
+    "adversaries":[
+      {"name":"adv1","position":[12,10],"type":"zombie"}
+    ],
+    "type":"state"},
+  [
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,2,1],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Luna Lovegood","position":[6,7],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"},
+          {"position":[6,6],"type":"key"}
+        ],"position":[5,7],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,2,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Neville Longbottom","position":[5,7],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"},
+          {"position":[6,6],"type":"key"}
+        ],
+        "position":[6,7],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[6,8],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [1,1,0,0,0],
+        [1,1,0,0,0],
+        [1,1,1,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Luna Lovegood","position":[6,7],"type":"player"}
+        ],
+        "objects":[
+          {"position":[6,6],"type":"key"}
+        ],
+        "position":[6,8],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Neville Longbottom","position":[6,8],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"},
+          {"position":[6,6],"type":"key"}
+        ],
+        "position":[6,7],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",{"to":[5,6],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [1,1,0,0,0],
+        [1,1,0,0,0],
+        [1,1,1,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Luna Lovegood","position":[5,6],"type":"player"}
+        ],
+        "objects":[
+          {"position":[6,6],"type":"key"}
+        ],
+        "position":[6,8],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,1],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"Neville Longbottom","position":[6,8],"type":"player"}
+        ],
+        "objects":[
+          {"position":[4,5],"type":"exit"},
+          {"position":[6,6],"type":"key"}
+        ],
+        "position":[5,6],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[6,9],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [1,0,0,0,0],
+        [1,0,0,0,0],
+        [1,2,1,1,1],
+        [0,0,0,0,1],
+        [0,0,0,0,1]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[6,9],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2],
+        [0,0,0,0,0]
+      ],
+        "actors":[],
+        "objects":[
+          {"position":[4,5],"type":"exit"},
+          {"position":[6,6],"type":"key"}
+        ],
+        "position":[5,6],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",{"to":[6,6],"type":"move"},"Key"],
+    ["Neville Longbottom",
+      {"layout":[
+        [1,0,0,0,0],
+        [1,0,0,0,0],
+        [1,2,1,1,1],
+        [0,0,0,0,1],
+        [0,0,0,0,1]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[6,9],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[6,6],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[6,10],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [2,1,1,1,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[6,10],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [0,1,1,1,0],
+        [0,1,1,1,0],
+        [0,1,1,1,2],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[6,6],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",{"to":[6,5],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [2,1,1,1,0],
+        [0,0,0,1,0],
+        [0,0,0,1,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[6,10],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[6,5],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[6,11],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[6,11],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,0,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[6,5],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",{"to":[5,5],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[6,11],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,0,0,0]
+      ],
+        "actors":[],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[5,5],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[7,11],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[7,11],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",
+      {"layout":[
+        [0,0,0,0,0],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,1,1,1],
+        [0,0,0,0,0]
+      ],
+        "actors":[],
+        "objects":[
+          {"position":[4,5],"type":"exit"}
+        ],
+        "position":[5,5],
+        "type":"player-update"
+      }
+    ],
+    ["Luna Lovegood",{"to":[4,5],"type":"move"},"Exit"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[7,11],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":null,"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,0,0,0],
+        [1,1,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[7,11],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[8,11],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [1,1,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,2,0,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[8,11],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[9,11],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,2,0,0],
+        [1,1,1,0,0]
+      ],
+        "actors":[],
+        "objects":[],
+        "position":[9,11],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[10,11],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [0,0,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0]
+      ],
+        "actors":[
+          {"name":"adv1","position":[12,10],"type":"zombie"}
+        ],
+        "objects":[],
+        "position":[10,11],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[11,11],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,1,0,0],
+        [0,0,2,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0]
+      ],
+        "actors":[
+          {"name":"adv1","position":[12,10],"type":"zombie"}
+        ],
+        "objects":[],
+        "position":[11,11],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[12,11],"type":"move"},"OK"],
+    ["Neville Longbottom",
+      {"layout":[
+        [0,0,2,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [1,1,1,0,0],
+        [0,0,0,0,0]
+      ],
+        "actors":[
+          {"name":"adv1","position":[12,10],"type":"zombie"}
+        ],
+        "objects":[],
+        "position":[12,11],
+        "type":"player-update"
+      }
+    ],
+    ["Neville Longbottom",{"to":[12,10],"type":"move"},"Eject"]
+  ]
+]

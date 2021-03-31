@@ -1,6 +1,10 @@
 package Game;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class RuleCheckerPlayer implements IRuleChecker {
     Level currentLevel;
@@ -26,13 +30,13 @@ public class RuleCheckerPlayer implements IRuleChecker {
             if (isOccupiedByAdversary(destination)) {
                 status = encountersOppositeCharacter();
             } else if (currentLevel.getKeyPositionInLevel().equals(destination)) {
-                status = keyTileIsLandedOn();
+                status = GameStatus.KEY_FOUND;
             } else if (currentLevel.getExitPositionInLevel().equals(destination)) {
                 status = exitTileIsLandedOn();
             }
         }
         return status;
-        }
+    }
 
     /**
      * Determines whether a given destination Position is a valid move by a player.
@@ -44,11 +48,23 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public boolean isValidMove(Position destPoint) {
         boolean valid = false;
         if (isOnLevelPlane(destPoint)) {
-            if (isTileTraversable(destPoint) && is2CardinalTilesAway(destPoint)) {
+            if ((isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 2))
+                    || (isCharactersCurrentPosition(destPoint))) {
                 valid = true;
             }
         }
         return valid;
+    }
+
+    /**
+     * Checks if the requested destination is the current player's current destination.
+     *
+     * @param destPoint the player's requested move
+     * @return a boolean indicating if it's the player's current position
+     */
+    @Override
+    public boolean isCharactersCurrentPosition(Position destPoint) {
+        return destPoint.toString().equals(this.player.getCharacterPosition().toString());
     }
 
     /**
@@ -104,32 +120,23 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * @param destPoint goal Position requested by player
      * @return true if destPoint is 2 units away, false if not
      */
-    public boolean is2CardinalTilesAway(Position destPoint) {
+    public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
         boolean withinReach = false;
-        ArrayList<Position> cardinalTiles = new ArrayList<Position>();
-        ArrayList<Position> adjTiles = currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition());
+        HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));
 
-        for (Position adjacent : adjTiles) {
-            cardinalTiles.add(adjacent);
-            for (Position adjacentOfAdjacent: currentLevel.getAllAdjacentTiles(adjacent)) {
-                if (!cardinalTiles.contains(adjacentOfAdjacent)) {
-                    cardinalTiles.add(adjacentOfAdjacent);
-                }
+        while (maxTilesAway > 1) {
+            HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);
+            for (Position adjacent : tempCardinalTiles) {
+                cardinalTiles.addAll(currentLevel.getAllAdjacentTiles(adjacent));
             }
+            maxTilesAway--;
         }
-        if (cardinalTiles.contains(destPoint)) {
-            withinReach = true;
-        }
-        return withinReach;
-    }
 
-    /**
-     * Returns the appropriate GameStatus for when a key tile is landed on.
-     *
-     * @return a GameStatus that signifies that the level key has been found
-     */
-    public GameStatus keyTileIsLandedOn() {
-        return GameStatus.KEY_FOUND;
+        for (Position pos : cardinalTiles) {
+            if (pos.toString().equals(destPoint.toString())) withinReach = true;
+        }
+
+        return withinReach;
     }
 
     /**
@@ -143,7 +150,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
         if (isLastLevel() && currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.GAME_WON;
         }
-        //if it is the last player exiting through the exit tile
+        // if it is the last player exiting through the exit tile
         else if (currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.LEVEL_WON;
         }

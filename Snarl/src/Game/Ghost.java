@@ -19,6 +19,11 @@ public class Ghost implements IAdversary{
     }
 
     @Override
+    public String getType() {
+        return "ghost";
+    }
+
+    @Override
     public void setCharacterPosition(Position p) {
         this.advPosition = new Position(p.getRow(), p.getCol());
     }

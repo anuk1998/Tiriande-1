@@ -105,19 +105,19 @@ public class TestState {
       switch (tile) {
         case "G":
         case "Z":
-          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, point, player);
+          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), point, player);
           outputArray = outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "ejected");
           break;
         case "O":
-          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_EXITED, point, player);
+          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_EXITED.name(), point, player);
           outputArray = outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "exited");
           break;
         case "*":
-          gameManager.parseMoveStatusAndDoAction(GameStatus.KEY_FOUND, point, player);
+          gameManager.parseMoveStatusAndDoAction(GameStatus.KEY_FOUND.name(), point, player);
           outputArray = outputRegularMoveMessage(outputArray, level, stateObject, false);
           break;
         default:
-          gameManager.parseMoveStatusAndDoAction(GameStatus.VALID, point, player);
+          gameManager.parseMoveStatusAndDoAction(GameStatus.VALID.name(), point, player);
           outputArray = outputRegularMoveMessage(outputArray, level, stateObject, true);
       }
     }
@@ -265,7 +265,7 @@ public class TestState {
    * @return the updated JSONArray after executing the valid move
    * @throws JSONException if malformed JSON is given
    */
-  private static JSONObject updateStateObject(Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
+  public static JSONObject updateStateObject(Level level, JSONObject stateObject, boolean isExitLocked) throws JSONException {
     JSONArray newPlayersList = new JSONArray();
     // make a new list of players based on the list of active players in Level
     for (Player activePlayer : level.getActivePlayers()) {
