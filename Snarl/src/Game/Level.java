@@ -110,7 +110,7 @@ public class Level {
     int randomIndexCol = rand.nextInt(this.levelNumOfCols);
     String randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
 
-    while (!randomTile.equals(".") && !randomTile.equals("|") && !randomTile.equals("●")) {
+    while (!randomTile.equals(".") && !randomTile.equals("|")) {
       randomIndexRow = rand.nextInt(this.levelNumOfRows);
       randomIndexCol = rand.nextInt(this.levelNumOfCols);
       randomTile = this.levelPlane[randomIndexRow][randomIndexCol];

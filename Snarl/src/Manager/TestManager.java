@@ -57,7 +57,7 @@ public class TestManager {
 
     Level level = new Level();
     TestLevel.constructLevel(levelObj, level);
-    GameManager manager = new GameManager(new ArrayList<>(Arrays.asList(level)));
+    GameManager manager = new GameManager(new ArrayList<>(Arrays.asList(level)), 0);
 
     registerCharactersFromJSON(manager, level, nameListArr, pointListArr);
     playGame(manager, level, turnLimit, nameListArr, actorMoveListListArr);

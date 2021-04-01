@@ -19,12 +19,17 @@ public class GameManager {
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
     ArrayList<Player> exitedPlayers = new ArrayList<>();
     ArrayList<Player> expelledPlayers = new ArrayList<>();
+    ArrayList<Level> allLevels;
     Level currentLevel;
     ArrayList<IObserver> observers = new ArrayList<>();
     ArrayList<IUser> users = new ArrayList<>();
+    int startLevel;
+    ArrayList<Integer> completedLevelsIndexes = new ArrayList<>();
 
-    public GameManager(ArrayList<Level> allLevels) {
-        this.currentLevel = allLevels.get(0);
+    public GameManager(ArrayList<Level> allLevels, int startLevel) {
+        this.allLevels = allLevels;
+        this.currentLevel = allLevels.get(startLevel);
+        this.startLevel = startLevel;
     }
 
     /**
@@ -32,7 +37,7 @@ public class GameManager {
      */
     public void startGame() {
         Scanner sc = new Scanner(System.in);
-        registerParticipants(sc);
+        //registerParticipants(sc);
         boolean gameStillGoing = true;
         int index = 0;
 
@@ -40,6 +45,11 @@ public class GameManager {
             ICharacter character = (ICharacter)allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
             IUser currentUser = getUserByName(character);
+
+            if (character instanceof IAdversary) {
+                chooseAdversaryMove(currentUser, character);
+                continue;
+            }
 
             currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
             if (playerIsActive) {
@@ -56,15 +66,38 @@ public class GameManager {
                 index++;
             }
         }
+
+        // TODO: potentially put a checker here if a new level is generated and recursively call startGame()
+
         sc.close();
         System.out.println("Game has ended.");
         // add other game terminus actions once networking elements/client/scanner/etc elements are known
     }
 
     /**
-     * This registers players and adversaries as participants of the game via STDin.
+     * Registers a certain number of players based on the given number.
+     *
+     * @param numOfPlayers number of players to register
+     * @param scanner instance to read in from STDin
      */
-    private void registerParticipants(Scanner sc) {
+    public void registerPlayers(int numOfPlayers, Scanner scanner) {
+        while (numOfPlayers > 0) {
+            System.out.println("Please enter a username for your player:");
+            String playerName = scanner.nextLine();
+            registerPlayer(playerName);
+            numOfPlayers--;
+        }
+        System.out.println("-----------------------------");
+        System.out.println("All players have been registered. Let's start the game.");
+    }
+
+
+    /**
+     * This registers players and adversaries as participants of the game via STDin.
+     *
+     * THIS METHOD IS STALE FOR NOW.
+     */
+    private void registerParticipantsOLD(Scanner sc) {
         System.out.println("Would you like to register as a player or adversary? Select 'P' for player or 'A' for adversary.");
         String whichTypeOfParticipant = sc.nextLine();
         //in case user does not enter 'P' or 'A'
@@ -104,9 +137,8 @@ public class GameManager {
             System.out.println("Okay, we're ready to start the game!");
         }
         else {
-            registerParticipants(sc);
+            registerParticipantsOLD(sc);
         }
-
     }
 
     /**
@@ -141,6 +173,16 @@ public class GameManager {
      */
     public void addUser(IUser user) {
         this.users.add(user);
+    }
+
+
+    /**
+     * Chooses the given adversary's next move and then sends it to RuleChecker before being executed.
+     *
+     * @param currentUser current adversary's user instance
+     * @param character adversary whose move it is
+     */
+    private void chooseAdversaryMove(IUser currentUser, ICharacter character) {
     }
 
 
@@ -222,15 +264,21 @@ public class GameManager {
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 exitedPlayers.add((Player) c);
+                completedLevelsIndexes.add(allLevels.indexOf(this.currentLevel));
+                if (isLastLevel()) {
+                    System.out.println("Players have won the game! Game over");
+                    return false;
+                }
                 resurrectPlayers();
                 //System.out.print("Congrats!! Players have won the level!");
-                return false; // THIS CAN CHANGE TO TRUE ONCE WE'RE DEALING WITH MORE THAN ONE LEVEL
-            case "GAME_WON":
-                currentLevel.restoreCharacterTile(c);
-                currentLevel.playerPassedThroughExit(c);
-                exitedPlayers.add((Player) c);
-                //System.out.print("Congrats!! Players have won the game!");
-                return false;
+                this.currentLevel = this.allLevels.get(getNewLevel());
+                return true;
+//            case "GAME_WON":
+//                currentLevel.restoreCharacterTile(c);
+//                currentLevel.playerPassedThroughExit(c);
+//                exitedPlayers.add((Player) c);
+//                //System.out.print("Congrats!! Players have won the game!");
+//                return false;
             case "GAME_LOST":
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
@@ -242,6 +290,20 @@ public class GameManager {
         }
         // will never get here
         return false;
+    }
+
+    /**
+     * Gets a new index for the allLevels list to generate a new level to be played.
+     *
+     * @return a number representing
+     */
+    private int getNewLevel() {
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(this.allLevels.size()-1);
+        while (completedLevelsIndexes.contains(randomIndex)) {
+            randomIndex = rand.nextInt(this.allLevels.size()-1);
+        }
+        return randomIndex;
     }
 
     /**
@@ -313,13 +375,13 @@ public class GameManager {
         IAdversary adversary = null;
         if (type.equalsIgnoreCase("zombie")) {
             adversary = new Zombie(name);
-            // IUser user = new LocalUser(name);
-            //addUser(user);
+            IUser user = new LocalUser(name);
+            addUser(user);
         }
         else if (type.equalsIgnoreCase("ghost")) {
             adversary = new Ghost(name);
-            // IUser user = new LocalUser(name);
-            // addUser(user);
+            IUser user = new LocalUser(name);
+            addUser(user);
         }
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
@@ -393,5 +455,14 @@ public class GameManager {
             }
         }
         return null;
+    }
+
+    /**
+     * Checks if the current level is the last level in the list.
+     *
+     * @return true if the game is on the last level, false if not
+     */
+    public boolean isLastLevel() {
+        return completedLevelsIndexes.size() == this.allLevels.size();
     }
 }

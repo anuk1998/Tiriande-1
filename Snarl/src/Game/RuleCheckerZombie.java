@@ -1,7 +1,5 @@
 package Game;
 
-import com.sun.xml.internal.bind.v2.TODO;
-
 public class RuleCheckerZombie implements IRuleChecker{
   Level currentLevel;
   IAdversary adversary;

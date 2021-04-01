@@ -92,7 +92,7 @@ public class TestState {
     // create a GameManager instance to be able to conduct various actions based on the type of move
     ArrayList<Level> listOfOneLevel = new ArrayList<>();
     listOfOneLevel.add(level);
-    GameManager gameManager = new GameManager(listOfOneLevel);
+    GameManager gameManager = new GameManager(listOfOneLevel, 0);
     // convert given point destination to our Position data representation for parsing
     Position point = new Position(pointObject.getInt(0), pointObject.getInt(1));
     // initialize the resulting output array that will be passed through functions below to be added to

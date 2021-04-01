@@ -1,10 +1,6 @@
 package Game;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public class RuleCheckerPlayer implements IRuleChecker {
     Level currentLevel;
@@ -147,11 +143,8 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     public GameStatus exitTileIsLandedOn() {
       if (isExitUnlocked()) {
-        if (isLastLevel() && currentLevel.getActivePlayers().size() == 1) {
-            return GameStatus.GAME_WON;
-        }
         // if it is the last player exiting through the exit tile
-        else if (currentLevel.getActivePlayers().size() == 1) {
+        if (currentLevel.getActivePlayers().size() == 1) {
             return GameStatus.LEVEL_WON;
         }
         return GameStatus.PLAYER_EXITED;
@@ -167,14 +160,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public boolean isExitUnlocked() {
         // returns true if the exit tile in the level has been unlocked, false otherwise
         return currentLevel.getTileInLevel(currentLevel.getExitPositionInLevel()).equals("O");
-    }
-
-    /**
-     * Not elaborated on in Milestone 5 because we are only dealing with one level so this will always be true.
-     * @return true if the game is on the last level, false if not
-     */
-    public boolean isLastLevel() {
-        return true;
     }
 
     /**

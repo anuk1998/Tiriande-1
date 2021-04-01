@@ -20,7 +20,7 @@ public class StateTesting {
   //static IAdversary zombie = new Ghost("Weird Zombie");
   static Level[] lev = {level1};
   static ArrayList<Level> listOfLevels = new ArrayList<Level>(Arrays.asList(lev));
-  static GameManager gm = new GameManager(listOfLevels);
+  static GameManager gm = new GameManager(listOfLevels, 0);
 
   public static void main(String[] args) {
     listOfLevels.add(level1);
@@ -54,12 +54,6 @@ public class StateTesting {
   public static void testIsExitUnlocked() {
     RuleCheckerPlayer exitUnlocked = new RuleCheckerPlayer(level1, p1);
     assertEquals(false, exitUnlocked.isExitUnlocked() );
-  }
-
-  @Test
-  public static void testIsLastLevel() {
-    RuleCheckerPlayer rcp = new RuleCheckerPlayer(level1, level1.getPlayerObjectFromName("Rob"));
-    assertEquals(true, rcp.isLastLevel());
   }
 
   @Test 

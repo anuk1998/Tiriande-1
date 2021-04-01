@@ -195,7 +195,7 @@ public class ObserverTesting {
     //initialize gameManager
     ArrayList<Level> listOfLevels = new ArrayList<>();
     listOfLevels.add(level1);
-    GameManager gm = new GameManager(listOfLevels);
+    GameManager gm = new GameManager(listOfLevels, 0);
 
     //register players for observer testing purposes
     gm.registerPlayer("Anu");
