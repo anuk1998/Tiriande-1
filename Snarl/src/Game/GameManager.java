@@ -12,6 +12,8 @@ import Common.IObserver;
 import Observer.LocalObserver;
 import User.LocalUser;
 import java.util.Scanner;
+import java.lang.*;
+import java.util.stream.Collectors;
 
 
 public class GameManager {
@@ -83,11 +85,38 @@ public class GameManager {
 
         System.out.println("\nGame has ended.\n");
 
-        // TODO: put the output message here as per 7) in the testing task
+        //rank player exited numbers
+        System.out.println("Players Ranked By Number Of Times Successfully Exited in the Game:");
+        printPlayerExitedRankings();
+
+        //rank players based on keys found
+        System.out.println("\nPlayers Ranked By Number Of Keys Found in the Game:");
+        printPlayerKeyFoundRankings();
 
         sc.close();
         // add other game terminus actions once networking elements/client/scanner/etc elements are known
     }
+
+    private boolean adversarysMove(ICharacter character, IUser currentUser) {
+        Position chosenMove = chooseAdversaryMove(currentUser, (IAdversary) character);
+        GameStatus moveStatus = callRuleChecker(character, chosenMove);
+
+        int invalidCount = 0;
+        // generate a new move until we get one that's not invalid
+        while (moveStatus.name().equals("INVALID")) {
+            invalidCount++;
+            // if there are no valid moves in any cardinal direction, keep the adversary stationary
+            if (invalidCount == 4) {
+                moveStatus = GameStatus.VALID;
+                chosenMove = character.getCharacterPosition();
+                break;
+            }
+            chosenMove = chooseAdversaryMove(currentUser, (IAdversary) character);
+            moveStatus = callRuleChecker(character, chosenMove);
+        }
+        return parseMoveStatusAndDoAction(moveStatus.name(), chosenMove, character);
+    }
+
 
     /**
      * Places all the players on new random positions in the new level.
@@ -285,6 +314,7 @@ public class GameManager {
                 currentLevel.moveCharacter(c, destination);
                 currentLevel.openExitTile();
                 System.out.println("Player " + c.getName() + " found the key.");
+                ((Player) c).increaseNumOfKeysFound();
                 return true;
             case "PLAYER_SELF_ELIMINATES":
                 currentLevel.restoreCharacterTile(c);
@@ -331,6 +361,7 @@ public class GameManager {
                     expelledPlayers.add(p3);
                 }
                 System.out.print("Congrats! Players have won the game!");
+
                 return false;
             case "GAME_LOST":
                 Player p4 = currentLevel.playerAtGivenPosition(destination);
@@ -342,13 +373,43 @@ public class GameManager {
                     currentLevel.expelPlayer(p4);
                     expelledPlayers.add(p4);
                 }
-                System.out.print("Sorry :( Players have lost the game!");
+                System.out.println("Sorry :( Players have lost the game!");
+
+
                 return false;
             default:
                 //System.out.print("Default case.Should never get here.");
         }
         // will never get here
         return false;
+    }
+
+    public void printPlayerExitedRankings() {
+        HashMap<String, Integer> playerExitedNumbers = new HashMap<>();
+
+        for (Player p : this.allPlayers.values()) {
+            playerExitedNumbers.put(p.getName(), p.getNumOfTimesExited());
+        }
+
+        HashMap<String, Integer> playerExitedNumbersSorted = playerExitedNumbers.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+        System.out.println(playerExitedNumbersSorted.toString());
+    }
+
+    private void printPlayerKeyFoundRankings() {
+        HashMap<String, Integer> playerKeyNumbers = new HashMap<>();
+
+        for (Player p : this.allPlayers.values()) {
+            playerKeyNumbers.put(p.getName(), p.getNumOfKeysFound());
+        }
+
+        HashMap<String, Integer> playerKeyNumbersSorted = playerKeyNumbers.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+
+        System.out.println(playerKeyNumbersSorted.toString());
     }
 
     /**
@@ -545,20 +606,7 @@ public class GameManager {
         this.observerView = isObserverView;
     }
 
-    /**
-     * Returns an IUser instance based on the given name.
-     *
-     * @param name the name of the IUser to be found.
-     * @return an IUser instance
-     */
-    public IUser getUserFromName(String name) {
-        for (IUser user: users) {
-            if (user.getUserName().equals(name)) {
-                return user;
-            }
-        }
-        return null;
-    }
+
 
     /**
      * Returns a Player object based on a given avatar.

@@ -149,14 +149,19 @@ public class RuleCheckerPlayer implements IRuleChecker {
         // if it is the last player exiting through the exit tile
         if (currentLevel.getActivePlayers().size() == 1) {
             if (isLastLevel()) {
+                this.player.increaseNumOfTimesExited();
                 return GameStatus.GAME_WON;
             }
+            this.player.increaseNumOfTimesExited();
             return GameStatus.LEVEL_WON;
         }
+        this.player.increaseNumOfTimesExited();
         return GameStatus.PLAYER_EXITED;
       }
       return GameStatus.VALID;
     }
+
+
 
     /**
      * Returns whether or not the exit tile is unlocked.

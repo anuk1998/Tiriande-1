@@ -221,7 +221,7 @@ public class TestManager {
     for (int i=0; i< nameListArr.length(); i++) {
       String name = nameListArr.getString(i);
       Player player = level.getPlayerObjectFromName(name);
-      IUser user = manager.getUserFromName(name);
+      IUser user = manager.getUserByName(name);
 
       if (player != null) {
         JSONArray playerUpdate = new JSONArray();
