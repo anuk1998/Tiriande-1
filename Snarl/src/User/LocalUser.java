@@ -35,13 +35,15 @@ public class LocalUser implements IUser {
 //        beginningOfLevel = false;
 //      }
     }
-    if (isPlayerActive) {
-      System.out.println(character.getName() + ", it is your turn to make a move. You are currently at position " +
-              character.getCharacterPosition().toString() + " in the level. Here is your view:");
-    } else {
-      System.out.println("Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position:");
+    else {
+      if (isPlayerActive) {
+        System.out.println(character.getName() + ", it is your turn to make a move. You are currently at position " +
+                character.getCharacterPosition().toString() + " in the level. Here is your view:");
+      } else {
+        System.out.println("Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position:");
+      }
+      System.out.println(renderView(currentLevel, character));
     }
-    System.out.println(renderView(currentLevel, character));
   }
 
   public ArrayList<Position> getAllPlayerLocations(Level currentLevel) {

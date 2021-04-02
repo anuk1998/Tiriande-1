@@ -46,6 +46,8 @@ public class Level {
       for (Position posInRoom : r.getListOfAllPositions()) {
         int scaledLevelRow = posInRoom.getRow() + r.getRoomOriginInLevel().getRow();
         int scaledLevelCol = posInRoom.getCol() + r.getRoomOriginInLevel().getCol();
+
+        r.addToListOfAllPositionsLevelScale(new Position(scaledLevelRow, scaledLevelCol));
         // if position is a door, add it to map of doors in level
         if (r.getDoorPositions().contains(posInRoom)) {
           this.listOfDoorsInLevel.put(new Position(scaledLevelRow, scaledLevelCol).toString(), r);
@@ -100,6 +102,10 @@ public class Level {
     }
     else if(character instanceof IAdversary) {
       this.adversaries.add((IAdversary) character);
+      if (((IAdversary) character).getType().equals("zombie")) {
+        Zombie zombie = (Zombie) character;
+        zombie.setZombiesRoom(getBelongingRoom(placeLocation));
+      }
     }
   }
 
@@ -110,7 +116,7 @@ public class Level {
     int randomIndexCol = rand.nextInt(this.levelNumOfCols);
     String randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
 
-    while (!randomTile.equals(".") && !randomTile.equals("|")) {
+    while (!randomTile.equals(".")) {
       randomIndexRow = rand.nextInt(this.levelNumOfRows);
       randomIndexCol = rand.nextInt(this.levelNumOfCols);
       randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
@@ -149,6 +155,7 @@ public class Level {
   // When moving or eliminating a character, this method converts the character's current position back
   //  to the tile type that it was before the character moved onto it
   public void restoreCharacterTile(ICharacter character) {
+    // TODO ADD CHECK FOR A KEY
     if (isInHallway(character)) {
       this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "x";
     }

@@ -8,6 +8,7 @@ public class Room {
     int numOfRows;
     int numOfCols;
     ArrayList<Position> listOfAllPositions = new ArrayList<Position>();
+    ArrayList<Position> listOfAllPositionsLevelScale = new ArrayList<Position>();
     ArrayList<Position> listOfEdgePositions = new ArrayList<Position>();
     ArrayList<Position> listOfDoorsInRoom = new ArrayList<Position>();
 
@@ -81,7 +82,15 @@ public class Room {
     }
 
     public ArrayList<Position> getListOfAllPositions() {
-        return this.listOfAllPositions;
+        return new ArrayList<>(this.listOfAllPositions);
+    }
+
+    public ArrayList<Position> getListOfAllPositionsLevelScale() {
+        return new ArrayList<>(this.listOfAllPositionsLevelScale);
+    }
+
+    public void addToListOfAllPositionsLevelScale(Position p) {
+        this.listOfAllPositionsLevelScale.add(p);
     }
 
     public String getTileInRoom(Position tilePosition) {

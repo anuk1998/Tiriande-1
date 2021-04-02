@@ -98,7 +98,7 @@ public class TestState {
     // initialize the resulting output array that will be passed through functions below to be added to
     JSONArray outputArray = new JSONArray();
 
-    IRuleChecker rcPlayer = new RuleCheckerPlayer(level, player);
+    IRuleChecker rcPlayer = new RuleCheckerPlayer(gameManager, level, player);
     if (rcPlayer.isTileTraversable(point)) {
       String tile = level.getTileInLevel(point);
       switch (tile) {

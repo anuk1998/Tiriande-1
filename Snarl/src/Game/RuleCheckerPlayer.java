@@ -6,7 +6,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
     Level currentLevel;
     Player player;
 
-    public RuleCheckerPlayer(Level currentLevel, Player player) {
+    public RuleCheckerPlayer(GameManager manager, Level currentLevel, Player player) {
         this.currentLevel = currentLevel;
         this.player = player;
     }
@@ -116,6 +116,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * @param destPoint goal Position requested by player
      * @return true if destPoint is 2 units away, false if not
      */
+    @Override
     public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
         boolean withinReach = false;
         HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));

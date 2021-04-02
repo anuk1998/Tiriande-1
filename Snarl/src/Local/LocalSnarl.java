@@ -41,8 +41,8 @@ public class LocalSnarl {
       startLevelNum = Integer.parseInt(argsList.get(index + 1));
     }
     if (argsList.contains("--observe")) {
-      int index = argsList.indexOf("--observe");
       observerView = true;
+      numOfPlayers = 1;
     }
 
     try {
@@ -79,7 +79,6 @@ public class LocalSnarl {
   }
 
   private static void initializeLevelAndRegister(ArrayList<JSONObject> levels, int numOfPlayers, int startLevelNum, boolean observerView) throws JSONException {
-    //JSONObject startingLevel = levels.get(startLevelNum - 1);
     ArrayList<Level> listOfLevels = new ArrayList<>();
     for (JSONObject jsonLevel : levels) {
       Level level = new Level();
@@ -87,7 +86,12 @@ public class LocalSnarl {
       listOfLevels.add(level);
     }
 
-    GameManager manager = new GameManager(listOfLevels, startLevelNum - 1);
+    if (startLevelNum > listOfLevels.size() - 1) {
+      System.out.println("Given starting level not valid. Will be starting at Level 1.");
+      startLevelNum = 1;
+    }
+
+    GameManager manager = new GameManager(listOfLevels, startLevelNum);
 
     Scanner scanner = new Scanner(System.in);
     manager.registerPlayers(numOfPlayers, scanner);
@@ -108,6 +112,7 @@ public class LocalSnarl {
   }
 
   private static void runGame(GameManager manager, Level level, boolean observerView) {
-    manager.startGame();
+    manager.runGame();
+
   }
 }
