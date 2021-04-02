@@ -5,10 +5,12 @@ import java.util.HashSet;
 public class RuleCheckerPlayer implements IRuleChecker {
     Level currentLevel;
     Player player;
+    GameManager gm;
 
     public RuleCheckerPlayer(GameManager manager, Level currentLevel, Player player) {
         this.currentLevel = currentLevel;
         this.player = player;
+        this.gm = manager;
     }
 
     /**
@@ -146,6 +148,9 @@ public class RuleCheckerPlayer implements IRuleChecker {
       if (isExitUnlocked()) {
         // if it is the last player exiting through the exit tile
         if (currentLevel.getActivePlayers().size() == 1) {
+            if (isLastLevel()) {
+                return GameStatus.GAME_WON;
+            }
             return GameStatus.LEVEL_WON;
         }
         return GameStatus.PLAYER_EXITED;
@@ -164,6 +169,17 @@ public class RuleCheckerPlayer implements IRuleChecker {
     }
 
     /**
+     * Checks if the current level is the last level in the list.
+     *
+     * @return true if the game is on the last level, false if not
+     */
+    @Override
+    public boolean isLastLevel() {
+        return gm.getAllLevels().indexOf(this.currentLevel) == gm.getAllLevels().size() - 1;
+    }
+
+
+    /**
      * Returns the appropriate GameStatus when a player encounters an IAdversary based on if they get expelled
      * and if they are the last player to get expelled.
      *
@@ -171,9 +187,20 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     @Override
     public GameStatus encountersOppositeCharacter() {
-        // checks if the player self-eliminating is the last active player in the level, if so the game is lost
+        // checks if the player self-eliminating is the last active player in the level
         if (currentLevel.getActivePlayers().size() == 1) {
-            return GameStatus.GAME_LOST;
+            //and everyone else is expelled
+            if (gm.getExpelledPlayers().size() == gm.getAllPlayers().size() - 1) {
+                return GameStatus.GAME_LOST;
+            }
+            //at least one player has passed through the level exit
+            else if (gm.getExitedPlayers().size() > 0) {
+                //it is the last level
+                if (isLastLevel()) {
+                    return GameStatus.GAME_WON;
+                }
+                return GameStatus.LEVEL_WON;
+            }
         }
         return GameStatus.PLAYER_SELF_ELIMINATES;
     }

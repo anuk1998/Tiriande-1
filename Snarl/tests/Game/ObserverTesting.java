@@ -24,7 +24,7 @@ public class ObserverTesting {
     //listOfLevels.add(level1);
     //System.out.println(level1.renderLevel());
     //GameManager gm = new GameManager(listOfLevels);
-    //gm.startGame()
+    //gm.runGame()
 
     //Individual method testing
 

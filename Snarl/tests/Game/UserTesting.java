@@ -16,12 +16,47 @@ public class UserTesting {
 
   public static void main(String[] args) {
     createInitialGameBoard();
-    //ArrayList<Level> listOfLevels = new ArrayList<>();
-    //listOfLevels.add(level1);
-    //GameManager gm = new GameManager(listOfLevels);
-    //gm.startGame();
+    //testChooseZombieMove();
+    //testChooseGhostMove();
+
+    //gm.runGame();
     //testRenderView();
 
+  }
+
+
+  @Test
+  public static void testChooseZombieMove() {
+    ArrayList<Level> listOfLevels = new ArrayList<>();
+    listOfLevels.add(level1);
+    GameManager gm = new GameManager(listOfLevels, 1);
+    gm.registerAdversary("meanie", "zombie");
+
+    ArrayList<Position> playerPositions = new ArrayList<>();
+    playerPositions.add(new Position(5,7));
+    playerPositions.add(new Position(12,18));
+    playerPositions.add(new Position(22,3));
+
+    IAdversary zombie = level1.getAdversaryObjectFromName("meanie");
+    zombie.setCharacterPosition(new Position(5,6));
+    assertEquals(new Position(5,7), gm.chooseZombieMove(zombie, playerPositions));
+  }
+
+  @Test
+  public static void testChooseGhostMove() {
+    ArrayList<Level> listOfLevels = new ArrayList<>();
+    listOfLevels.add(level1);
+    GameManager gm = new GameManager(listOfLevels, 1);
+    gm.registerAdversary("scary", "ghost");
+
+    ArrayList<Position> playerPositions = new ArrayList<>();
+    playerPositions.add(new Position(4,2));
+    playerPositions.add(new Position(2,18));
+    playerPositions.add(new Position(25,17));
+
+    IAdversary ghost = level1.getAdversaryObjectFromName("scary");
+    ghost.setCharacterPosition(new Position(5,6));
+    assertEquals(new Position(5,5), gm.chooseGhostMove(ghost, playerPositions));
   }
 
 

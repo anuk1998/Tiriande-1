@@ -25,15 +25,10 @@ public class LocalUser implements IUser {
 
 
   @Override
-
-  public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive ){
-    //boolean beginningOfLevel
-    if(character instanceof IAdversary) {
+  public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
+    if (character instanceof IAdversary) {
       System.out.println("List of player locations: " + getAllPlayerLocations((currentLevel)));
-//      if(beginningOfLevel) {
-//        System.out.println("Here is the initial level view: " + currentLevel.renderLevel());
-//        beginningOfLevel = false;
-//      }
+      System.out.println("List of adversary locations: " + getAllAdversaryLocations(currentLevel));
     }
     else {
       if (isPlayerActive) {
@@ -44,6 +39,14 @@ public class LocalUser implements IUser {
       }
       System.out.println(renderView(currentLevel, character));
     }
+  }
+
+  public ArrayList<Position> getAllAdversaryLocations(Level currentLevel) {
+    ArrayList<Position> adversaryLocations = new ArrayList<>();
+    for(IAdversary a: currentLevel.getAdversaries()) {
+      adversaryLocations.add(a.getCharacterPosition());
+    }
+    return adversaryLocations;
   }
 
   public ArrayList<Position> getAllPlayerLocations(Level currentLevel) {
@@ -92,6 +95,10 @@ public class LocalUser implements IUser {
   public String renderView(Level currentLevel, ICharacter character) {
     String[][] view = makeView(currentLevel, character);
     return outputView(view);
+  }
+
+  public void renderLevelForAdversary(Level currentLevel) {
+    System.out.println("Here is an image of the current level: " + currentLevel.renderLevel());
   }
 
   public String outputView(String[][] view) {

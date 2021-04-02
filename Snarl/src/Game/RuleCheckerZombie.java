@@ -1,5 +1,7 @@
 package Game;
 
+import java.util.HashSet;
+
 public class RuleCheckerZombie implements IRuleChecker{
   Level currentLevel;
   IAdversary adversary;
@@ -90,7 +92,22 @@ public class RuleCheckerZombie implements IRuleChecker{
 
   @Override
   public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
-    return true;
+    boolean withinReach = false;
+    HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.adversary.getCharacterPosition()));
+
+    while (maxTilesAway > 1) {
+      HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);
+      for (Position adjacent : tempCardinalTiles) {
+        cardinalTiles.addAll(currentLevel.getAllAdjacentTiles(adjacent));
+      }
+      maxTilesAway--;
+    }
+
+    for (Position pos : cardinalTiles) {
+      if (pos.toString().equals(destPoint.toString())) withinReach = true;
+    }
+
+    return withinReach;
   }
 
 }

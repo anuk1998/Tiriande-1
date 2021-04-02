@@ -21,6 +21,19 @@ public class Room {
         makeRoom();
     }
 
+    public void renderRoom() {
+        for (int i=0; i<numOfRows; i++) {
+            for (int j=0; j<numOfCols; j++) {
+                if (j == numOfCols - 1) {
+                    System.out.print(room[i][j] + "\n");
+                }
+                else {
+                    System.out.print(room[i][j] + " ");
+                }
+            }
+        }
+    }
+
     private void collectEdges() {
         // puts all edge positions in a list
         for (int i=0; i<this.numOfRows; i++) {

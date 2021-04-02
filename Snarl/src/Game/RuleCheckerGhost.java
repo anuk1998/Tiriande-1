@@ -1,5 +1,7 @@
 package Game;
 
+import java.util.HashSet;
+
 public class RuleCheckerGhost implements IRuleChecker {
     Level currentLevel;
     IAdversary adversary;
@@ -13,7 +15,22 @@ public class RuleCheckerGhost implements IRuleChecker {
 
     @Override
     public GameStatus runRuleChecker(Position destination) {
-        return null;
+        GameStatus status = GameStatus.INVALID;
+        if (isValidMove(destination)) {
+            status = GameStatus.VALID;
+            if (landedOnPlayer(destination)) {
+                status = encountersOppositeCharacter();
+            }
+            if (landedOnAWallTile(destination)) {
+                status = GameStatus.GHOST_TRANSPORTS;
+            }
+        }
+        return status;
+    }
+
+    private boolean landedOnPlayer(Position destination) {
+        String symbol = this.currentLevel.getTileInLevel(destination);
+        return symbol.equals("@") || symbol.equals("¤") || symbol.equals("$") || symbol.equals("~");
     }
 
     @Override
@@ -36,7 +53,6 @@ public class RuleCheckerGhost implements IRuleChecker {
         return GameStatus.PLAYER_EXPELLED;
     }
 
-    //TODO ghosts cannot skip moves aka stay in current position, need to change last part of if statement
     @Override
     public boolean isValidMove(Position destPoint) {
         boolean valid = false;
@@ -48,10 +64,16 @@ public class RuleCheckerGhost implements IRuleChecker {
         }
         return valid;
     }
+
+    public boolean landedOnAWallTile(Position destination) {
+        return this.currentLevel.getTileInLevel(destination).equals("■");
+    }
     
     @Override
     public boolean isTileTraversable(Position tile) {
-        return !this.currentLevel.getTileInLevel(tile).equals(" ");
+        return !this.currentLevel.getTileInLevel(tile).equals(" ") &&
+                !this.currentLevel.getTileInLevel(tile).equals("G") &&
+                !this.currentLevel.getTileInLevel(tile).equals("Z");
 
     }
 
@@ -62,7 +84,22 @@ public class RuleCheckerGhost implements IRuleChecker {
 
     @Override
     public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
-      return true;
+        boolean withinReach = false;
+        HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.adversary.getCharacterPosition()));
+
+        while (maxTilesAway > 1) {
+            HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);
+            for (Position adjacent : tempCardinalTiles) {
+                cardinalTiles.addAll(currentLevel.getAllAdjacentTiles(adjacent));
+            }
+            maxTilesAway--;
+        }
+
+        for (Position pos : cardinalTiles) {
+            if (pos.toString().equals(destPoint.toString())) withinReach = true;
+        }
+
+        return withinReach;
     }
 
     @Override

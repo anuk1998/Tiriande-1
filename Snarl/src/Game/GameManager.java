@@ -2,6 +2,7 @@ package Game;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -36,7 +37,7 @@ public class GameManager {
     /**
      * This method kick-starts the Snarl game.
      */
-    public void startGame() {
+    public void runGame() {
         Scanner sc = new Scanner(System.in);
         //registerParticipants(sc);
         boolean gameStillGoing = true;
@@ -398,6 +399,9 @@ public class GameManager {
                 exitedPlayers.add((Player) c);
                 System.out.println("Player " + c.getName() + " exited.");
                 return true;
+            case "GHOST_TRANSPORTS":
+                currentLevel.moveCharacter(c, currentLevel.pickRandomPositionForCharacterInLevel());
+                return true;
             case "LEVEL_WON":
                 Player p2 = currentLevel.playerAtGivenPosition(destination);
                 currentLevel.restoreCharacterTile(c);
@@ -555,7 +559,9 @@ public class GameManager {
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
-        //System.out.println("New adversary " + name + " of type " + type + " has been registered.");
+        //System.out.println("New adversary " + name + " of type " + type + " has been registered.")
+        // TODO: DELETE, HERE FOR DEBUGGING PURPOSES
+        System.out.println(this.currentLevel.renderLevel());
     }
 
     private void registerObservers() {
@@ -624,6 +630,35 @@ public class GameManager {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the list of expelled players.
+     */
+    public ArrayList<Player> getExpelledPlayers(){
+        return this.expelledPlayers;
+    }
+
+    /**
+     * Returns the list of levels.
+     */
+    public ArrayList<Level> getAllLevels() {
+        return this.allLevels;
+    }
+
+
+    /**
+     * Returns the list of allPlayers
+     */
+    public LinkedHashMap<String, Player> getAllPlayers() {
+        return this.allPlayers;
+    }
+
+    /**
+     * Returns the list of exitedPlayers
+     */
+    public ArrayList<Player> getExitedPlayers() {
+        return this.exitedPlayers;
     }
 
 
