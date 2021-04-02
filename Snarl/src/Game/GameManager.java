@@ -27,6 +27,7 @@ public class GameManager {
     ArrayList<IUser> users = new ArrayList<>();
     int startLevel;
     boolean isNewLevel = false;
+    boolean observerView = false;
 
     public GameManager(ArrayList<Level> allLevels, int startLevel) {
         this.allLevels = allLevels;
@@ -39,7 +40,6 @@ public class GameManager {
      */
     public void runGame() {
         Scanner sc = new Scanner(System.in);
-        //registerParticipants(sc);
         boolean gameStillGoing = true;
         int index = 0;
 
@@ -48,22 +48,24 @@ public class GameManager {
                 resetForNewLevel();
                 isNewLevel = false;
             }
-            ICharacter character = (ICharacter)allCharacters.toArray()[index];
+            ICharacter character = (ICharacter) allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
-            IUser currentUser = getUserByName(character);
+            IUser currentUser = getUserByName(character.getName());
 
+            // Move the adversary automatically
             if (character instanceof IAdversary) {
-                System.out.println("DEBUG: It is an Adversary's move.");
-                //currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
-                Position chosenMove = chooseAdversaryMove(currentUser, (IAdversary) character);
-                System.out.println("DEBUG: Zombie's chosen move was " + chosenMove.toString());
-                GameStatus moveStatus = callRuleChecker(character, chosenMove);
-                gameStillGoing = parseMoveStatusAndDoAction(moveStatus.name(), chosenMove, character);
+                gameStillGoing = adversarysMove(character, currentUser);
             }
+
+            // Ask the player for a move and validate/execute that move
             else {
                 // move this broadcast line in a later milestone -- here for now because this Milestone doesn't broadcast to adversaries
                 currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
                 if (playerIsActive) {
+                    if (observerView) {
+                        System.out.println("\nThis is the Observer View of the Level:");
+                        System.out.println(this.currentLevel.renderLevel());
+                    }
                     Position requestedMove = currentUser.getUserMove(sc, character);
                     GameStatus moveStatus = callRuleChecker(character, requestedMove);
                     gameStillGoing = parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character);
@@ -74,16 +76,16 @@ public class GameManager {
             // check if we're on the last character in the list and if so, loop back to the beginning
             if (index == allCharacters.size() - 1) {
                 index = 0;
-            }
-            else {
+            } else {
                 index++;
             }
         }
 
+        System.out.println("\nGame has ended.\n");
+
         // TODO: put the output message here as per 7) in the testing task
 
         sc.close();
-        System.out.println("Game has ended.");
         // add other game terminus actions once networking elements/client/scanner/etc elements are known
     }
 
@@ -93,10 +95,8 @@ public class GameManager {
      */
     private void resetForNewLevel() {
         System.out.println("----------------------------");
-        System.out.println("Starting the next level...");
-        System.out.println();
-        System.out.println();
-        //empty list of exited & expelled players for the new level
+        System.out.println("Starting the next level...\n\n");
+        // reset data structures for new level
         this.allCharacters = new LinkedHashSet<>();
         this.exitedPlayers = new ArrayList<>();
         this.expelledPlayers = new ArrayList<>();
@@ -114,116 +114,30 @@ public class GameManager {
 
         int levelNum = this.allLevels.indexOf(this.currentLevel);
 
-        int numOfZombies = (int) (Math.floor(levelNum / 2) + 1);
-        int numOfGhosts = (int) Math.floor((levelNum - 1) / 2);
+        int numOfZombies = (int) (Math.floor((levelNum + 1) / 2) + 1);
+        int numOfGhosts = (int) Math.floor(levelNum / 2);
 
-        System.out.println("DEBUG: Num of Zombies: " + numOfZombies);
-        System.out.println("DEBUG: Num of Ghosts: " + numOfGhosts);
-
-        for (int z=1; z<numOfZombies+1; z++) {
+        for (int z = 1; z < numOfZombies + 1; z++) {
             registerAdversary("zombie" + z, "zombie");
         }
-        for (int g=1; g<numOfGhosts+1; g++) {
+        for (int g = 1; g < numOfGhosts + 1; g++) {
             registerAdversary("ghost" + g, "ghost");
         }
     }
 
-
-    /**
-     * This registers players and adversaries as participants of the game via STDin.
-     *
-     * THIS METHOD IS STALE FOR NOW.
-     */
-    private void registerParticipantsOLD(Scanner sc) {
-        System.out.println("Would you like to register as a player or adversary? Select 'P' for player or 'A' for adversary.");
-        String whichTypeOfParticipant = sc.nextLine();
-        //in case user does not enter 'P' or 'A'
-        while (!whichTypeOfParticipant.equalsIgnoreCase("P") && !whichTypeOfParticipant.equalsIgnoreCase("A")) {
-            System.out.println("Invalid response. Please enter 'P' for player or 'A' for adversary");
-            whichTypeOfParticipant = sc.nextLine();
-        }
-        if (whichTypeOfParticipant.equalsIgnoreCase("P")) {
-            System.out.println("Please enter a username for your player");
-            String playerName = sc.nextLine();
-            registerPlayer(playerName);
-
-        }
-        else if (whichTypeOfParticipant.equalsIgnoreCase("A")) {
-            System.out.println("Please enter a username for your adversary");
-            String adversaryName = sc.nextLine();
-            System.out.println("Please select which type of adversary to register. Enter 'Ghost' for ghost or 'Zombie' for zombie");
-
-            String adversaryType = sc.nextLine();
-            //in case user does not enter 'Ghost' or 'Zombie'
-            while(!adversaryType.equalsIgnoreCase("Ghost") && !adversaryType.equalsIgnoreCase("Zombie")) {
-                System.out.println("Sorry, invalid response. Please enter 'Ghost' for ghost or 'Zombie' for zombie");
-                adversaryType = sc.nextLine();
-            }
-            registerAdversary(adversaryName, adversaryType);
-        }
-        //Register more participants?
-        System.out.println("Would you like to register another participant? Enter 'Y' for yes or 'N' for no");
-        String wantsToRegisterMore = sc.nextLine();
-        //in case user does not enter 'Y' or 'N' to register another participant
-        while(!wantsToRegisterMore.equalsIgnoreCase("Y") && !wantsToRegisterMore.equalsIgnoreCase("N")) {
-            System.out.println("Sorry, invalid response. Please enter 'Y' for yes or 'N' for no");
-            wantsToRegisterMore = sc.nextLine();
-        }
-
-        if (wantsToRegisterMore.equalsIgnoreCase("N")) {
-            System.out.println("Okay, we're ready to start the game!");
-        }
-        else {
-            registerParticipantsOLD(sc);
-        }
-    }
-
-    /**
-     * Returns the LocalUser object based on the current character's name.
-     *
-     * @param character the character whose turn it is
-     * @return the IUser object for the corresponding character
-     */
-    private IUser getUserByName(ICharacter character) {
-        IUser currentUser = null;
-        for (IUser u: this.users) {
-            if (u.getUserName().equals(character.getName())){
-                 currentUser = u;
-            }
-        }
-        return currentUser;
-    }
-
-    /**
-     * Adds an observer to the list of observers
-     *
-     * @param observer the new observer to be added
-     */
-    public void addObserver(IObserver observer) {
-        this.observers.add(observer);
-    }
-
-    /**
-     * Adds a user to the list of users
-     *
-     * @param user the new user to be added
-     */
-    public void addUser(IUser user) {
-        this.users.add(user);
-    }
-
-
     /**
      * Chooses the given adversary's next move and then sends it to RuleChecker before being executed.
+     *
      * @param currentUser current adversary's user instance
-     * @param character adversary whose move it is
+     * @param character   adversary whose move it is
      * @return a chosen position for the given adversary
      */
     public Position chooseAdversaryMove(IUser currentUser, IAdversary character) {
         LocalUser user = (LocalUser) currentUser;
         ArrayList<Position> playerPositions = user.getAllPlayerLocations(this.currentLevel);
         Position chosenPosition;
-        if (character.getType().equals("zombie")) chosenPosition = chooseZombieMove(character, playerPositions);
+        if (character.getType().equals("zombie"))
+            chosenPosition = chooseZombieMove(character, playerPositions);
         else chosenPosition = chooseGhostMove(character, playerPositions);
 
         return chosenPosition;
@@ -234,7 +148,7 @@ public class GameManager {
      * are no players in its room, a random cardinal position is chosen. If there are multiple players
      * in the room, the zombie will move towards the closest one.
      *
-     * @param character the Zombie
+     * @param character       the Zombie
      * @param playerPositions list of all the players' positions
      * @return a chosen position for the zombie to move to
      */
@@ -245,32 +159,25 @@ public class GameManager {
         Room zombiesRoom = zom.getZombiesRoom();
         ArrayList<Position> playersInRoomWithZombie = new ArrayList<>();
 
-        System.out.println(playerPositions.toString());
-        System.out.println(zombiesRoom.getListOfAllPositions().toString());
-
         // determines which players are in the same room as the zombie and adds their positions to a list
         for (Position playerPos : playerPositions) {
             for (Position roomPos : zombiesRoom.getListOfAllPositionsLevelScale()) {
                 if (playerPos.toString().equals(roomPos.toString())) {
-                    System.out.println("Adding to the list");
                     playersInRoomWithZombie.add(playerPos);
                 }
             }
         }
 
+        // Based on how many players are in the room with the Zombie, choose which player to attack
+        // and then subsequently which cardinal move is closest to that chosen player
         ArrayList<Position> cardinalPositions = this.currentLevel.getAllAdjacentTiles(zomPos);
         if (playersInRoomWithZombie.size() == 0) {
-            System.out.println("DEBUG: No players in the room. Zombie picking random.");
             Random rand = new Random();
             int cardinalIndex = rand.nextInt(cardinalPositions.size() - 1);
             chosenMove = cardinalPositions.get(cardinalIndex);
-        }
-        else if (playersInRoomWithZombie.size() == 1) {
-            System.out.println("DEBUG: Only one in the room with zombie.");
+        } else if (playersInRoomWithZombie.size() == 1) {
             chosenMove = getClosestPositionTo(cardinalPositions, playersInRoomWithZombie.get(0));
-        }
-        else {
-            System.out.println("DEBUG: More than one player in the room with zombie.");
+        } else {
             Position closestPlayerPos = getClosestPositionTo(playersInRoomWithZombie, zomPos);
             chosenMove = getClosestPositionTo(cardinalPositions, closestPlayerPos);
         }
@@ -282,7 +189,7 @@ public class GameManager {
      * Chooses the given Ghost's next move based on what other players are closest to it by distance,
      * regardless of what room they are in.
      *
-     * @param character the Ghost
+     * @param character       the Ghost
      * @param playerPositions list of all the players' positions
      * @return a chosen position for the ghost to move to
      */
@@ -297,7 +204,7 @@ public class GameManager {
      * Helper for chooseGhostMove and chooseZombieMove
      *
      * @param positionsToCompare list of positions
-     * @param source position to compare distance to
+     * @param source             position to compare distance to
      * @return the closest position in distance
      */
     public Position getClosestPositionTo(ArrayList<Position> positionsToCompare, Position source) {
@@ -326,7 +233,7 @@ public class GameManager {
      *
      * @param character the user whose turn it is
      * @return Returns true if the Player has been expelled/are no longer active, false if the Player is
-     *         still active or if the character is an Adversary (i.e. ghost, zombie)
+     * still active or if the character is an Adversary (i.e. ghost, zombie)
      */
     public boolean checkPlayerActiveStatus(ICharacter character) {
         if (character instanceof Player) {
@@ -338,22 +245,20 @@ public class GameManager {
     /**
      * Calls the RuleChecker Interface depending on if the user is a Player or an Adversary.
      *
-     * @param character the character whose turn it is
+     * @param character     the character whose turn it is
      * @param requestedMove the goal Position the character wants to move to
      * @return the GameStatus depending on what kind of move it is
      */
     public GameStatus callRuleChecker(ICharacter character, Position requestedMove) {
         GameStatus moveStatus = GameStatus.DEFAULT;
         if (character instanceof Player) {
-            RuleCheckerPlayer rcPlayer = new RuleCheckerPlayer(this, currentLevel, (Player)character);
+            RuleCheckerPlayer rcPlayer = new RuleCheckerPlayer(this, currentLevel, (Player) character);
             moveStatus = rcPlayer.runRuleChecker(requestedMove);
-        }
-        else if (character instanceof IAdversary) {
+        } else if (character instanceof IAdversary) {
             IRuleChecker rcAdversary;
             if (((IAdversary) character).getType().equals("zombie")) {
-                rcAdversary = new RuleCheckerZombie(this, currentLevel, (IAdversary)character);
-            }
-            else rcAdversary = new RuleCheckerGhost(this, currentLevel, (IAdversary)character);
+                rcAdversary = new RuleCheckerZombie(this, currentLevel, (IAdversary) character);
+            } else rcAdversary = new RuleCheckerGhost(this, currentLevel, (IAdversary) character);
 
             moveStatus = rcAdversary.runRuleChecker(requestedMove);
         }
@@ -363,9 +268,9 @@ public class GameManager {
     /**
      * Parses the given GameStatus type and applies specific actions based on which type of move it is.
      *
-     * @param moveStatus: the returned enum GameStatus that signifies what type the requested move is
+     * @param moveStatus:  the returned enum GameStatus that signifies what type the requested move is
      * @param destination: the requested destination from the user
-     * @param c: the current character whose move it is
+     * @param c:           the current character whose move it is
      * @return a boolean indicating if the game is still in play
      */
     public boolean parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c) {
@@ -374,7 +279,7 @@ public class GameManager {
                 currentLevel.moveCharacter(c, destination);
                 return true;
             case "INVALID":
-                System.out.println("Requested move was invalid. You miss your turn.");
+                System.out.println("Requested move to " + destination.toString() + " was invalid. You miss your turn.");
                 return true;
             case "KEY_FOUND":
                 currentLevel.moveCharacter(c, destination);
@@ -408,12 +313,11 @@ public class GameManager {
                 currentLevel.playerPassedThroughExit(c);
                 if (c instanceof Player) {
                     exitedPlayers.add((Player) c);
-                }
-                else {
+                } else {
                     expelledPlayers.add(p2);
                 }
                 resurrectPlayers();
-                System.out.print("Congrats!! Players have won the level!");
+                System.out.println("Congrats!! Players have won the level!");
                 this.currentLevel = this.allLevels.get(getNewLevel());
                 isNewLevel = true;
                 return true;
@@ -423,8 +327,7 @@ public class GameManager {
                 currentLevel.playerPassedThroughExit(c);
                 if (c instanceof Player) {
                     exitedPlayers.add((Player) c);
-                }
-                else {
+                } else {
                     expelledPlayers.add(p3);
                 }
                 System.out.print("Congrats! Players have won the game!");
@@ -435,8 +338,7 @@ public class GameManager {
                 if (c instanceof Player) {
                     currentLevel.expelPlayer((Player) c);
                     expelledPlayers.add((Player) c);
-                }
-                else {
+                } else {
                     currentLevel.expelPlayer(p4);
                     expelledPlayers.add(p4);
                 }
@@ -560,8 +462,6 @@ public class GameManager {
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
         //System.out.println("New adversary " + name + " of type " + type + " has been registered.")
-        // TODO: DELETE, HERE FOR DEBUGGING PURPOSES
-        System.out.println(this.currentLevel.renderLevel());
     }
 
     private void registerObservers() {
@@ -586,6 +486,40 @@ public class GameManager {
     }
 
     /**
+     * Returns the LocalUser object based on the current character's name.
+     *
+     * @param name the name of the character whose turn it is
+     * @return the IUser object for the corresponding character
+     */
+    public IUser getUserByName(String name) {
+        IUser currentUser = null;
+        for (IUser u : this.users) {
+            if (u.getUserName().equals(name)) {
+                currentUser = u;
+            }
+        }
+        return currentUser;
+    }
+
+    /**
+     * Adds an observer to the list of observers
+     *
+     * @param observer the new observer to be added
+     */
+    public void addObserver(IObserver observer) {
+        this.observers.add(observer);
+    }
+
+    /**
+     * Adds a user to the list of users
+     *
+     * @param user the new user to be added
+     */
+    public void addUser(IUser user) {
+        this.users.add(user);
+    }
+
+    /**
      * Sends a series of updates about the game state to all observers.
      *
      * @param character the current character whose move it is
@@ -600,6 +534,15 @@ public class GameManager {
         for (IObserver observer : observers) {
             observer.sendUpdates(character, requestedMove, moveStatus, currentLevel, exitedPlayers, expelledPlayers);
         }
+    }
+
+    /**
+     * Sets the observer view to whatever boolean is given.
+     *
+     * @param isObserverView boolean indicating if we want the observer view
+     */
+    public void setObserverView(boolean isObserverView) {
+        this.observerView = isObserverView;
     }
 
     /**

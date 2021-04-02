@@ -54,8 +54,7 @@ public class RuleCheckerZombie implements IRuleChecker{
   public boolean isValidMove(Position destPoint) {
     boolean valid = false;
     if (isOnLevelPlane(destPoint)) {
-      if (!isCharactersCurrentPosition(destPoint)
-              && isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 1)) {
+      if (isNotOnDoor(destPoint) && isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 1)) {
         valid = true;
       }
     }
@@ -68,6 +67,18 @@ public class RuleCheckerZombie implements IRuleChecker{
     int levelNumCols = this.currentLevel.getLevelNumOfCols();
     return destPoint.getRow() >= 0 && destPoint.getRow() < levelNumRows
             && destPoint.getCol() >= 0 && destPoint.getCol() < levelNumCols;
+  }
+
+  private boolean isNotOnDoor(Position destPoint) {
+    boolean isNotOnDoor = true;
+
+    for (String doorPos : this.currentLevel.getListOfDoorPositions()) {
+      if (destPoint.toString().equals(doorPos)) {
+        isNotOnDoor = false;
+      }
+    }
+
+    return isNotOnDoor;
   }
 
   @Override

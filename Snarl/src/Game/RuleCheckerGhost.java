@@ -57,8 +57,7 @@ public class RuleCheckerGhost implements IRuleChecker {
     public boolean isValidMove(Position destPoint) {
         boolean valid = false;
         if (isOnLevelPlane(destPoint)) {
-            if (!isCharactersCurrentPosition(destPoint)
-                    && isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 1)) {
+            if (isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 1)) {
                 valid = true;
             }
         }
@@ -74,7 +73,6 @@ public class RuleCheckerGhost implements IRuleChecker {
         return !this.currentLevel.getTileInLevel(tile).equals(" ") &&
                 !this.currentLevel.getTileInLevel(tile).equals("G") &&
                 !this.currentLevel.getTileInLevel(tile).equals("Z");
-
     }
 
     @Override

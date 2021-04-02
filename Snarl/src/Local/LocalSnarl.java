@@ -75,8 +75,6 @@ public class LocalSnarl {
       numOfLevels--;
     }
 
-
-
     return jsonLevels;
   }
 
@@ -88,7 +86,7 @@ public class LocalSnarl {
       listOfLevels.add(level);
     }
 
-    if (startLevelNum > listOfLevels.size() - 1) {
+    if (startLevelNum > listOfLevels.size()) {
       System.out.println("Given starting level not valid. Will be starting at Level 1.");
       startLevelNum = 1;
     }
@@ -108,13 +106,9 @@ public class LocalSnarl {
       manager.registerAdversary("ghost" + g, "ghost");
     }
 
-    runGame(manager, listOfLevels.get(startLevelNum - 1), observerView);
+    manager.setObserverView(observerView);
 
-    scanner.close();
-  }
-
-  private static void runGame(GameManager manager, Level level, boolean observerView) {
     manager.runGame();
-
+    scanner.close();
   }
 }
