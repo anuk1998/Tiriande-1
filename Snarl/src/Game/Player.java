@@ -5,11 +5,29 @@ public class Player implements ICharacter{
     String name;
     String avatar;
     boolean isExpelled;
+    int numOfTimesExited = 0;
+    int numOfKeysFound = 0;
 
 
     public Player(String n) {
         this.name = n;
         isExpelled = false;
+    }
+
+    public int getNumOfTimesExited() {
+        return this.numOfTimesExited;
+    }
+
+    public int getNumOfKeysFound() {
+        return this.numOfKeysFound;
+    }
+
+    public void increaseNumOfKeysFound() {
+        this.numOfKeysFound++;
+    }
+
+    public void increaseNumOfTimesExited() {
+        this.numOfTimesExited++;
     }
 
     public void setIsExpelled(boolean expel) {
