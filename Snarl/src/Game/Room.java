@@ -12,6 +12,11 @@ public class Room {
     ArrayList<Position> listOfEdgePositions = new ArrayList<Position>();
     ArrayList<Position> listOfDoorsInRoom = new ArrayList<Position>();
 
+    //Constants for tile types
+    String WALL = TileType.WALL.toString();
+    String DOOR = TileType.DOOR.toString();
+    String ROOM = TileType.ROOM.toString();
+
     public Room(Position roomPos, int rows, int cols) {
         this.roomPositionInLevel = roomPos;
         this.numOfRows = rows;

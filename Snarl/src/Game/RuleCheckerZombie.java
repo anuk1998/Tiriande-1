@@ -40,7 +40,8 @@ public class RuleCheckerZombie implements IRuleChecker{
 
   private boolean landedOnPlayer(Position destination) {
     String symbol = this.currentLevel.getTileInLevel(destination);
-    return symbol.equals("@") || symbol.equals("¤") || symbol.equals("$") || symbol.equals("~");
+    return symbol.equals(PLAYER_1) || symbol.equals(PLAYER_2) ||
+            symbol.equals(PLAYER_3) || symbol.equals(PLAYER_4);
   }
 
   @Override
@@ -103,12 +104,12 @@ public class RuleCheckerZombie implements IRuleChecker{
 
   @Override
   public boolean isTileTraversable(Position tile) {
-    return !this.currentLevel.getTileInLevel(tile).equals(" ") &&
-            !this.currentLevel.getTileInLevel(tile).equals("G") &&
-            !this.currentLevel.getTileInLevel(tile).equals("Z") &&
-            !this.currentLevel.getTileInLevel(tile).equals("|") &&
-            !this.currentLevel.getTileInLevel(tile).equals("x") &&
-            !this.currentLevel.getTileInLevel(tile).equals("■");
+    return !this.currentLevel.getTileInLevel(tile).equals(VOID) &&
+            !this.currentLevel.getTileInLevel(tile).equals(GHOST) &&
+            !this.currentLevel.getTileInLevel(tile).equals(ZOMBIE) &&
+            !this.currentLevel.getTileInLevel(tile).equals(DOOR) &&
+            !this.currentLevel.getTileInLevel(tile).equals(HALLWAY) &&
+            !this.currentLevel.getTileInLevel(tile).equals(WALL);
   }
 
   @Override

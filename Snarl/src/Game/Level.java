@@ -18,6 +18,25 @@ public class Level {
   HashMap<String, ArrayList<Hallway>> roomsAndTheirHallways = new HashMap<String, ArrayList<Hallway>>();
   HashMap<String, Room> positionsAndTheirRooms = new HashMap<>();
 
+  // Enum constants for actor and tile representations
+  String VOID = TileType.VOID.toString();
+  String WALL = TileType.WALL.toString();
+  String KEY = TileType.KEY.toString();
+  String HALLWAY = TileType.HALLWAY.toString();
+  String ROOM = TileType.ROOM.toString();
+  String UNLOCKED_EXIT = TileType.UNLOCKED_EXIT.toString();
+  String LOCKED_EXIT = TileType.LOCKED_EXIT.toString();
+  String DOOR = TileType.DOOR.toString();
+
+  String PLAYER_1 = Avatars.PLAYER_1.toString();
+  String PLAYER_2 = Avatars.PLAYER_1.toString();
+  String PLAYER_3 = Avatars.PLAYER_1.toString();
+  String PLAYER_4 = Avatars.PLAYER_1.toString();
+  String GHOST = Avatars.GHOST.toString();
+  String ZOMBIE = Avatars.ZOMBIE.toString();
+  ;
+
+
   public Level() {
     levelNumOfRows = 40;
     levelNumOfCols = 40;
@@ -36,7 +55,7 @@ public class Level {
   public void makeLevel() {
     for (int i = 0; i < this.levelNumOfRows; i++) {
       for (int j = 0; j < this.levelNumOfCols; j++) {
-        this.levelPlane[i][j] = " ";
+        this.levelPlane[i][j] = VOID;
       }
     }
   }
@@ -70,7 +89,7 @@ public class Level {
   public void addHallway(Hallway hallway) {
     listOfHallwaysInLevel.add(hallway);
     for (Position hallwayPos : hallway.getAllHallwayPositions()) {
-      this.levelPlane[hallwayPos.getRow()][hallwayPos.getCol()] = "x";
+      this.levelPlane[hallwayPos.getRow()][hallwayPos.getCol()] = HALLWAY;
     }
     // This part only relevant for testing harness
     // adds that hallway to its room's list of connected hallways
@@ -83,7 +102,7 @@ public class Level {
   public void addObject(Position p, String symbol) {
     try {
       this.levelPlane[p.getRow()][p.getCol()] = symbol;
-      if (symbol.equals("*")) {
+      if (symbol.equals(KEY)) {
         keyLevelPosition = new Position(p.getRow(), p.getCol());
       } else {
         exitLevelPosition = new Position(p.getRow(), p.getCol());
@@ -103,7 +122,7 @@ public class Level {
     }
     else if(character instanceof IAdversary) {
       this.adversaries.add((IAdversary) character);
-      if (((IAdversary) character).getType().equals("zombie")) {
+      if (((IAdversary) character).getType().equals(ZOMBIE)) {
         Zombie zombie = (Zombie) character;
         zombie.setZombiesRoom(getBelongingRoom(placeLocation));
       }
@@ -117,7 +136,7 @@ public class Level {
     int randomIndexCol = rand.nextInt(this.levelNumOfCols);
     String randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
 
-    while (!randomTile.equals(".")) {
+    while (!randomTile.equals(ROOM)) {
       randomIndexRow = rand.nextInt(this.levelNumOfRows);
       randomIndexCol = rand.nextInt(this.levelNumOfCols);
       randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
@@ -133,7 +152,7 @@ public class Level {
         if (j == levelNumOfCols - 1) {
           levelASCII.append(levelPlane[i][j]).append("\n");
         } else {
-          levelASCII.append(levelPlane[i][j]).append(" ");
+          levelASCII.append(levelPlane[i][j]).append(VOID);
         }
       }
     }
@@ -161,24 +180,24 @@ public class Level {
     int charCol = charPos.getCol();
     if (charPos.toString().equals(keyLevelPosition.toString())) {
       if (character instanceof IAdversary && !keyFound) {
-        this.levelPlane[charRow][charCol] = "*";
+        this.levelPlane[charRow][charCol] = KEY;
       }
       else {
-        this.levelPlane[charRow][charCol] = ".";
+        this.levelPlane[charRow][charCol] = ROOM;
       }
     }
     else if (isInHallway(character)) {
-      this.levelPlane[charRow][charCol] = "x";
+      this.levelPlane[charRow][charCol] = HALLWAY;
     }
     else if (isOnADoor(character)) {
-      this.levelPlane[charRow][charCol] = "|";
+      this.levelPlane[charRow][charCol] = DOOR;
     }
     else if (charPos.toString().equals(exitLevelPosition.toString())) {
-      if (exitLocked) this.levelPlane[charRow][charCol] = "●";
-      else this.levelPlane[charRow][charCol] = "O";
+      if (exitLocked) this.levelPlane[charRow][charCol] = LOCKED_EXIT;
+      else this.levelPlane[charRow][charCol] = UNLOCKED_EXIT;
     }
     else {
-      this.levelPlane[charRow][charCol] = ".";
+      this.levelPlane[charRow][charCol] = ROOM;
     }
   }
 
