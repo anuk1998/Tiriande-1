@@ -7,6 +7,19 @@ public class RuleCheckerZombie implements IRuleChecker{
   IAdversary adversary;
   GameManager gm;
 
+  // Tile/Actor representation constants
+  String PLAYER_1 = Avatars.PLAYER_1.toString();
+  String PLAYER_2 = Avatars.PLAYER_1.toString();
+  String PLAYER_3 = Avatars.PLAYER_1.toString();
+  String PLAYER_4 = Avatars.PLAYER_1.toString();
+  String GHOST = Avatars.GHOST.toString();
+  String ZOMBIE = Avatars.ZOMBIE.toString();
+  String VOID = TileType.VOID.toString();
+  String DOOR = TileType.DOOR.toString();
+  String HALLWAY = TileType.HALLWAY.toString();
+  String WALL = TileType.WALL.toString();
+
+
   public RuleCheckerZombie(GameManager gm, Level currentLevel, IAdversary adversary) {
       this.currentLevel = currentLevel;
       this.adversary = adversary;
@@ -54,7 +67,9 @@ public class RuleCheckerZombie implements IRuleChecker{
   public boolean isValidMove(Position destPoint) {
     boolean valid = false;
     if (isOnLevelPlane(destPoint)) {
-      if (isNotOnDoor(destPoint) && isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 1)) {
+      if (isNotOnDoor(destPoint)
+              && isTileTraversable(destPoint)
+              && isNCardinalTilesAway(destPoint, 1)) {
         valid = true;
       }
     }
@@ -104,7 +119,8 @@ public class RuleCheckerZombie implements IRuleChecker{
   @Override
   public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
     boolean withinReach = false;
-    HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.adversary.getCharacterPosition()));
+    HashSet<Position> cardinalTiles = new HashSet<>(
+            currentLevel.getAllAdjacentTiles(this.adversary.getCharacterPosition()));
 
     while (maxTilesAway > 1) {
       HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);

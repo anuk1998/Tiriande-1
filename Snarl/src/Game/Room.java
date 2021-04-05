@@ -59,9 +59,9 @@ public class Room {
             for (int j = 0; j < this.numOfCols; j++) {
                 Position tempPos = new Position(i, j);
                 if (this.listOfEdgePositions.contains(tempPos)) {
-                    this.room[i][j] = "■";
+                    this.room[i][j] = WALL;
                 } else {
-                    this.room[i][j] = ".";
+                    this.room[i][j] = ROOM;
                 }
                 listOfAllPositions.add(tempPos);
             }
@@ -70,7 +70,7 @@ public class Room {
 
     public void addDoor(Position p) throws IllegalArgumentException{
         if (this.listOfEdgePositions.contains(p)) {
-            room[p.getRow()][p.getCol()] = "|";
+            room[p.getRow()][p.getCol()] = DOOR;
             this.listOfDoorsInRoom.add(p);
         }
         else {

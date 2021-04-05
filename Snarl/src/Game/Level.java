@@ -235,8 +235,10 @@ public class Level {
   public void openExitTile() {
     keyFound = true;
     exitLocked = false;
+    int exitRowPos = exitLevelPosition.getRow();
+    int exitColPos = exitLevelPosition.getCol();
     if (playerAtGivenPosition(exitLevelPosition) == null) {
-      levelPlane[exitLevelPosition.getRow()][exitLevelPosition.getCol()] = ("O");
+      levelPlane[exitRowPos][exitColPos] = UNLOCKED_EXIT;
     }
   }
 

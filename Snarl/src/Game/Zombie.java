@@ -32,7 +32,7 @@ public class Zombie implements IAdversary {
 
     @Override
     public String getAvatar(){
-        return "Z";
+        return Avatars.ZOMBIE.toString();
     }
 
     public Room getZombiesRoom() {

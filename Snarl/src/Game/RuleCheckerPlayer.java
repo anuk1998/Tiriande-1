@@ -121,7 +121,8 @@ public class RuleCheckerPlayer implements IRuleChecker {
     @Override
     public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
         boolean withinReach = false;
-        HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));
+        HashSet<Position> cardinalTiles = new HashSet<>(
+                currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));
 
         while (maxTilesAway > 1) {
             HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);
