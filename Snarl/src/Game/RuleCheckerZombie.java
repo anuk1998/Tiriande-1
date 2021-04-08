@@ -7,6 +7,19 @@ public class RuleCheckerZombie implements IRuleChecker{
   IAdversary adversary;
   GameManager gm;
 
+  // Tile/Actor representation constants
+  String PLAYER_1 = Avatars.PLAYER_1.toString();
+  String PLAYER_2 = Avatars.PLAYER_1.toString();
+  String PLAYER_3 = Avatars.PLAYER_1.toString();
+  String PLAYER_4 = Avatars.PLAYER_1.toString();
+  String GHOST = Avatars.GHOST.toString();
+  String ZOMBIE = Avatars.ZOMBIE.toString();
+  String VOID = TileType.VOID.toString();
+  String DOOR = TileType.DOOR.toString();
+  String HALLWAY = TileType.HALLWAY.toString();
+  String WALL = TileType.WALL.toString();
+
+
   public RuleCheckerZombie(GameManager gm, Level currentLevel, IAdversary adversary) {
       this.currentLevel = currentLevel;
       this.adversary = adversary;
@@ -27,7 +40,8 @@ public class RuleCheckerZombie implements IRuleChecker{
 
   private boolean landedOnPlayer(Position destination) {
     String symbol = this.currentLevel.getTileInLevel(destination);
-    return symbol.equals("@") || symbol.equals("¤") || symbol.equals("$") || symbol.equals("~");
+    return symbol.equals(PLAYER_1) || symbol.equals(PLAYER_2) ||
+            symbol.equals(PLAYER_3) || symbol.equals(PLAYER_4);
   }
 
   @Override
@@ -54,7 +68,9 @@ public class RuleCheckerZombie implements IRuleChecker{
   public boolean isValidMove(Position destPoint) {
     boolean valid = false;
     if (isOnLevelPlane(destPoint)) {
-      if (isNotOnDoor(destPoint) && isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 1)) {
+      if (isNotOnDoor(destPoint)
+              && isTileTraversable(destPoint)
+              && isNCardinalTilesAway(destPoint, 1)) {
         valid = true;
       }
     }
@@ -88,12 +104,12 @@ public class RuleCheckerZombie implements IRuleChecker{
 
   @Override
   public boolean isTileTraversable(Position tile) {
-    return !this.currentLevel.getTileInLevel(tile).equals(" ") &&
-            !this.currentLevel.getTileInLevel(tile).equals("G") &&
-            !this.currentLevel.getTileInLevel(tile).equals("Z") &&
-            !this.currentLevel.getTileInLevel(tile).equals("|") &&
-            !this.currentLevel.getTileInLevel(tile).equals("x") &&
-            !this.currentLevel.getTileInLevel(tile).equals("■");
+    return !this.currentLevel.getTileInLevel(tile).equals(VOID) &&
+            !this.currentLevel.getTileInLevel(tile).equals(GHOST) &&
+            !this.currentLevel.getTileInLevel(tile).equals(ZOMBIE) &&
+            !this.currentLevel.getTileInLevel(tile).equals(DOOR) &&
+            !this.currentLevel.getTileInLevel(tile).equals(HALLWAY) &&
+            !this.currentLevel.getTileInLevel(tile).equals(WALL);
   }
 
   @Override
@@ -104,7 +120,8 @@ public class RuleCheckerZombie implements IRuleChecker{
   @Override
   public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
     boolean withinReach = false;
-    HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.adversary.getCharacterPosition()));
+    HashSet<Position> cardinalTiles = new HashSet<>(
+            currentLevel.getAllAdjacentTiles(this.adversary.getCharacterPosition()));
 
     while (maxTilesAway > 1) {
       HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);

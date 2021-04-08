@@ -30,7 +30,7 @@ public class Ghost implements IAdversary{
 
     @Override
     public String getAvatar(){
-        return "G";
+        return Avatars.GHOST.toString();
     }
 
 }

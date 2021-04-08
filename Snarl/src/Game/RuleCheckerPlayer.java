@@ -7,6 +7,16 @@ public class RuleCheckerPlayer implements IRuleChecker {
     Player player;
     GameManager gm;
 
+    String VOID = TileType.VOID.toString();
+    String WALL = TileType.WALL.toString();
+    String PLAYER_1 = Avatars.PLAYER_1.toString();
+    String PLAYER_2 = Avatars.PLAYER_1.toString();
+    String PLAYER_3 = Avatars.PLAYER_1.toString();
+    String PLAYER_4 = Avatars.PLAYER_1.toString();
+    String GHOST = Avatars.GHOST.toString();
+    String ZOMBIE = Avatars.ZOMBIE.toString();
+    String UNLOCKED_EXIT = TileType.UNLOCKED_EXIT.toString();
+
     public RuleCheckerPlayer(GameManager manager, Level currentLevel, Player player) {
         this.currentLevel = currentLevel;
         this.player = player;
@@ -73,7 +83,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     @Override
     public boolean isTileTraversable(Position tile) {
-        return !this.currentLevel.getTileInLevel(tile).equals(" ") && !this.currentLevel.getTileInLevel(tile).equals("■") &&
+        return !this.currentLevel.getTileInLevel(tile).equals(VOID) && !this.currentLevel.getTileInLevel(tile).equals(WALL) &&
                 !isOccupiedByAnotherPlayer(tile);
     }
 
@@ -85,7 +95,10 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     private boolean isOccupiedByAnotherPlayer(Position tile) {
         String symbol = this.currentLevel.getTileInLevel(tile);
-        return symbol.equals("@") || symbol.equals("¤") || symbol.equals("$") || symbol.equals("~");
+        return symbol.equals(PLAYER_1) ||
+                symbol.equals(PLAYER_2) ||
+                symbol.equals(PLAYER_3) ||
+                symbol.equals(PLAYER_4);
     }
 
     /**
@@ -96,7 +109,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     private boolean isOccupiedByAdversary(Position destination) {
         String goalTile = this.currentLevel.getTileInLevel(destination);
-        return goalTile.equals("G") || goalTile.equals("Z");
+        return goalTile.equals(GHOST) || goalTile.equals(ZOMBIE);
     }
 
     /**
@@ -121,7 +134,8 @@ public class RuleCheckerPlayer implements IRuleChecker {
     @Override
     public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
         boolean withinReach = false;
-        HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));
+        HashSet<Position> cardinalTiles = new HashSet<>(
+                currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));
 
         while (maxTilesAway > 1) {
             HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);
@@ -169,8 +183,8 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * @return true if the exit tile is unlocked, false if it is locked
      */
     public boolean isExitUnlocked() {
-        // returns true if the exit tile in the level has been unlocked, false otherwise
-        return currentLevel.getTileInLevel(currentLevel.getExitPositionInLevel()).equals("O");
+        Position exitPos = currentLevel.getExitPositionInLevel();
+        return currentLevel.getTileInLevel(exitPos).equals(UNLOCKED_EXIT);
     }
 
     /**
