@@ -18,8 +18,6 @@ import Game.Level;
 import Level.TestLevel;
 
 public class LocalSnarl {
-  // TODO: delete at the end
-  // ./localSnarl [--levels FILENAME] [--players N] [--start N] [--observe]
   public static void main(String[] args) throws JSONException, IOException {
     ArrayList<String> argsList = new ArrayList<>(Arrays.asList(args));
     String filename = "snarl.levels";
@@ -27,7 +25,6 @@ public class LocalSnarl {
     int startLevelNum = 1;
     boolean observerView = false;
 
-    // TODO: ABSTRACT THIS
     if (argsList.contains("--levels")) {
       int index = argsList.indexOf("--levels");
       filename = argsList.get(index + 1);
