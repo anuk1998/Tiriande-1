@@ -57,7 +57,7 @@ public class TestManager {
 
     Level level = new Level();
     TestLevel.constructLevel(levelObj, level);
-    GameManager manager = new GameManager(new ArrayList<>(Arrays.asList(level)));
+    GameManager manager = new GameManager(new ArrayList<>(Arrays.asList(level)), 0);
 
     registerCharactersFromJSON(manager, level, nameListArr, pointListArr);
     playGame(manager, level, turnLimit, nameListArr, actorMoveListListArr);
@@ -221,7 +221,7 @@ public class TestManager {
     for (int i=0; i< nameListArr.length(); i++) {
       String name = nameListArr.getString(i);
       Player player = level.getPlayerObjectFromName(name);
-      IUser user = manager.getUserFromName(name);
+      IUser user = manager.getUserByName(name);
 
       if (player != null) {
         JSONArray playerUpdate = new JSONArray();

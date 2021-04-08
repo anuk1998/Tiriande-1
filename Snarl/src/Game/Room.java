@@ -8,6 +8,7 @@ public class Room {
     int numOfRows;
     int numOfCols;
     ArrayList<Position> listOfAllPositions = new ArrayList<Position>();
+    ArrayList<Position> listOfAllPositionsLevelScale = new ArrayList<Position>();
     ArrayList<Position> listOfEdgePositions = new ArrayList<Position>();
     ArrayList<Position> listOfDoorsInRoom = new ArrayList<Position>();
 
@@ -18,6 +19,19 @@ public class Room {
         room = new String[numOfRows][numOfCols];
         collectEdges();
         makeRoom();
+    }
+
+    public void renderRoom() {
+        for (int i=0; i<numOfRows; i++) {
+            for (int j=0; j<numOfCols; j++) {
+                if (j == numOfCols - 1) {
+                    System.out.print(room[i][j] + "\n");
+                }
+                else {
+                    System.out.print(room[i][j] + " ");
+                }
+            }
+        }
     }
 
     private void collectEdges() {
@@ -81,7 +95,15 @@ public class Room {
     }
 
     public ArrayList<Position> getListOfAllPositions() {
-        return this.listOfAllPositions;
+        return new ArrayList<>(this.listOfAllPositions);
+    }
+
+    public ArrayList<Position> getListOfAllPositionsLevelScale() {
+        return new ArrayList<>(this.listOfAllPositionsLevelScale);
+    }
+
+    public void addToListOfAllPositionsLevelScale(Position p) {
+        this.listOfAllPositionsLevelScale.add(p);
     }
 
     public String getTileInRoom(Position tilePosition) {

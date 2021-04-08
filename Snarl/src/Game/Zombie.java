@@ -3,6 +3,7 @@ package Game;
 public class Zombie implements IAdversary {
     Position advPosition;
     String name;
+    Room zombiesRoom;
 
     public Zombie(String name) {
         this.name = name;
@@ -32,6 +33,14 @@ public class Zombie implements IAdversary {
     @Override
     public String getAvatar(){
         return "Z";
+    }
+
+    public Room getZombiesRoom() {
+        return this.zombiesRoom;
+    }
+
+    public void setZombiesRoom(Room r) {
+        this.zombiesRoom = r;
     }
 
 }

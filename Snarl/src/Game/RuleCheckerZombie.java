@@ -1,33 +1,60 @@
 package Game;
 
-import com.sun.xml.internal.bind.v2.TODO;
+import java.util.HashSet;
 
 public class RuleCheckerZombie implements IRuleChecker{
   Level currentLevel;
   IAdversary adversary;
+  GameManager gm;
 
-  public RuleCheckerZombie(Level currentLevel, IAdversary adversary) {
+  public RuleCheckerZombie(GameManager gm, Level currentLevel, IAdversary adversary) {
       this.currentLevel = currentLevel;
       this.adversary = adversary;
+      this.gm = gm;
   }
 
   @Override
   public GameStatus runRuleChecker(Position destination) {
-    return null;
+    GameStatus status = GameStatus.INVALID;
+    if (isValidMove(destination)) {
+      status = GameStatus.VALID;
+      if (landedOnPlayer(destination)) {
+        status = encountersOppositeCharacter();
+      }
+    }
+    return status;
+  }
+
+  private boolean landedOnPlayer(Position destination) {
+    String symbol = this.currentLevel.getTileInLevel(destination);
+    return symbol.equals("@") || symbol.equals("¤") || symbol.equals("$") || symbol.equals("~");
   }
 
   @Override
   public GameStatus encountersOppositeCharacter() {
-    return null;
+    // checks if the player being expelled is the last active player in the level
+    if (currentLevel.getActivePlayers().size() == 1) {
+      // and everyone else is expelled
+      if (gm.getExpelledPlayers().size() == gm.getAllPlayers().size() - 1) {
+        return GameStatus.GAME_LOST;
+      }
+      // checks that at least one player has passed through the level exit
+      else if (gm.getExitedPlayers().size() > 0) {
+        //it is the last level
+        if (isLastLevel()) {
+          return GameStatus.GAME_WON;
+        }
+        return GameStatus.LEVEL_WON;
+      }
+    }
+    return GameStatus.PLAYER_EXPELLED;
   }
 
-  //TODO zombies cannot skip moves aka stay in current position, need to change last part of if statement
   @Override
   public boolean isValidMove(Position destPoint) {
     boolean valid = false;
     if (isOnLevelPlane(destPoint)) {
-      if (!isCharactersCurrentPosition(destPoint)
-              && isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 1)) {
+      if (isNotOnDoor(destPoint) && isTileTraversable(destPoint) && isNCardinalTilesAway(destPoint, 1)) {
         valid = true;
       }
     }
@@ -42,15 +69,31 @@ public class RuleCheckerZombie implements IRuleChecker{
             && destPoint.getCol() >= 0 && destPoint.getCol() < levelNumCols;
   }
 
-  @Override
-  public boolean isTileTraversable(Position tile) {
-    return !this.currentLevel.getTileInLevel(tile).equals(" ") && !this.currentLevel.getTileInLevel(tile).equals("|") &&
-            !isOccupiedByAnAdversary(tile);
+  private boolean isNotOnDoor(Position destPoint) {
+    boolean isNotOnDoor = true;
+
+    for (String doorPos : this.currentLevel.getListOfDoorPositions()) {
+      if (destPoint.toString().equals(doorPos)) {
+        isNotOnDoor = false;
+      }
+    }
+
+    return isNotOnDoor;
   }
 
-  private boolean isOccupiedByAnAdversary(Position tile) {
-    String symbol = this.currentLevel.getTileInLevel(tile);
-    return symbol.equals("Z") || symbol.equals("G");
+  @Override
+  public boolean isLastLevel() {
+    return gm.getAllLevels().indexOf(this.currentLevel) == gm.getAllLevels().size() - 1;
+  }
+
+  @Override
+  public boolean isTileTraversable(Position tile) {
+    return !this.currentLevel.getTileInLevel(tile).equals(" ") &&
+            !this.currentLevel.getTileInLevel(tile).equals("G") &&
+            !this.currentLevel.getTileInLevel(tile).equals("Z") &&
+            !this.currentLevel.getTileInLevel(tile).equals("|") &&
+            !this.currentLevel.getTileInLevel(tile).equals("x") &&
+            !this.currentLevel.getTileInLevel(tile).equals("■");
   }
 
   @Override
@@ -60,7 +103,22 @@ public class RuleCheckerZombie implements IRuleChecker{
 
   @Override
   public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
-    return true;
+    boolean withinReach = false;
+    HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.adversary.getCharacterPosition()));
+
+    while (maxTilesAway > 1) {
+      HashSet<Position> tempCardinalTiles = new HashSet<>(cardinalTiles);
+      for (Position adjacent : tempCardinalTiles) {
+        cardinalTiles.addAll(currentLevel.getAllAdjacentTiles(adjacent));
+      }
+      maxTilesAway--;
+    }
+
+    for (Position pos : cardinalTiles) {
+      if (pos.toString().equals(destPoint.toString())) withinReach = true;
+    }
+
+    return withinReach;
   }
 
 }

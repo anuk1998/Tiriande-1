@@ -10,6 +10,7 @@ public class Level {
   Position keyLevelPosition;
   Position exitLevelPosition;
   boolean exitLocked = true;
+  boolean keyFound = false;
   Set<Player> activePlayers = new HashSet<Player>();
   Set<IAdversary> adversaries = new HashSet<IAdversary>();
   HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
@@ -46,6 +47,8 @@ public class Level {
       for (Position posInRoom : r.getListOfAllPositions()) {
         int scaledLevelRow = posInRoom.getRow() + r.getRoomOriginInLevel().getRow();
         int scaledLevelCol = posInRoom.getCol() + r.getRoomOriginInLevel().getCol();
+
+        r.addToListOfAllPositionsLevelScale(new Position(scaledLevelRow, scaledLevelCol));
         // if position is a door, add it to map of doors in level
         if (r.getDoorPositions().contains(posInRoom)) {
           this.listOfDoorsInLevel.put(new Position(scaledLevelRow, scaledLevelCol).toString(), r);
@@ -100,6 +103,10 @@ public class Level {
     }
     else if(character instanceof IAdversary) {
       this.adversaries.add((IAdversary) character);
+      if (((IAdversary) character).getType().equals("zombie")) {
+        Zombie zombie = (Zombie) character;
+        zombie.setZombiesRoom(getBelongingRoom(placeLocation));
+      }
     }
   }
 
@@ -110,7 +117,7 @@ public class Level {
     int randomIndexCol = rand.nextInt(this.levelNumOfCols);
     String randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
 
-    while (!randomTile.equals(".") && !randomTile.equals("|") && !randomTile.equals("●")) {
+    while (!randomTile.equals(".")) {
       randomIndexRow = rand.nextInt(this.levelNumOfRows);
       randomIndexCol = rand.nextInt(this.levelNumOfCols);
       randomTile = this.levelPlane[randomIndexRow][randomIndexCol];
@@ -149,18 +156,29 @@ public class Level {
   // When moving or eliminating a character, this method converts the character's current position back
   //  to the tile type that it was before the character moved onto it
   public void restoreCharacterTile(ICharacter character) {
-    if (isInHallway(character)) {
-      this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "x";
+    Position charPos = character.getCharacterPosition();
+    int charRow = charPos.getRow();
+    int charCol = charPos.getCol();
+    if (charPos.toString().equals(keyLevelPosition.toString())) {
+      if (character instanceof IAdversary && !keyFound) {
+        this.levelPlane[charRow][charCol] = "*";
+      }
+      else {
+        this.levelPlane[charRow][charCol] = ".";
+      }
+    }
+    else if (isInHallway(character)) {
+      this.levelPlane[charRow][charCol] = "x";
     }
     else if (isOnADoor(character)) {
-      this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "|";
+      this.levelPlane[charRow][charCol] = "|";
     }
-    else if (character.getCharacterPosition().toString().equals(exitLevelPosition.toString())) {
-      if (exitLocked) this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "●";
-      else this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = "O";
+    else if (charPos.toString().equals(exitLevelPosition.toString())) {
+      if (exitLocked) this.levelPlane[charRow][charCol] = "●";
+      else this.levelPlane[charRow][charCol] = "O";
     }
     else {
-      this.levelPlane[character.getCharacterPosition().getRow()][character.getCharacterPosition().getCol()] = ".";
+      this.levelPlane[charRow][charCol] = ".";
     }
   }
 
@@ -215,6 +233,7 @@ public class Level {
 
   // Changes a closed exit tile to an open exit tile when the key is found by a player
   public void openExitTile() {
+    keyFound = true;
     exitLocked = false;
     if (playerAtGivenPosition(exitLevelPosition) == null) {
       levelPlane[exitLevelPosition.getRow()][exitLevelPosition.getCol()] = ("O");
@@ -265,6 +284,10 @@ public class Level {
   // Returns if the level exit is locked or not
   public boolean getExitLocked() {
     return this.exitLocked;
+  }
+
+  public ArrayList<String> getListOfDoorPositions() {
+    return new ArrayList<String>(this.listOfDoorsInLevel.keySet());
   }
 
   /**

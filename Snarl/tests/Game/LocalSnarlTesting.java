@@ -1,11 +1,13 @@
 package Game;
 
-import java.util.ArrayList;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import User.LocalUser;
 
-public class UserTesting {
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
+
+public class LocalSnarlTesting
+{
   static Level level1 = new Level();
   static Room room1 = new Room(new Position(0, 0), 8, 10);
   static Room room2 = new Room(new Position(15, 15), 10, 10);
@@ -18,31 +20,61 @@ public class UserTesting {
     createInitialGameBoard();
     //testChooseZombieMove();
     //testChooseGhostMove();
+    testGetClosestPositionTo();
 
     //gm.runGame();
     //testRenderView();
 
   }
 
+  @Test
+  public static void testChooseZombieMove() {
 
+    ArrayList<Level> listOfLevels = new ArrayList<>();
+    listOfLevels.add(level1);
+    GameManager gm = new GameManager(listOfLevels, 1);
+    gm.registerAdversary("meanie", "zombie");
+
+    ArrayList<Position> playerPositions = new ArrayList<>();
+    playerPositions.add(new Position(5,7));
+    playerPositions.add(new Position(12,18));
+    playerPositions.add(new Position(22,3));
+
+    IAdversary zombie = level1.getAdversaryObjectFromName("meanie");
+    zombie.setCharacterPosition(new Position(5,6));
+    assertEquals(new Position(5,7), gm.chooseZombieMove(zombie, playerPositions));
+  }
 
   @Test
-  public static void testRenderView() {
-    LocalUser testUser = new LocalUser("RenderViewCorrectly");
-    String [][] testArray = new String[5][4];
-    for(int i = 0; i < testArray.length; i++) {
-      for(int j = 0; j < testArray[0].length; j++) {
-        testArray[i][j] = ".";
-      }
-    }
-    testArray[0][0] = "■";
-    testArray[0][1] = "■";
-    testArray[0][2] = "|";
-    testArray[0][3] = "■";
-    testArray[2][1] = "O";
-    testArray[3][2] = "Z";
-    assertEquals("■ ■ | ■\n" + ". . . .\n" +
-            ". O . .\n" + ". . Z .\n" + ". . . .\n", testUser.outputView(testArray));
+  public static void testChooseGhostMove() {
+    ArrayList<Level> listOfLevels = new ArrayList<>();
+    listOfLevels.add(level1);
+    GameManager gm = new GameManager(listOfLevels, 1);
+    gm.registerAdversary("scary", "ghost");
+
+    ArrayList<Position> playerPositions = new ArrayList<>();
+    playerPositions.add(new Position(4,2));
+    playerPositions.add(new Position(2,18));
+    playerPositions.add(new Position(25,17));
+
+    IAdversary ghost = level1.getAdversaryObjectFromName("scary");
+    ghost.setCharacterPosition(new Position(5,6));
+    assertEquals(new Position(5,5), gm.chooseGhostMove(ghost, playerPositions));
+  }
+
+  @Test
+  public static void testGetClosestPositionTo() {
+    ArrayList<Level> listOfLevels = new ArrayList<>();
+    listOfLevels.add(level1);
+    GameManager gm = new GameManager(listOfLevels, 1);
+    ArrayList<Position> positionsToCompare = new ArrayList<>();
+    positionsToCompare.add(new Position(2,3));
+    positionsToCompare.add(new Position(5,3));
+    positionsToCompare.add(new Position(7,9));
+    positionsToCompare.add(new Position(2,7));
+
+    assertEquals(new Position(2,3), gm.getClosestPositionTo(positionsToCompare, new Position(1,3)));
+
 
   }
 
@@ -145,4 +177,5 @@ public class UserTesting {
     ICharacter newPlayer = new Player("ILoveCoding");
     level1.addCharacter(newPlayer, new Position(4,5));
   }
+
 }

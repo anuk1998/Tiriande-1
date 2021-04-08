@@ -1,18 +1,16 @@
 package Game;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
 
 public class RuleCheckerPlayer implements IRuleChecker {
     Level currentLevel;
     Player player;
+    GameManager gm;
 
-    public RuleCheckerPlayer(Level currentLevel, Player player) {
+    public RuleCheckerPlayer(GameManager manager, Level currentLevel, Player player) {
         this.currentLevel = currentLevel;
         this.player = player;
+        this.gm = manager;
     }
 
     /**
@@ -120,6 +118,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      * @param destPoint goal Position requested by player
      * @return true if destPoint is 2 units away, false if not
      */
+    @Override
     public boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway) {
         boolean withinReach = false;
         HashSet<Position> cardinalTiles = new HashSet<>(currentLevel.getAllAdjacentTiles(this.player.getCharacterPosition()));
@@ -147,17 +146,22 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     public GameStatus exitTileIsLandedOn() {
       if (isExitUnlocked()) {
-        if (isLastLevel() && currentLevel.getActivePlayers().size() == 1) {
-            return GameStatus.GAME_WON;
-        }
         // if it is the last player exiting through the exit tile
-        else if (currentLevel.getActivePlayers().size() == 1) {
+        if (currentLevel.getActivePlayers().size() == 1) {
+            if (isLastLevel()) {
+                this.player.increaseNumOfTimesExited();
+                return GameStatus.GAME_WON;
+            }
+            this.player.increaseNumOfTimesExited();
             return GameStatus.LEVEL_WON;
         }
+        this.player.increaseNumOfTimesExited();
         return GameStatus.PLAYER_EXITED;
       }
       return GameStatus.VALID;
     }
+
+
 
     /**
      * Returns whether or not the exit tile is unlocked.
@@ -170,12 +174,15 @@ public class RuleCheckerPlayer implements IRuleChecker {
     }
 
     /**
-     * Not elaborated on in Milestone 5 because we are only dealing with one level so this will always be true.
+     * Checks if the current level is the last level in the list.
+     *
      * @return true if the game is on the last level, false if not
      */
+    @Override
     public boolean isLastLevel() {
-        return true;
+        return gm.getAllLevels().indexOf(this.currentLevel) == gm.getAllLevels().size() - 1;
     }
+
 
     /**
      * Returns the appropriate GameStatus when a player encounters an IAdversary based on if they get expelled
@@ -185,9 +192,20 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     @Override
     public GameStatus encountersOppositeCharacter() {
-        // checks if the player self-eliminating is the last active player in the level, if so the game is lost
+        // checks if the player self-eliminating is the last active player in the level
         if (currentLevel.getActivePlayers().size() == 1) {
-            return GameStatus.GAME_LOST;
+            //and everyone else is expelled
+            if (gm.getExpelledPlayers().size() == gm.getAllPlayers().size() - 1) {
+                return GameStatus.GAME_LOST;
+            }
+            //at least one player has passed through the level exit
+            else if (gm.getExitedPlayers().size() > 0) {
+                //it is the last level
+                if (isLastLevel()) {
+                    return GameStatus.GAME_WON;
+                }
+                return GameStatus.LEVEL_WON;
+            }
         }
         return GameStatus.PLAYER_SELF_ELIMINATES;
     }

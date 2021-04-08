@@ -8,6 +8,7 @@ public enum GameStatus {
     PLAYER_SELF_ELIMINATES, 
     PLAYER_EXPELLED,
     PLAYER_EXITED,
+    GHOST_TRANSPORTS,
     LEVEL_WON, 
     GAME_WON, 
     GAME_LOST;
