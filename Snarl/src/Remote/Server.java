@@ -36,7 +36,7 @@ public class Server {
 
     try {
       ArrayList<JSONObject> levels = readFile(filename);
-      initializeLevelAndRegister(levels, numOfClients, observerView);
+      manager = initializeLevelAndRegister(levels, startLevelNum, observerView);
     }
     catch (FileNotFoundException e) {
       System.out.println("File not found.");

@@ -5,13 +5,10 @@ To-do List for Milestone 9:
 - parse JSON messages from clients
     - make different methods for different types of JSON messages
 - Construct outgoing player messages (look at Milestone 7 for those methods -- maybe import that file?)
-- Test multiple clients being able to connect
 - In the 'try' in Server main, send a server welcome message to client as soon as
   they connect, and then in ClientThread, parse that message then have the client write back a response and
   then back in the Server class 'try' parse that response and send it to a list of registered names to be
   registered ASAP
-- Test that timeout happens after 60 seconds of inactivity and that it doesn't shut down the existing
-  connections
 - Write what happens after the while loop that accepts connections --> start the level
 
 - Test that timeout happens after 60 seconds of inactivity and that it doesn't shut down the existing

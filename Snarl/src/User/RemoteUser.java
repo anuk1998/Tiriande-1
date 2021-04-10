@@ -9,15 +9,19 @@ import Game.Level;
 import Game.Position;
 import Game.IAdversary;
 import Game.Player;
-import Game.*;
+import Remote.ClientThread;
 
-public class LocalUser implements IUser {
+public class RemoteUser implements IUser {
   String userName;
+  ClientThread clientConnection;
 
-  public LocalUser(String userName) {
+  public RemoteUser(String userName) {
     this.userName = userName;
   }
 
+  public void setRemoteUserConnection(ClientThread conn) {
+    this.clientConnection = conn;
+  }
 
   @Override
   public String getUserName() {
@@ -26,51 +30,41 @@ public class LocalUser implements IUser {
 
   @Override
   public String sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
-   switch(moveStatus) {
-     case "INVALID":
-       System.out.println("Sorry, that is an invalid move. Please enter a different one.");
-       break;
-     case "KEY_FOUND":
-       System.out.println("Player " + c.getName() + " found the key.");
-       break;
-     case "PLAYER_EXPELLED":
-     case "PLAYER_SELF_ELIMINATES":
-       System.out.println("Player " + c.getName() + " was expelled.");
-       break;
-     case "PLAYER_EXITED":
-       System.out.println("Player " + c.getName() + " exited.");
-       break;
-     case "LEVEL_WON":
-       System.out.println("Congrats!! Players have won the level!");
-       break;
-     case "GAME_WON":
-       System.out.print("Congrats! Players have won the game!");
-       break;
-     case "GAME_LOST":
-       System.out.println("Sorry :( Players have lost the game!");
-       break;
-     case "DEFAULT":
-       System.out.println("Default case: will never get here");
-   }
-   return "";
+    switch(moveStatus) {
+      case "KEY_FOUND":
+        return "Player " + c.getName() + " found the key.";
+      case "PLAYER_EXPELLED":
+      case "PLAYER_SELF_ELIMINATES":
+        return "Player " + c.getName() + " was expelled.";
+      case "PLAYER_EXITED":
+       return "Player " + c.getName() + " exited.";
+      case "LEVEL_WON":
+        return "Congrats!! Players have won the level!";
+      case "GAME_WON":
+       return "Congrats! Players have won the game!";
+      case "GAME_LOST":
+        return "Sorry :( Players have lost the game!";
+      case "DEFAULT":
+        return "Default case: will never get here";
+    }
+    return "Will never get here";
   }
 
   @Override
   public String broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
     if (character instanceof IAdversary) {
-      System.out.println("List of player locations: " + getAllPlayerLocations((currentLevel)));
-      System.out.println("List of adversary locations: " + getAllAdversaryLocations(currentLevel));
+      return "List of player locations: " + getAllPlayerLocations(currentLevel) +
+      "\nList of adversary locations: " + getAllAdversaryLocations(currentLevel) + "\nHere is your view: \n" + renderView(currentLevel, character);
     }
     else {
       if (isPlayerActive) {
-        System.out.println(character.getName() + ", it is your turn to make a move. You are currently at position " +
-                character.getCharacterPosition().toString() + " in the level. Here is your view:");
+        return character.getName() + ", it is your turn to make a move. You are currently at position " +
+                character.getCharacterPosition().toString() + " in the level. Here is your view:";
       } else {
-        System.out.println("Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position:");
+        return "Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position: \n" +
+                renderView(currentLevel, character);
       }
-      System.out.println(renderView(currentLevel, character));
     }
-    return "";
   }
 
   public ArrayList<Position> getAllAdversaryLocations(Level currentLevel) {
@@ -131,15 +125,12 @@ public class LocalUser implements IUser {
 
   @Override
   public String renderObserverView(Level currentLevel) {
-    System.out.println("Here is the observer view of the current level:");
-    System.out.println(currentLevel.renderLevel());
-    return "";
+    return "Here is the observer view of the current level:\n" + currentLevel.renderLevel();
   }
 
   @Override
   public String sendNoMoveUpdate() {
-    System.out.println("You've run out of chances. No move for you this turn.");
-    return "";
+    return "You've run out of chances. No move for you this turn.";
   }
 
   public String outputView(String[][] view) {

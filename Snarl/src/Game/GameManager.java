@@ -310,7 +310,7 @@ public class GameManager {
     /**
      * Parses the given GameStatus type and applies specific actions to the level/game based on which type of move it is.
      */
-    public boolean parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c) {
+    public void parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c, IUser currentUser) {
         switch (moveStatus) {
             case "VALID":
                 currentLevel.moveCharacter(c, destination);
@@ -318,30 +318,28 @@ public class GameManager {
             case "KEY_FOUND":
                 currentLevel.moveCharacter(c, destination);
                 currentLevel.openExitTile();
-                System.out.println("Player " + c.getName() + " found the key.");
                 ((Player) c).increaseNumOfKeysFound();
-                return true;
+                break;
             case "PLAYER_SELF_ELIMINATES":
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
                 expelledPlayers.add((Player) c);
-                return true;
+                break;
             case "PLAYER_EXPELLED":
                 Player p = currentLevel.playerAtGivenPosition(destination);
                 currentLevel.expelPlayer(p);
                 expelledPlayers.add(p);
                 currentLevel.moveCharacter(c, destination);
-                System.out.println("Player " + p.getName() + " was expelled.");
-                return true;
+                break;
             case "PLAYER_EXITED":
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 exitedPlayers.add((Player) c);
-                System.out.println("Player " + c.getName() + " exited.");
-                return true;
+                break;
             case "GHOST_TRANSPORTS":
-                currentLevel.moveCharacter(c, currentLevel.pickRandomPositionForCharacterInLevel());
-                return true;
+                Position newGhostPos = currentLevel.pickRandomPositionForCharacterInLevel();
+                currentLevel.moveCharacter(c, newGhostPos);
+                break;
             case "LEVEL_WON":
                 levelWon(destination, c);
                 break;
@@ -352,7 +350,6 @@ public class GameManager {
                 gameLost(destination, c);
                 break;
             default:
-                //System.out.print("Default case.Should never get here.");
         }
         currentUser.sendMoveUpdate(moveStatus, destination, c);
     }
@@ -487,7 +484,7 @@ public class GameManager {
      */
     public Registration registerPlayer(String name, Registration playerType) {
         if (allPlayers.containsKey(name)) {
-            System.out.println("Cannot register Player with name `" + name + "`. Name already has been taken. Please pick again.");
+            return Registration.DUPLICATE_NAME;
         }
         else if (allPlayers.size() < 4) {
             addUser(name, playerType);
@@ -537,27 +534,6 @@ public class GameManager {
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
-    }
-
-    private void registerObservers() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Would you like to register as an observer? Enter 'Y' for yes or 'N' for no.");
-        String wantsToMakeObserver = sc.nextLine();
-        while(!(wantsToMakeObserver.equalsIgnoreCase("Y") || wantsToMakeObserver.equalsIgnoreCase("N")) ) {
-            System.out.println("Sorry, invalid response. Please enter 'Y' for yes or 'N' for no");
-            wantsToMakeObserver = sc.nextLine();
-        }
-
-        if(wantsToMakeObserver.equalsIgnoreCase("N")) {
-            System.out.println("Okay, you will not be joining as an observer.");
-        }
-        else if(wantsToMakeObserver.equalsIgnoreCase("Y")) {
-            System.out.println("Please enter a username for your observer");
-            String observerName = sc.nextLine();
-            IObserver observer = new LocalObserver(observerName);
-            addObserver(observer);
-            System.out.println(observerName + " has been added to the game as an Observer.");
-        }
     }
 
     /**

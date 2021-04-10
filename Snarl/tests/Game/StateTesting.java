@@ -44,7 +44,7 @@ public class StateTesting {
 
   @Test
   public static void testParseMoveDoAction() {
-    assertEquals(true, gm.parseMoveStatusAndDoAction(GameStatus.INVALID.name(), new Position(2000, 2), level1.getPlayerObjectFromName("Carl")));
+    assertEquals(true, gm.checkGameStatus(GameStatus.INVALID));
     Position ghostPos = level1.getAdversaryObjectFromName("scary").getCharacterPosition();
     gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), ghostPos, level1.getPlayerObjectFromName("Carl"), null);
     assertEquals(null, level1.getPlayerObjectFromName("Carl"));
