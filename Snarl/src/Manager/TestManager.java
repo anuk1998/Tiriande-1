@@ -16,6 +16,7 @@ import Game.ICharacter;
 import Game.Level;
 import Game.Player;
 import Game.Position;
+import Game.Registration;
 import Level.TestLevel;
 import User.LocalUser;
 
@@ -83,7 +84,7 @@ public class TestManager {
     // register all given players via the GameManager
     for (int i=0; i<nameListArr.length(); i++) {
       String name = nameListArr.getString(i);
-      manager.registerPlayer(name);
+      manager.registerPlayer(name, Registration.LOCAL);
     }
 
     // moves each player (and potentially adversaries) to their corresponding start positions in the level
@@ -204,7 +205,8 @@ public class TestManager {
       }
       // actually send the move to the game manager and have them perform whatever action that needs to be done
       // based on what kind of move it is (result)
-      gameStillGoing = manager.parseMoveStatusAndDoAction(result.name(), newMove, player);
+      manager.parseMoveStatusAndDoAction(result.name(), newMove, player, null);
+      gameStillGoing = manager.checkGameStatus(result);
     }
 
     return gameStillGoing;

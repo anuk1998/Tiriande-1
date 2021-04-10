@@ -1,6 +1,5 @@
 package Local;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -15,6 +14,7 @@ import java.util.Scanner;
 
 import Game.GameManager;
 import Game.Level;
+import Game.Registration;
 import Level.TestLevel;
 
 public class LocalSnarl {
@@ -89,9 +89,23 @@ public class LocalSnarl {
     }
 
     GameManager manager = new GameManager(listOfLevels, startLevelNum);
-
     Scanner scanner = new Scanner(System.in);
-    manager.registerPlayers(numOfPlayers, scanner);
+
+    while (numOfPlayers > 0) {
+      System.out.println("Please enter a username for your player:");
+      String playerName = scanner.nextLine();
+      Registration registrationStatus = manager.registerPlayer(playerName, Registration.LOCAL);
+      if (registrationStatus.toString().equals("AT_CAPACITY")) {
+        System.out.println("Sorry. You have already registered 4 players.");
+        break;
+      }
+      while (registrationStatus.toString().equals("DUPLICATE_NAME")) {
+        System.out.println("Sorry. That name has already been chosen. Please pick again:");
+        playerName = scanner.nextLine();
+        registrationStatus = manager.registerPlayer(playerName, Registration.LOCAL);
+      }
+      numOfPlayers--;
+    }
 
     int numOfZombies = (int) (Math.floor(startLevelNum / 2) + 1);
     int numOfGhosts = (int) Math.floor((startLevelNum - 1) / 2);
@@ -102,10 +116,9 @@ public class LocalSnarl {
     for (int g=1; g<numOfGhosts+1; g++) {
       manager.registerAdversary("ghost" + g, "ghost");
     }
-
     manager.setObserverView(observerView);
+    runLocalSnarlGame(manager);
 
-    manager.runGame();
     scanner.close();
   }
 }

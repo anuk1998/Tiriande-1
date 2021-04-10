@@ -11,6 +11,6 @@ public enum GameStatus {
     GHOST_TRANSPORTS,
     LEVEL_WON, 
     GAME_WON, 
-    GAME_LOST;
+    GAME_LOST
 }
 

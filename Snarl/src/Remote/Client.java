@@ -5,14 +5,8 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class Client {
-  private Socket clientSocket;
-  private BufferedReader input;
-  private OutputStream output;
-  private Scanner s;
-
-  public Client() {
-    this.s = new Scanner(System.in);
-  }
+  String host = "localhost";
+  int port = 45678;
 
   public static void main(String[] args) {
     Client client = new Client();
@@ -21,31 +15,23 @@ public class Client {
 
   public void run() {
     try {
-      this.clientSocket = new Socket("localhost", 8000);
-      this.output = this.clientSocket.getOutputStream();
-      PrintWriter writer = new PrintWriter(this.output, true);
-      //this.output.println("client to server output");
-      this.input = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+      Socket clientSocket = new Socket(host, port);
+      BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
+      Scanner sc = new Scanner(System.in);
 
-
-      while(true) {
-
-        //client to server communication
-        String reply = this.s.nextLine();
-        writer.println(reply);
-        writer.flush();
-        if(reply.equals("END")){
-          String message = this.input.readLine();
-          System.out.println(message);
-          break;
+      while (true) {
+        String serverMessage = input.readLine();
+        boolean isResponseNeeded = parseServerMessage(serverMessage);
+        if (isResponseNeeded) {
+          String reply = sc.nextLine();
+          output.println(reply);
+          output.flush();
         }
-
       }
 
-      clientSocket.close();
     } catch (Exception var3) {
       var3.printStackTrace();
     }
-
   }
 }

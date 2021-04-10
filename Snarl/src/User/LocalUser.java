@@ -25,7 +25,7 @@ public class LocalUser implements IUser {
 
 
   @Override
-  public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
+  public String broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
     if (character instanceof IAdversary) {
       System.out.println("List of player locations: " + getAllPlayerLocations((currentLevel)));
       System.out.println("List of adversary locations: " + getAllAdversaryLocations(currentLevel));
@@ -39,6 +39,7 @@ public class LocalUser implements IUser {
       }
       System.out.println(renderView(currentLevel, character));
     }
+    return "";
   }
 
   public ArrayList<Position> getAllAdversaryLocations(Level currentLevel) {
@@ -97,8 +98,17 @@ public class LocalUser implements IUser {
     return outputView(view);
   }
 
-  public void renderLevelForAdversary(Level currentLevel) {
-    System.out.println("Here is an image of the current level: " + currentLevel.renderLevel());
+  @Override
+  public String renderObserverView(Level currentLevel) {
+    System.out.println("Here is the observer view of the current level:");
+    System.out.println(currentLevel.renderLevel());
+    return "";
+  }
+
+  @Override
+  public String sendNoMoveUpdate() {
+    System.out.println("You've run out of chances. No move for you this turn.");
+    return "";
   }
 
   public String outputView(String[][] view) {
@@ -116,7 +126,8 @@ public class LocalUser implements IUser {
   }
 
   @Override
-  public Position getUserMove(Scanner scanner, ICharacter character) {
+  public Position getUserMove(ICharacter character) {
+    Scanner scanner = new Scanner(System.in);
     int rowPos = 0;
     int colPos = 0;
 

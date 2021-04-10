@@ -21,7 +21,7 @@ public interface IUser {
    *
    * @param character the current character whose turn it is
    */
-   void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive);
+   String broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive);
 
   /**
    * Renders the view for the given character before they request a move.
@@ -38,7 +38,8 @@ public interface IUser {
    *
    * @return the resulting Position in level where the user would like to move to
    */
-   Position getUserMove(Scanner scanner, ICharacter character);
+   Position getUserMove(ICharacter character);
 
 
+  String sendNoMoveUpdate();
 }

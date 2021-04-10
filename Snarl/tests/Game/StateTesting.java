@@ -46,7 +46,7 @@ public class StateTesting {
   public static void testParseMoveDoAction() {
     assertEquals(true, gm.parseMoveStatusAndDoAction(GameStatus.INVALID.name(), new Position(2000, 2), level1.getPlayerObjectFromName("Carl")));
     Position ghostPos = level1.getAdversaryObjectFromName("scary").getCharacterPosition();
-    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), ghostPos, level1.getPlayerObjectFromName("Carl"));
+    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), ghostPos, level1.getPlayerObjectFromName("Carl"), null);
     assertEquals(null, level1.getPlayerObjectFromName("Carl"));
   }
 
@@ -64,7 +64,7 @@ public class StateTesting {
     // checking active status after Player has been expelled
     IAdversary evil = new Ghost("evil");
     level1.addCharacter(evil, new Position(bob.getCharacterPosition().getRow() - 1, bob.getCharacterPosition().getCol()));
-    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), evil.getCharacterPosition(), bob);
+    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), evil.getCharacterPosition(), bob, null);
     assertEquals(false, gm.checkPlayerActiveStatus(bob));
   }
 
@@ -242,10 +242,10 @@ public class StateTesting {
     level1.addHallway(h8);
 
     //register players and add them to the board
-    gm.registerPlayer("Bob");
-    gm.registerPlayer("Carl");
-    gm.registerPlayer("Santiago");
-    gm.registerPlayer("Anu");
+    gm.registerPlayer("Bob", Registration.LOCAL);
+    gm.registerPlayer("Carl", Registration.LOCAL);
+    gm.registerPlayer("Santiago", Registration.LOCAL);
+    gm.registerPlayer("Anu", Registration.LOCAL);
 
     //register adversaries and add them to the board
     gm.registerAdversary("scary", "ghost");

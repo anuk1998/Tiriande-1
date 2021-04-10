@@ -198,10 +198,10 @@ public class ObserverTesting {
     GameManager gm = new GameManager(listOfLevels, 0);
 
     //register players for observer testing purposes
-    gm.registerPlayer("Anu");
-    gm.registerPlayer("Giselle");
-    gm.registerPlayer("Harry Potter");
-    gm.registerPlayer("Hermione Granger");
+    gm.registerPlayer("Anu", Registration.LOCAL);
+    gm.registerPlayer("Giselle", Registration.LOCAL);
+    gm.registerPlayer("Harry Potter", Registration.LOCAL);
+    gm.registerPlayer("Hermione Granger", Registration.LOCAL);
 
     //register adversaries for observer testing purposes
     gm.registerAdversary("meanie", "ghost");
