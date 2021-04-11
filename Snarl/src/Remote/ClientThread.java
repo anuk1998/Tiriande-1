@@ -43,7 +43,7 @@ public class ClientThread extends Thread {
         message = input.readLine();
         status = manager.registerPlayer(message, Registration.REMOTE);
       }
-      manager.passConnectionToRemoveUser(message, this);
+      manager.passConnectionToRemoteUser(message, this);
     }
     catch (IOException | JSONException e) {
       e.printStackTrace();
@@ -68,9 +68,32 @@ public class ClientThread extends Thread {
     }
   }
 
-  public void sendToAllPlayerClients(ArrayList<ClientThread> clients, JSONObject update) {
-    for (ClientThread client : clients) {
-      client.output.println(update);
+  private JSONObject makeStartLevelMessage() {
+    JSONArray names = new JSONArray();
+    for (String p : this.manager.getAllPlayers().keySet()) {
+      names.put(p);
+    }
+    JSONObject startLevel = new JSONObject();
+    try {
+      startLevel.put("type", "start-level");
+      startLevel.put("level", 1);
+      startLevel.put("players", names);
+    }
+    catch (JSONException e) {
+      e.getStackTrace();
+    }
+    return startLevel;
+  }
+
+  public void sendPlayerUpdateMessage(String moveStatus, ICharacter movedCharacter, ICharacter thisCharacter, RemoteUser user) {
+    try {
+      TestManager tm = new TestManager();
+      JSONObject playerUpdate = tm.formPlayerUpdate(this.manager, this.manager.getCurrentLevel(), thisCharacter, user);
+      playerUpdate.put("message", movedCharacter.getName() + " made a move and the status of that move was: " + moveStatus);
+      output.println(playerUpdate.toString());
+    }
+    catch (JSONException e) {
+      e.printStackTrace();
     }
   }
 

@@ -630,7 +630,14 @@ public class GameManager {
         return this.exitedPlayers;
     }
 
-    public void passConnectionToRemoveUser(String name, ClientThread conn) {
+    /**
+     * Returns the current level of the game
+     */
+    public Level getCurrentLevel() {
+        return this.currentLevel;
+    }
+
+    public void passConnectionToRemoteUser(String name, ClientThread conn) {
         RemoteUser user = (RemoteUser) getUserByName(name);
         user.setRemoteUserConnection(conn);
     }

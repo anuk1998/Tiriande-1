@@ -4,7 +4,6 @@ import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import Common.IUser;
 import Game.ICharacter;
@@ -35,23 +34,16 @@ public class RemoteUser implements IUser {
   public void sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
     clientConnection.sendToClient(moveStatus, MessageType.RESULT);
     switch(moveStatus) {
+      case "INVALID":
+        clientConnection.sendToClient("Invalid", MessageType.RESULT);
       case "KEY_FOUND":
         clientConnection.sendToClient("Key", MessageType.RESULT);
       case "PLAYER_EXPELLED":
       case "PLAYER_SELF_ELIMINATES":
-        return "Player " + c.getName() + " was expelled.";
+        clientConnection.sendToClient("Eject", MessageType.RESULT);
       case "PLAYER_EXITED":
-       return "Player " + c.getName() + " exited.";
-      case "LEVEL_WON":
-        return "Congrats!! Players have won the level!";
-      case "GAME_WON":
-       return "Congrats! Players have won the game!";
-      case "GAME_LOST":
-        return "Sorry :( Players have lost the game!";
-      case "DEFAULT":
-        return "Default case: will never get here";
+        clientConnection.sendToClient("Exit", MessageType.RESULT);
     }
-    return "Will never get here";
   }
 
   @Override
@@ -67,12 +59,8 @@ public class RemoteUser implements IUser {
     return adversaryLocations;
   }
 
-  public ArrayList<Position> getAllPlayerLocations(Level currentLevel) {
-    ArrayList<Position> playerLocations = new ArrayList<>();
-    for(Player p: currentLevel.getActivePlayers()) {
-      playerLocations.add(p.getCharacterPosition());
-    }
-    return playerLocations;
+  public void sendPlayerUpdateMessage(String moveStatus, ICharacter movedCharacter, ICharacter thisCharacter) {
+    clientConnection.sendPlayerUpdateMessage(moveStatus, movedCharacter, thisCharacter, this);
   }
 
   @Override
@@ -155,6 +143,6 @@ public class RemoteUser implements IUser {
     catch (IOException ignored) {
     }
 
-    return move;
+    return newPos;
   }
 }
