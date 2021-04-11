@@ -16,6 +16,7 @@ import org.json.JSONTokener;
 
 import Game.GameManager;
 import Game.Level;
+import Game.MessageType;
 import Level.TestLevel;
 
 import static java.lang.System.exit;
@@ -61,13 +62,15 @@ public class Server {
         }
       }
 
+      registerAutomatedAdversaries();
+
+      for (ClientThread client : clients) {
+        client.sendToClient("start-level", MessageType.LEVEL_START);
+      }
+
       /////
       // loop through all client connections and play the game
 
-      //close sockets
-      for (ClientThread conn : clients) {
-        conn.close();
-      }
       serverSocket.close();
     }
     catch (IOException var3) {
@@ -119,15 +122,15 @@ public class Server {
     return manager;
   }
 
-  private void registerAutomatedAdversaries(GameManager manager) {
+  private void registerAutomatedAdversaries() {
     int numOfZombies = (int) (Math.floor(startLevelNum / 2) + 1);
     int numOfGhosts = (int) Math.floor((startLevelNum - 1) / 2);
 
     for (int z=1; z<numOfZombies+1; z++) {
-      manager.registerAdversary("zombie" + z, "zombie");
+      this.manager.registerAdversary("zombie" + z, "zombie");
     }
     for (int g=1; g<numOfGhosts+1; g++) {
-      manager.registerAdversary("ghost" + g, "ghost");
+      this.manager.registerAdversary("ghost" + g, "ghost");
     }
   }
 

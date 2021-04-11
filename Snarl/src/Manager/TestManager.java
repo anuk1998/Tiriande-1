@@ -19,11 +19,12 @@ import Game.Position;
 import Game.Registration;
 import Level.TestLevel;
 import User.LocalUser;
+import User.RemoteUser;
 
 public class TestManager {
   private static JSONArray managerUpdates = new JSONArray();
 
-  public static void main(String[] args) throws JSONException {
+  public void main(String[] args) throws JSONException {
     StringBuilder input_as_string = new StringBuilder();
     String text;
     Scanner scanner = new Scanner(System.in);
@@ -49,7 +50,7 @@ public class TestManager {
    *
    * @param jsonArrayInput the input JSONArray from the user
    */
-  private static void parseManagerJSONInput(JSONArray jsonArrayInput) throws JSONException {
+  private void parseManagerJSONInput(JSONArray jsonArrayInput) throws JSONException {
     JSONArray nameListArr = jsonArrayInput.getJSONArray(0);
     JSONObject levelObj = jsonArrayInput.getJSONObject(1);
     int turnLimit = jsonArrayInput.getInt(2);
@@ -110,7 +111,7 @@ public class TestManager {
    * @param nameListArr the list of all players
    * @param actorMoveListListArr the list of lists of actor moves to make during the game
    */
-  private static void playGame(GameManager manager, Level level, int turnLimit, JSONArray nameListArr, JSONArray actorMoveListListArr) throws JSONException {
+  private void playGame(GameManager manager, Level level, int turnLimit, JSONArray nameListArr, JSONArray actorMoveListListArr) throws JSONException {
     ArrayList<ArrayList<Position>> listOfMovesForPlayers = convertFromJSONArrayToListOfMoves(actorMoveListListArr);
     boolean gameStillGoing = true;
     int characterIndex = 0;
@@ -219,7 +220,7 @@ public class TestManager {
    * @param level the Level oject being played
    * @param manager the GameManager instance
    */
-  private static void makeUpdates(JSONArray nameListArr, Level level, GameManager manager) throws JSONException {
+  private void makeUpdates(JSONArray nameListArr, Level level, GameManager manager) throws JSONException {
     for (int i=0; i< nameListArr.length(); i++) {
       String name = nameListArr.getString(i);
       Player player = level.getPlayerObjectFromName(name);
@@ -244,14 +245,13 @@ public class TestManager {
    * @param user the current player's corresponding user object
    * @return a JSONObject of a player update
    */
-  private static JSONObject formPlayerUpdate(GameManager manager, Level level, ICharacter player, IUser user) throws JSONException {
+  public JSONObject formPlayerUpdate(GameManager manager, Level level, ICharacter player, IUser user) throws JSONException {
     JSONObject playerUpdate = new JSONObject();
     // add the type field
     playerUpdate.put("type", "player-update");
 
     // add the layout field
-    LocalUser localUser = (LocalUser) user;
-    String[][] layout = localUser.makeView(level, player);
+    String[][] layout = user.makeView(level, player);
     JSONArray layoutArray = convertToLayoutArray(layout);
     playerUpdate.put("layout", layoutArray);
 

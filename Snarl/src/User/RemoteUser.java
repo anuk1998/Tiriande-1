@@ -1,14 +1,17 @@
 package User;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 import Common.IUser;
 import Game.ICharacter;
 import Game.Level;
+import Game.MessageType;
 import Game.Position;
 import Game.IAdversary;
-import Game.Player;
 import Remote.ClientThread;
 
 public class RemoteUser implements IUser {
@@ -29,10 +32,11 @@ public class RemoteUser implements IUser {
   }
 
   @Override
-  public String sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
+  public void sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
+    clientConnection.sendToClient(moveStatus, MessageType.RESULT);
     switch(moveStatus) {
       case "KEY_FOUND":
-        return "Player " + c.getName() + " found the key.";
+        clientConnection.sendToClient("Key", MessageType.RESULT);
       case "PLAYER_EXPELLED":
       case "PLAYER_SELF_ELIMINATES":
         return "Player " + c.getName() + " was expelled.";
@@ -51,20 +55,8 @@ public class RemoteUser implements IUser {
   }
 
   @Override
-  public String broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
-    if (character instanceof IAdversary) {
-      return "List of player locations: " + getAllPlayerLocations(currentLevel) +
-      "\nList of adversary locations: " + getAllAdversaryLocations(currentLevel) + "\nHere is your view: \n" + renderView(currentLevel, character);
-    }
-    else {
-      if (isPlayerActive) {
-        return character.getName() + ", it is your turn to make a move. You are currently at position " +
-                character.getCharacterPosition().toString() + " in the level. Here is your view:";
-      } else {
-        return "Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position: \n" +
-                renderView(currentLevel, character);
-      }
-    }
+  public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
+    clientConnection.sendToClient("update", null);
   }
 
   public ArrayList<Position> getAllAdversaryLocations(Level currentLevel) {
@@ -83,6 +75,7 @@ public class RemoteUser implements IUser {
     return playerLocations;
   }
 
+  @Override
   public String[][] makeView(Level currentLevel, ICharacter character) {
     Position charPos = character.getCharacterPosition();
     int viewArrayRowCount = 0;
@@ -124,13 +117,13 @@ public class RemoteUser implements IUser {
   }
 
   @Override
-  public String renderObserverView(Level currentLevel) {
-    return "Here is the observer view of the current level:\n" + currentLevel.renderLevel();
+  public void renderObserverView(Level currentLevel) {
+    clientConnection.sendToClient("Here is the observer view of the current level:\n" + currentLevel.renderLevel(), MessageType.OBSERVER_VIEW);
   }
 
   @Override
-  public String sendNoMoveUpdate() {
-    return "You've run out of chances. No move for you this turn.";
+  public void sendNoMoveUpdate() {
+    clientConnection.sendToClient("You've run out of chances. No move for you this turn.", MessageType.NO_MOVE);
   }
 
   public String outputView(String[][] view) {
@@ -149,55 +142,19 @@ public class RemoteUser implements IUser {
 
   @Override
   public Position getUserMove(ICharacter character) {
-    Scanner scanner = new Scanner(System.in);
-    int rowPos = 0;
-    int colPos = 0;
-
-    System.out.println("Would you like to move your position? Please enter 'YES' or 'NO'.");
-    String response = scanner.nextLine();
-
-    while (!response.equalsIgnoreCase("no") && !response.equalsIgnoreCase("yes")) {
-      System.out.println("Invalid answer.");
-      System.out.println("Would you like to move your position? Please enter 'YES' or 'NO'.");
-      response = scanner.nextLine();
+    Position newPos = null;
+    try {
+      Position move = clientConnection.getMoveFromClient("move", MessageType.MOVE);
+      if (move == null) {
+        newPos = character.getCharacterPosition();
+      }
+      else {
+        newPos = move;
+      }
     }
-
-    //player remains where they are and scanner connection is closed
-    if (response.equalsIgnoreCase("NO")) {
-      System.out.println("Okay, you will remain where you are.");
-      return character.getCharacterPosition();
+    catch (IOException ignored) {
     }
-
-    System.out.print("Please enter your desired row: ");
-    rowPos = getMoveCoordinate(scanner, rowPos);
-    System.out.print("Please enter your desired column: ");
-    colPos = getMoveCoordinate(scanner, colPos);
-    Position move = new Position(rowPos, colPos);
 
     return move;
-  }
-
-  /**
-   * Asks the user for a move for their turn via STDin.
-   *
-   * @param sc the Scanner instance
-   * @param pos the type of pos we want (either row or column)
-   * @return an integer representing a coordinate
-   */
-  private int getMoveCoordinate(Scanner sc, int pos) {
-    boolean isNotNumber = true;
-
-    while (isNotNumber) {
-      String posStr = sc.nextLine();
-      String posNoSpace = posStr.replaceAll("\\s+", "");
-      try {
-        pos = Integer.parseInt(posNoSpace);
-        isNotNumber = false;
-      }
-      catch (NumberFormatException e) {
-        System.out.println("Sorry, you entered an invalid value. Please enter a number.");
-      }
-    }
-    return pos;
   }
 }

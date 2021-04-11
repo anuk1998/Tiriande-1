@@ -109,7 +109,6 @@ public class GameManager {
      * Requests a move from the given player and assesses its validity then executes it.
      */
     private boolean playersMove(ICharacter character, IUser currentUser, boolean playerIsActive) {
-        currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
         if (playerIsActive) {
             if (observerView) {
                 currentUser.renderObserverView(this.currentLevel);
@@ -130,9 +129,10 @@ public class GameManager {
                 requestedMove = currentUser.getUserMove(character);
                 moveStatus = callRuleChecker(character, requestedMove);
             }
+            currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
             boolean gameStillGoing = checkGameStatus(moveStatus);
             parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character, currentUser);
-            sendUpdatesToObservers(character, requestedMove, moveStatus, this.currentLevel, exitedPlayers, expelledPlayers);
+            sendUpdateToUsers(moveStatus.name(), character);
             return gameStillGoing;
         }
         return true;
@@ -550,6 +550,21 @@ public class GameManager {
             }
         }
         return currentUser;
+    }
+
+    private void sendUpdateToUsers(String moveStatus, ICharacter character) {
+        for (IUser user : users) {
+            if (user instanceof RemoteUser) {
+                RemoteUser ru = (RemoteUser) user;
+                ICharacter usersCharacter = getPlayerFromName(user.getUserName());
+                ru.sendPlayerUpdateMessage(moveStatus, character, usersCharacter);
+            }
+        }
+    }
+
+    private ICharacter getPlayerFromName(String userName) {
+        Player p = allPlayers.get(userName);
+        return p;
     }
 
     /**

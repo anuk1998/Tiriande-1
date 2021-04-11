@@ -25,7 +25,7 @@ public class LocalUser implements IUser {
   }
 
   @Override
-  public String sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
+  public void sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
    switch(moveStatus) {
      case "INVALID":
        System.out.println("Sorry, that is an invalid move. Please enter a different one.");
@@ -52,11 +52,10 @@ public class LocalUser implements IUser {
      case "DEFAULT":
        System.out.println("Default case: will never get here");
    }
-   return "";
   }
 
   @Override
-  public String broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
+  public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
     if (character instanceof IAdversary) {
       System.out.println("List of player locations: " + getAllPlayerLocations((currentLevel)));
       System.out.println("List of adversary locations: " + getAllAdversaryLocations(currentLevel));
@@ -70,7 +69,6 @@ public class LocalUser implements IUser {
       }
       System.out.println(renderView(currentLevel, character));
     }
-    return "";
   }
 
   public ArrayList<Position> getAllAdversaryLocations(Level currentLevel) {
@@ -130,16 +128,14 @@ public class LocalUser implements IUser {
   }
 
   @Override
-  public String renderObserverView(Level currentLevel) {
+  public void renderObserverView(Level currentLevel) {
     System.out.println("Here is the observer view of the current level:");
     System.out.println(currentLevel.renderLevel());
-    return "";
   }
 
   @Override
-  public String sendNoMoveUpdate() {
+  public void sendNoMoveUpdate() {
     System.out.println("You've run out of chances. No move for you this turn.");
-    return "";
   }
 
   public String outputView(String[][] view) {

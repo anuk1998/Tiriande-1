@@ -15,7 +15,7 @@ public interface IUser {
    */
   String getUserName();
 
-  String sendMoveUpdate(String moveStatus, Position destination, ICharacter c);
+  void sendMoveUpdate(String moveStatus, Position destination, ICharacter c);
 
   /**
    * Broadcasts to the character that it's their turn and then renders their specific level view
@@ -23,7 +23,7 @@ public interface IUser {
    *
    * @param character the current character whose turn it is
    */
-   String broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive);
+   void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive);
 
   /**
    * Renders the view for the given character before they request a move.
@@ -46,8 +46,10 @@ public interface IUser {
    * Renders a view of the level to the user
    * @param currentLevel
    */
-  public String renderObserverView(Level currentLevel);
+  void renderObserverView(Level currentLevel);
 
 
-  String sendNoMoveUpdate();
+  void sendNoMoveUpdate();
+
+  String[][] makeView(Level currentLevel, ICharacter character);
 }

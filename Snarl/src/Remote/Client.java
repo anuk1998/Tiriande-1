@@ -12,6 +12,8 @@ import org.json.JSONObject;
 public class Client {
   String host = "localhost";
   int port = 45678;
+  boolean moveTime = false;
+  boolean invalid = false;
 
   public void main(String[] args) {
     ArrayList<String> argsList = new ArrayList<>(Arrays.asList(args));
@@ -43,12 +45,22 @@ public class Client {
         boolean isResponseNeeded = parseServerMessage(serverMessage);
         if (isResponseNeeded) {
           String reply = sc.nextLine();
+          if (moveTime || invalid) {
+            reply = parsePlayerMoveMessageAsJSON(reply);
+            while (reply.equals("invalid")) {
+              reply = sc.nextLine();
+              reply = parsePlayerMoveMessageAsJSON(reply);
+            }
+            moveTime = false;
+            invalid = false;
+          }
           output.println(reply);
           output.flush();
         }
       }
 
-    } catch (Exception var3) {
+    }
+    catch (Exception var3) {
       var3.printStackTrace();
     }
   }
@@ -59,7 +71,8 @@ public class Client {
         System.out.println("Please enter your name for the game:");
         return true;
       case "move":
-        System.out.println("Please supply a position for your next move. Enter with this exact format: [row, column].");
+        System.out.println("Please supply a position for your next move. Enter with this exact format: [row, column]. If you don't want to move your position, type 'null'.");
+        moveTime = true;
         return true;
       case "OK":
         System.out.println("The requested move was valid.");
@@ -75,6 +88,7 @@ public class Client {
         return false;
       case "Invalid":
         System.out.println("Sorry, that is an invalid move. Try another one.");
+        invalid = true;
         return true;
     }
     return parsedServerMessageAsJSON(serverMessage);
@@ -101,12 +115,12 @@ public class Client {
           JSONArray objects = serverMessageAsJSON.getJSONArray("objects");
           JSONArray actors = serverMessageAsJSON.getJSONArray("actors");
           JSONArray position = serverMessageAsJSON.getJSONArray("point");
-          String message = serverMessageAsJSON.getString("point");
+          String message = serverMessageAsJSON.getString("message");
           System.out.println("Update on the game:");
-          System.out.println("Layout: " + layout);
-          System.out.println("Objects: " + objects);
-          System.out.println("Actors: " + actors);
-          System.out.println("Your Position: " + position);
+          System.out.println("Your view layout: " + layout.toString());
+          System.out.println("Objects near you: " + objects.toString());
+          System.out.println("Actors near you: " + actors.toString());
+          System.out.println("Your Position: " + position.toString());
           System.out.println("Message: " + message);
           break;
         case "end-level":
@@ -131,5 +145,28 @@ public class Client {
       jsonException.printStackTrace();
     }
     return false;
+  }
+
+  private String parsePlayerMoveMessageAsJSON(String playerMove) throws JSONException {
+    JSONObject playerMoveJSON = new JSONObject();
+    playerMoveJSON.put("type", "move");
+    if (playerMove.equals("null")) {
+      try {
+        playerMoveJSON.put("to", "null");
+      } catch (JSONException e) {
+        e.printStackTrace();
+      }
+    }
+    else {
+      try {
+        JSONArray move = new JSONArray(playerMove);
+        playerMoveJSON.put("to", move);
+      }
+      catch (JSONException e) {
+        System.out.print("Sorry, that was an invalid format. Please enter your move in this format: [x, y]");
+        return "invalid";
+      }
+    }
+    return playerMoveJSON.toString();
   }
 }
