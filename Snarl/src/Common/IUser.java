@@ -2,6 +2,7 @@ package Common;
 
 import java.util.Scanner;
 
+import Game.GameStatus;
 import Game.ICharacter;
 import Game.Position;
 import Game.Level;
@@ -14,6 +15,7 @@ public interface IUser {
    */
   String getUserName();
 
+  void sendMoveUpdate(String moveStatus, Position destination, ICharacter c);
 
   /**
    * Broadcasts to the character that it's their turn and then renders their specific level view
@@ -38,7 +40,16 @@ public interface IUser {
    *
    * @return the resulting Position in level where the user would like to move to
    */
-   Position getUserMove(Scanner scanner, ICharacter character);
+   Position getUserMove(ICharacter character);
+
+  /**
+   * Renders a view of the level to the user
+   * @param currentLevel
+   */
+  void renderObserverView(Level currentLevel);
 
 
+  void sendNoMoveUpdate();
+
+  String[][] makeView(Level currentLevel, ICharacter character);
 }

@@ -9,9 +9,10 @@ import java.util.Map;
 import java.util.Random;
 import Common.IUser;
 import Common.IObserver;
-import Observer.LocalObserver;
 import User.LocalUser;
-import java.util.Scanner;
+import User.RemoteUser;
+import Remote.ClientThread;
+
 import java.lang.*;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,6 @@ public class GameManager {
      * This method kick-starts the Snarl game.
      */
     public void runGame() {
-        Scanner sc = new Scanner(System.in);
         boolean gameStillGoing = true;
         int index = 0;
 
@@ -58,23 +58,10 @@ public class GameManager {
             if (character instanceof IAdversary) {
                 gameStillGoing = adversarysMove(character, currentUser);
             }
-
             // Ask the player for a move and validate/execute that move
             else {
-                // move this broadcast line in a later milestone -- here for now because this Milestone doesn't broadcast to adversaries
-                currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
-                if (playerIsActive) {
-                    if (observerView) {
-                        System.out.println("\nThis is the Observer View of the Level:");
-                        System.out.println(this.currentLevel.renderLevel());
-                    }
-                    Position requestedMove = currentUser.getUserMove(sc, character);
-                    GameStatus moveStatus = callRuleChecker(character, requestedMove);
-                    gameStillGoing = parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character);
-                    sendUpdatesToObservers(character, requestedMove, moveStatus, this.currentLevel, exitedPlayers, expelledPlayers);
-                }
+                gameStillGoing = playersMove(character, currentUser, playerIsActive);
             }
-
             // check if we're on the last character in the list and if so, loop back to the beginning
             if (index == allCharacters.size() - 1) {
                 index = 0;
@@ -82,28 +69,26 @@ public class GameManager {
                 index++;
             }
         }
-
-        System.out.println("\nGame has ended.\n");
-
-        //rank player exited numbers
-        System.out.println("Players Ranked By Number Of Times Successfully Exited in the Game:");
-        printPlayerExitedRankings();
-
-        //rank players based on keys found
-        System.out.println("\nPlayers Ranked By Number Of Keys Found in the Game:");
-        printPlayerKeyFoundRankings();
-
-        sc.close();
-        // add other game terminus actions once networking elements/client/scanner/etc elements are known
     }
 
+    /**
+     * Returns a boolean indicating if the game is still going or not.
+     * @param moveStatus the status of the actor's most recent move
+     * @return a boolean true if the game is still going, false otherwise
+     */
+    public boolean checkGameStatus(GameStatus moveStatus) {
+        return !moveStatus.toString().equals("GAME_WON") && !(moveStatus.toString().equals("GAME_LOST"));
+    }
+
+    /**
+     * Selects the given adversary's next move based on player locations.
+     */
     private boolean adversarysMove(ICharacter character, IUser currentUser) {
         Position chosenMove = chooseAdversaryMove(currentUser, (IAdversary) character);
         GameStatus moveStatus = callRuleChecker(character, chosenMove);
-
         int invalidCount = 0;
         // generate a new move until we get one that's not invalid
-        while (moveStatus.name().equals("INVALID")) {
+        while (moveStatus.toString().equals("INVALID")) {
             invalidCount++;
             // if there are no valid moves in any cardinal direction, keep the adversary stationary
             if (invalidCount == 4) {
@@ -111,34 +96,64 @@ public class GameManager {
                 chosenMove = character.getCharacterPosition();
                 break;
             }
-            chosenMove = chooseAdversaryMove(currentUser, (IAdversary) character);
-            moveStatus = callRuleChecker(character, chosenMove);
+            else {
+                chosenMove = chooseAdversaryMove(currentUser, (IAdversary) character);
+                moveStatus = callRuleChecker(character, chosenMove);
+            }
         }
-        return parseMoveStatusAndDoAction(moveStatus.name(), chosenMove, character);
+        parseMoveStatusAndDoAction(moveStatus.name(), chosenMove, character, currentUser);
+        return checkGameStatus(moveStatus);
     }
 
+    /**
+     * Requests a move from the given player and assesses its validity then executes it.
+     */
+    private boolean playersMove(ICharacter character, IUser currentUser, boolean playerIsActive) {
+        if (playerIsActive) {
+            if (observerView) {
+                System.out.println("In the observerView if statement");
+                currentUser.renderObserverView(this.currentLevel);
+            }
+            Position requestedMove = currentUser.getUserMove(character);
+            GameStatus moveStatus = callRuleChecker(character, requestedMove);
+            int invalidCount = 0;
+            // Continues to ask for a move until the requested move from player is valid
+            while (moveStatus.toString().equals("INVALID")) {
+                invalidCount++;
+                if (invalidCount == 3) {
+                    currentUser.sendNoMoveUpdate();
+                    moveStatus = GameStatus.VALID;
+                    requestedMove = character.getCharacterPosition();
+                    break;
+                }
+                currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
+                requestedMove = currentUser.getUserMove(character);
+                moveStatus = callRuleChecker(character, requestedMove);
+            }
+            currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
+            boolean gameStillGoing = checkGameStatus(moveStatus);
+            parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character, currentUser);
+            sendUpdateToUsers(moveStatus.name(), character);
+            return gameStillGoing;
+        }
+        return true;
+    }
 
     /**
      * Places all the players on new random positions in the new level.
      * Generate new adversaries and new positions for them.
      */
     private void resetForNewLevel() {
-        System.out.println("----------------------------");
-        System.out.println("Starting the next level...\n\n");
         // reset data structures for new level
         this.allCharacters = new LinkedHashSet<>();
         this.exitedPlayers = new ArrayList<>();
         this.expelledPlayers = new ArrayList<>();
-        this.users = new ArrayList<>();
 
         // add all players in the game to the new level
         for (Player player : this.allPlayers.values()) {
             Position randomPos = this.currentLevel.pickRandomPositionForCharacterInLevel();
             currentLevel.addCharacter(player, randomPos);
             allCharacters.add(player);
-
-            IUser user = new LocalUser(player.getName());
-            addUser(user);
         }
 
         int levelNum = this.allLevels.indexOf(this.currentLevel);
@@ -182,7 +197,7 @@ public class GameManager {
      * @return a chosen position for the zombie to move to
      */
     public Position chooseZombieMove(IAdversary character, ArrayList<Position> playerPositions) {
-        Position chosenMove = null;
+        Position chosenMove;
         Zombie zom = (Zombie) character;
         Position zomPos = zom.getCharacterPosition();
         Room zombiesRoom = zom.getZombiesRoom();
@@ -196,7 +211,6 @@ public class GameManager {
                 }
             }
         }
-
         // Based on how many players are in the room with the Zombie, choose which player to attack
         // and then subsequently which cardinal move is closest to that chosen player
         ArrayList<Position> cardinalPositions = this.currentLevel.getAllAdjacentTiles(zomPos);
@@ -230,7 +244,7 @@ public class GameManager {
 
     /**
      * Determines which position in a given list that is closest to the given source position.
-     * Helper for chooseGhostMove and chooseZombieMove
+     * Helper for chooseGhostMove and chooseZombieMove.
      *
      * @param positionsToCompare list of positions
      * @param source             position to compare distance to
@@ -295,96 +309,108 @@ public class GameManager {
     }
 
     /**
-     * Parses the given GameStatus type and applies specific actions based on which type of move it is.
-     *
-     * @param moveStatus:  the returned enum GameStatus that signifies what type the requested move is
-     * @param destination: the requested destination from the user
-     * @param c:           the current character whose move it is
-     * @return a boolean indicating if the game is still in play
+     * Parses the given GameStatus type and applies specific actions to the level/game based on which type of move it is.
      */
-    public boolean parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c) {
+    public void parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c, IUser currentUser) {
         switch (moveStatus) {
             case "VALID":
                 currentLevel.moveCharacter(c, destination);
-                return true;
-            case "INVALID":
-                System.out.println("Requested move to " + destination.toString() + " was invalid. You miss your turn.");
-                return true;
+                break;
             case "KEY_FOUND":
                 currentLevel.moveCharacter(c, destination);
                 currentLevel.openExitTile();
-                System.out.println("Player " + c.getName() + " found the key.");
                 ((Player) c).increaseNumOfKeysFound();
-                return true;
+                break;
             case "PLAYER_SELF_ELIMINATES":
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
                 expelledPlayers.add((Player) c);
-                return true;
+                break;
             case "PLAYER_EXPELLED":
                 Player p = currentLevel.playerAtGivenPosition(destination);
                 currentLevel.expelPlayer(p);
                 expelledPlayers.add(p);
                 currentLevel.moveCharacter(c, destination);
-                System.out.println("Player " + p.getName() + " was expelled.");
-                return true;
+                break;
             case "PLAYER_EXITED":
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.playerPassedThroughExit(c);
                 exitedPlayers.add((Player) c);
-                System.out.println("Player " + c.getName() + " exited.");
-                return true;
+                break;
             case "GHOST_TRANSPORTS":
-                currentLevel.moveCharacter(c, currentLevel.pickRandomPositionForCharacterInLevel());
-                return true;
+                Position newGhostPos = currentLevel.pickRandomPositionForCharacterInLevel();
+                currentLevel.moveCharacter(c, newGhostPos);
+                break;
             case "LEVEL_WON":
-                Player p2 = currentLevel.playerAtGivenPosition(destination);
-                currentLevel.restoreCharacterTile(c);
-                currentLevel.playerPassedThroughExit(c);
-                if (c instanceof Player) {
-                    exitedPlayers.add((Player) c);
-                } else {
-                    expelledPlayers.add(p2);
-                }
-                resurrectPlayers();
-                System.out.println("Congrats!! Players have won the level!");
-                this.currentLevel = this.allLevels.get(getNewLevel());
-                isNewLevel = true;
-                return true;
+                levelWon(destination, c);
+                break;
             case "GAME_WON":
-                Player p3 = currentLevel.playerAtGivenPosition(destination);
-                currentLevel.restoreCharacterTile(c);
-                currentLevel.playerPassedThroughExit(c);
-                if (c instanceof Player) {
-                    exitedPlayers.add((Player) c);
-                } else {
-                    expelledPlayers.add(p3);
-                }
-                System.out.print("Congrats! Players have won the game!");
-
-                return false;
+                gameWon(destination, c);
+                break;
             case "GAME_LOST":
-                Player p4 = currentLevel.playerAtGivenPosition(destination);
-                currentLevel.restoreCharacterTile(c);
-                if (c instanceof Player) {
-                    currentLevel.expelPlayer((Player) c);
-                    expelledPlayers.add((Player) c);
-                } else {
-                    currentLevel.expelPlayer(p4);
-                    expelledPlayers.add(p4);
-                }
-                System.out.println("Sorry :( Players have lost the game!");
-
-
-                return false;
+                gameLost(destination, c);
+                break;
             default:
-                //System.out.print("Default case.Should never get here.");
         }
-        // will never get here
-        return false;
+        currentUser.sendMoveUpdate(moveStatus, destination, c);
     }
 
-    public void printPlayerExitedRankings() {
+    /**
+     * Actions to conduct when the game has been won by the players.
+     */
+    private void gameWon(Position destination, ICharacter c) {
+        Player p3 = currentLevel.playerAtGivenPosition(destination);
+        currentLevel.restoreCharacterTile(c);
+        currentLevel.playerPassedThroughExit(c);
+        addToListOfExitedOrExpelled(p3, c);
+    }
+
+    /**
+     * Actions to conduct when the game has been lost by the players.
+     */
+    private void gameLost(Position destination, ICharacter c) {
+        Player p4 = currentLevel.playerAtGivenPosition(destination);
+        currentLevel.restoreCharacterTile(c);
+        if (c instanceof Player) {
+            currentLevel.expelPlayer((Player) c);
+            expelledPlayers.add((Player) c);
+        } else {
+            currentLevel.expelPlayer(p4);
+            expelledPlayers.add(p4);
+        }
+    }
+
+    /**
+     * Actions to conduct when the level has been won.
+     */
+    private void levelWon(Position destination, ICharacter c) {
+        Player p2 = currentLevel.playerAtGivenPosition(destination);
+        currentLevel.restoreCharacterTile(c);
+        currentLevel.playerPassedThroughExit(c);
+        addToListOfExitedOrExpelled(p2, c);
+        resurrectPlayers();
+        this.currentLevel = this.allLevels.get(getNewLevel());
+        this.isNewLevel = true;
+    }
+
+    /**
+     * Adds the given character to the list of exited players if they are a player and they left the game,
+     * or to the list of expelled players if the character is an adversary.
+     */
+    private void addToListOfExitedOrExpelled(Player p,ICharacter c) {
+        if (c instanceof Player) {
+            exitedPlayers.add((Player) c);
+        } else {
+            expelledPlayers.add(p);
+        }
+    }
+
+    /**
+     * Creates a list of the players' rankings during the Game, based on the number of times they exited.
+     *
+     * @return a list-as-string
+     */
+    public String printPlayerExitedRankings() {
         HashMap<String, Integer> playerExitedNumbers = new HashMap<>();
 
         for (Player p : this.allPlayers.values()) {
@@ -395,10 +421,16 @@ public class GameManager {
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-        System.out.println(playerExitedNumbersSorted.toString());
+        return playerExitedNumbersSorted.toString();
     }
 
-    private void printPlayerKeyFoundRankings() {
+    /**
+     * Creates a list of the players' rankings during the Game, based on the number of times they
+     * collected a key.
+     *
+     * @return a list-as-string
+     */
+    public String printPlayerKeyFoundRankings() {
         HashMap<String, Integer> playerKeyNumbers = new HashMap<>();
 
         for (Player p : this.allPlayers.values()) {
@@ -409,7 +441,7 @@ public class GameManager {
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-        System.out.println(playerKeyNumbersSorted.toString());
+        return playerKeyNumbersSorted.toString();
     }
 
     /**
@@ -424,8 +456,6 @@ public class GameManager {
     /**
      * Resurrects all expelled players once the level has been won by players, so that they can all
      * move onto the next level.
-     *
-     * CURRENTLY NOT USED.
      */
     private void resurrectPlayers() {
         for (Player player : this.allPlayers.values()) {
@@ -449,37 +479,16 @@ public class GameManager {
     }
 
     /**
-     * Registers a certain number of players based on the given number.
-     *
-     * @param numOfPlayers number of players to register
-     * @param scanner instance to read in from STDin
-     */
-    public void registerPlayers(int numOfPlayers, Scanner scanner) {
-        while (numOfPlayers > 0) {
-            System.out.println("Please enter a username for your player:");
-            String playerName = scanner.nextLine();
-            registerPlayer(playerName);
-            numOfPlayers--;
-        }
-        System.out.println("-----------------------------");
-        System.out.println("All players have been registered. Let's start the game.");
-        System.out.println();
-    }
-
-    /**
      * Registers a player with a given unique name and add them to the level.
-     * Not called anywhere for Milestone 5 because we don't know user entry point yet.
      *
      * @param name the name of player to register
      */
-    public void registerPlayer(String name) {
+    public Registration registerPlayer(String name, Registration playerType) {
         if (allPlayers.containsKey(name)) {
-            System.out.println("Cannot register Player with name `" + name + "`. Name already has been taken. Please pick again.");
+            return Registration.DUPLICATE_NAME;
         }
         else if (allPlayers.size() < 4) {
-            IUser user = new LocalUser(name);
-            addUser(user);
-
+            addUser(name, playerType);
             Player newPlayer = new Player(name);
             assignPlayerAvatar(newPlayer);
             allPlayers.put(name, newPlayer);
@@ -487,18 +496,26 @@ public class GameManager {
 
             Position randomPos = currentLevel.pickRandomPositionForCharacterInLevel();
             currentLevel.addCharacter(newPlayer, randomPos);
-            System.out.println("Player " + name + " has been registered at position: " + randomPos.toString() + " with avatar: " + newPlayer.getAvatar());
+            return Registration.REGISTERED;
         }
         else {
-            System.out.println("Cannot register player " + name + ". Game has reached maximum participant count. Sorry!");
-            registerObservers();
+            return Registration.AT_CAPACITY;
         }
     }
 
+    private void addUser(String name, Registration playerType) {
+        IUser user;
+        if (playerType.equals(Registration.LOCAL)) {
+            user = new LocalUser(name);
+        }
+        else {
+            user = new RemoteUser(name);
+        }
+        this.users.add(user);
+    }
 
     /**
      * Registers an adversary with a given unique name and add them to the level.
-     * Not called anywhere for Milestone 5 because we don't know user entry point yet.
      *
      * @param name the name of adversary to register
      * @param type which type of adversary it is
@@ -508,46 +525,20 @@ public class GameManager {
         if (type.equalsIgnoreCase("zombie")) {
             adversary = new Zombie(name);
             LocalUser user = new LocalUser(name);
-            addUser(user);
-            /** Commented for now because we don't want players to see the entire level via STDIN */
-            //user.renderLevelForAdversary(this.currentLevel);
+            this.users.add(user);
         }
         else if (type.equalsIgnoreCase("ghost")) {
             adversary = new Ghost(name);
             LocalUser user = new LocalUser(name);
-            addUser(user);
-            /** Commented for now because we don't want players to see the entire level via STDIN */
-            //user.renderLevelForAdversary(this.currentLevel);
+            this.users.add(user);
         }
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
-        //System.out.println("New adversary " + name + " of type " + type + " has been registered.")
-    }
-
-    private void registerObservers() {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("Would you like to register as an observer? Enter 'Y' for yes or 'N' for no.");
-        String wantsToMakeObserver = sc.nextLine();
-        while(!(wantsToMakeObserver.equalsIgnoreCase("Y") || wantsToMakeObserver.equalsIgnoreCase("N")) ) {
-            System.out.println("Sorry, invalid response. Please enter 'Y' for yes or 'N' for no");
-            wantsToMakeObserver = sc.nextLine();
-        }
-
-        if(wantsToMakeObserver.equalsIgnoreCase("N")) {
-            System.out.println("Okay, you will not be joining as an observer.");
-        }
-        else if(wantsToMakeObserver.equalsIgnoreCase("Y")) {
-            System.out.println("Please enter a username for your observer");
-            String observerName = sc.nextLine();
-            IObserver observer = new LocalObserver(observerName);
-            addObserver(observer);
-            System.out.println(observerName + " has been added to the game as an Observer.");
-        }
     }
 
     /**
-     * Returns the LocalUser object based on the current character's name.
+     * Returns the IUser object based on the current character's name.
      *
      * @param name the name of the character whose turn it is
      * @return the IUser object for the corresponding character
@@ -562,33 +553,34 @@ public class GameManager {
         return currentUser;
     }
 
-    /**
-     * Adds an observer to the list of observers
-     *
-     * @param observer the new observer to be added
-     */
-    public void addObserver(IObserver observer) {
-        this.observers.add(observer);
+    public void sendInitialUpdateToUsers() {
+        for (IUser user : users) {
+            if (user instanceof RemoteUser) {
+                RemoteUser ru = (RemoteUser) user;
+                ICharacter usersCharacter = getPlayerFromName(user.getUserName());
+                ru.sendInitialUpdate(usersCharacter);
+            }
+        }
+    }
+
+    private void sendUpdateToUsers(String moveStatus, ICharacter character) {
+        for (IUser user : users) {
+            if (user instanceof RemoteUser) {
+                RemoteUser ru = (RemoteUser) user;
+                ICharacter usersCharacter = getPlayerFromName(user.getUserName());
+                ru.sendPlayerUpdateMessage(moveStatus, character, usersCharacter);
+            }
+        }
+    }
+
+    private ICharacter getPlayerFromName(String userName) {
+        Player p = allPlayers.get(userName);
+        return p;
     }
 
     /**
-     * Adds a user to the list of users
-     *
-     * @param user the new user to be added
-     */
-    public void addUser(IUser user) {
-        this.users.add(user);
-    }
-
-    /**
-     * Sends a series of updates about the game state to all observers.
-     *
-     * @param character the current character whose move it is
-     * @param requestedMove the character's requested destination
-     * @param moveStatus what type of move the character requested
-     * @param currentLevel the level being played
-     * @param exitedPlayers a list of players who have successfully exited the game
-     * @param expelledPlayers a list of players who have been expelled from the game
+     * Sends a series of updates about the game state to all observers, including the character whose turn it is,
+     * where they requested to move, the status of that move, and lists representing other information about the level.
      */
     private void sendUpdatesToObservers(ICharacter character, Position requestedMove, GameStatus moveStatus,
                                         Level currentLevel, ArrayList<Player> exitedPlayers, ArrayList<Player> expelledPlayers) {
@@ -605,8 +597,6 @@ public class GameManager {
     public void setObserverView(boolean isObserverView) {
         this.observerView = isObserverView;
     }
-
-
 
     /**
      * Returns a Player object based on a given avatar.
@@ -637,7 +627,6 @@ public class GameManager {
         return this.allLevels;
     }
 
-
     /**
      * Returns the list of allPlayers
      */
@@ -650,6 +639,18 @@ public class GameManager {
      */
     public ArrayList<Player> getExitedPlayers() {
         return this.exitedPlayers;
+    }
+
+    /**
+     * Returns the current level of the game
+     */
+    public Level getCurrentLevel() {
+        return this.currentLevel;
+    }
+
+    public void passConnectionToRemoteUser(String name, ClientThread conn) {
+        RemoteUser user = (RemoteUser) getUserByName(name);
+        user.setRemoteUserConnection(conn);
     }
 
 
