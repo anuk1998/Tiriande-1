@@ -9,6 +9,7 @@ import Game.Level;
 import Game.Position;
 import Game.IAdversary;
 import Game.Player;
+import Game.*;
 
 public class LocalUser implements IUser {
   String userName;
@@ -23,6 +24,35 @@ public class LocalUser implements IUser {
     return this.userName;
   }
 
+  @Override
+  public void sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
+   switch(moveStatus) {
+     case "INVALID":
+       System.out.println("Sorry, that is an invalid move. Please enter a different one.");
+       break;
+     case "KEY_FOUND":
+       System.out.println("Player " + c.getName() + " found the key.");
+       break;
+     case "PLAYER_EXPELLED":
+     case "PLAYER_SELF_ELIMINATES":
+       System.out.println("Player " + c.getName() + " was expelled.");
+       break;
+     case "PLAYER_EXITED":
+       System.out.println("Player " + c.getName() + " exited.");
+       break;
+     case "LEVEL_WON":
+       System.out.println("Congrats!! Players have won the level!");
+       break;
+     case "GAME_WON":
+       System.out.print("Congrats! Players have won the game!");
+       break;
+     case "GAME_LOST":
+       System.out.println("Sorry :( Players have lost the game!");
+       break;
+     case "DEFAULT":
+       System.out.println("Default case: will never get here");
+   }
+  }
 
   @Override
   public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
@@ -97,8 +127,15 @@ public class LocalUser implements IUser {
     return outputView(view);
   }
 
-  public void renderLevelForAdversary(Level currentLevel) {
-    System.out.println("Here is an image of the current level: " + currentLevel.renderLevel());
+  @Override
+  public void renderObserverView(Level currentLevel) {
+    System.out.println("Here is the observer view of the current level:");
+    System.out.println(currentLevel.renderLevel());
+  }
+
+  @Override
+  public void sendNoMoveUpdate() {
+    System.out.println("You've run out of chances. No move for you this turn.");
   }
 
   public String outputView(String[][] view) {
@@ -116,7 +153,8 @@ public class LocalUser implements IUser {
   }
 
   @Override
-  public Position getUserMove(Scanner scanner, ICharacter character) {
+  public Position getUserMove(ICharacter character) {
+    Scanner scanner = new Scanner(System.in);
     int rowPos = 0;
     int colPos = 0;
 
