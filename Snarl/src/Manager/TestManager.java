@@ -339,7 +339,9 @@ public class TestManager {
    * @return a JSONArray representing the actors in view
    */
   private static JSONArray detectActorsInView(String[][] layout, Level level, ICharacter player, GameManager manager) throws JSONException {
+    System.out.println(player);
     Position playerPos = player.getCharacterPosition();
+    System.out.println(playerPos);
     Position playerPosInLayout = getPlayerPosInLayout(layout, player);
     int rowDiff = playerPos.getRow() - playerPosInLayout.getRow();
     int colDiff = playerPos.getCol() - playerPosInLayout.getCol();

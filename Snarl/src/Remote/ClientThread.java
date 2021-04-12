@@ -11,10 +11,10 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import Game.GameManager;
+import Game.ICharacter;
 import Game.MessageType;
 import Game.Position;
 import Game.Registration;
-import Game.*;
 import User.RemoteUser;
 import Manager.TestManager;
 
@@ -53,14 +53,17 @@ public class ClientThread extends Thread {
   private JSONObject serverWelcomeMessage() throws JSONException {
     JSONObject welcome = new JSONObject();
     welcome.put("type", "welcome");
-    welcome.put("info", "Version: 1. Server Group Owner: Tiriande. Players get maximum 3 chances to make a valid move, otherwise they lose their turn.");
+    welcome.put("info", "Version: 1\nServer Group Owner: Tiriande\nTo Knows:\n- Players get maximum 3 chances to make a valid move, otherwise they lose their turn\n");
     return welcome;
   }
 
   public void sendToClient(String message, MessageType type) {
-    if (type.equals(MessageType.OBSERVER_VIEW) ||
-            type.equals(MessageType.NO_MOVE) ||
+    if (type.equals(MessageType.NO_MOVE) ||
             type.equals(MessageType.RESULT)) {
+      output.println(message);
+    }
+    else if (type.equals(MessageType.OBSERVER_VIEW)) {
+      output.println("observe");
       output.println(message);
     }
     else {
@@ -83,6 +86,18 @@ public class ClientThread extends Thread {
       e.getStackTrace();
     }
     return startLevel;
+  }
+
+  public void sendInitialUpdateToClient(ICharacter usersCharacter, RemoteUser remoteUser) {
+    try {
+      TestManager tm = new TestManager();
+      JSONObject playerUpdate = tm.formPlayerUpdate(this.manager, this.manager.getCurrentLevel(), usersCharacter, remoteUser);
+      playerUpdate.put("message", JSONObject.NULL);
+      output.println(playerUpdate.toString());
+    }
+    catch (JSONException e) {
+      e.printStackTrace();
+    }
   }
 
   public void sendPlayerUpdateMessage(String moveStatus, ICharacter movedCharacter, ICharacter thisCharacter, RemoteUser user) {
@@ -115,4 +130,8 @@ public class ClientThread extends Thread {
     return movePos;
   }
 
+  public void close() throws IOException {
+    this.input.close();
+    this.output.close();
+  }
 }

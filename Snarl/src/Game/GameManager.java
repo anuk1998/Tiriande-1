@@ -77,7 +77,7 @@ public class GameManager {
      * @return a boolean true if the game is still going, false otherwise
      */
     public boolean checkGameStatus(GameStatus moveStatus) {
-        return moveStatus.toString().equals("GAME_WON") || (moveStatus.toString().equals("GAME_LOST"));
+        return !moveStatus.toString().equals("GAME_WON") && !(moveStatus.toString().equals("GAME_LOST"));
     }
 
     /**
@@ -111,6 +111,7 @@ public class GameManager {
     private boolean playersMove(ICharacter character, IUser currentUser, boolean playerIsActive) {
         if (playerIsActive) {
             if (observerView) {
+                System.out.println("In the observerView if statement");
                 currentUser.renderObserverView(this.currentLevel);
             }
             Position requestedMove = currentUser.getUserMove(character);
@@ -550,6 +551,16 @@ public class GameManager {
             }
         }
         return currentUser;
+    }
+
+    public void sendInitialUpdateToUsers() {
+        for (IUser user : users) {
+            if (user instanceof RemoteUser) {
+                RemoteUser ru = (RemoteUser) user;
+                ICharacter usersCharacter = getPlayerFromName(user.getUserName());
+                ru.sendInitialUpdate(usersCharacter);
+            }
+        }
     }
 
     private void sendUpdateToUsers(String moveStatus, ICharacter character) {

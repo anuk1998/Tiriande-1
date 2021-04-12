@@ -32,23 +32,33 @@ public class RemoteUser implements IUser {
 
   @Override
   public void sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
-    clientConnection.sendToClient(moveStatus, MessageType.RESULT);
-    switch(moveStatus) {
-      case "INVALID":
-        clientConnection.sendToClient("Invalid", MessageType.RESULT);
-      case "KEY_FOUND":
-        clientConnection.sendToClient("Key", MessageType.RESULT);
-      case "PLAYER_EXPELLED":
-      case "PLAYER_SELF_ELIMINATES":
-        clientConnection.sendToClient("Eject", MessageType.RESULT);
-      case "PLAYER_EXITED":
-        clientConnection.sendToClient("Exit", MessageType.RESULT);
+    if (clientConnection != null) {
+      switch (moveStatus) {
+        case "VALID":
+          clientConnection.sendToClient("OK", MessageType.RESULT);
+          break;
+        case "INVALID":
+          clientConnection.sendToClient("Invalid", MessageType.RESULT);
+          break;
+        case "KEY_FOUND":
+          clientConnection.sendToClient("Key", MessageType.RESULT);
+          break;
+        case "PLAYER_EXPELLED":
+        case "PLAYER_SELF_ELIMINATES":
+          clientConnection.sendToClient("Eject", MessageType.RESULT);
+          break;
+        case "PLAYER_EXITED":
+          clientConnection.sendToClient("Exit", MessageType.RESULT);
+          break;
+      }
     }
   }
 
   @Override
   public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
-    clientConnection.sendToClient("update", null);
+    if (clientConnection != null) {
+      clientConnection.sendToClient("update", null);
+    }
   }
 
   public ArrayList<Position> getAllAdversaryLocations(Level currentLevel) {
@@ -60,7 +70,9 @@ public class RemoteUser implements IUser {
   }
 
   public void sendPlayerUpdateMessage(String moveStatus, ICharacter movedCharacter, ICharacter thisCharacter) {
-    clientConnection.sendPlayerUpdateMessage(moveStatus, movedCharacter, thisCharacter, this);
+    if (clientConnection != null) {
+      clientConnection.sendPlayerUpdateMessage(moveStatus, movedCharacter, thisCharacter, this);
+    }
   }
 
   @Override
@@ -106,12 +118,17 @@ public class RemoteUser implements IUser {
 
   @Override
   public void renderObserverView(Level currentLevel) {
-    clientConnection.sendToClient("Here is the observer view of the current level:\n" + currentLevel.renderLevel(), MessageType.OBSERVER_VIEW);
+    System.out.println("In render observer view");
+    if (clientConnection != null) {
+      clientConnection.sendToClient("Here is the level observer view:" + currentLevel.renderLevel(), MessageType.OBSERVER_VIEW);
+    }
   }
 
   @Override
   public void sendNoMoveUpdate() {
-    clientConnection.sendToClient("You've run out of chances. No move for you this turn.", MessageType.NO_MOVE);
+    if (clientConnection != null) {
+      clientConnection.sendToClient("You've run out of chances. No move for you this turn.", MessageType.NO_MOVE);
+    }
   }
 
   public String outputView(String[][] view) {
@@ -144,5 +161,11 @@ public class RemoteUser implements IUser {
     }
 
     return newPos;
+  }
+
+  public void sendInitialUpdate(ICharacter usersCharacter) {
+    if (clientConnection != null) {
+      clientConnection.sendInitialUpdateToClient(usersCharacter, this);
+    }
   }
 }

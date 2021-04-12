@@ -10,19 +10,20 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Client {
-  String host = "localhost";
-  int port = 45678;
+  static BufferedReader input;
+  static String host = "localhost";
+  static int port = 45678;
   boolean moveTime = false;
   boolean invalid = false;
 
-  public void main(String[] args) {
+  public static void main(String[] args) {
     ArrayList<String> argsList = new ArrayList<>(Arrays.asList(args));
     parseCommandLine(argsList);
     Client client = new Client();
     client.run();
   }
 
-  private void parseCommandLine(ArrayList<String> argsList) {
+  private static void parseCommandLine(ArrayList<String> argsList) {
     if (argsList.contains("--address")) {
       int index = argsList.indexOf("--address");
       host = argsList.get(index + 1);
@@ -36,7 +37,7 @@ public class Client {
   public void run() {
     try {
       Socket clientSocket = new Socket(host, port);
-      BufferedReader input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+      input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
       PrintWriter output = new PrintWriter(clientSocket.getOutputStream(), true);
       Scanner sc = new Scanner(System.in);
 
@@ -55,7 +56,7 @@ public class Client {
             invalid = false;
           }
           output.println(reply);
-          output.flush();
+          //output.flush();
         }
       }
 
@@ -65,13 +66,20 @@ public class Client {
     }
   }
 
-  private boolean parseServerMessage(String serverMessage) {
+  private boolean parseServerMessage(String serverMessage) throws IOException {
     switch (serverMessage) {
       case "name":
         System.out.println("Please enter your name for the game:");
         return true;
+      case "observe":
+        String str;
+        while ((str = input.readLine()) != null && str.length() != 0) {
+          System.out.println(str);
+        }
+        return false;
       case "move":
-        System.out.println("Please supply a position for your next move. Enter with this exact format: [row, column]. If you don't want to move your position, type 'null'.");
+        System.out.println("~~~YOUR MOVE:~~~");
+        System.out.println("Please supply a position for your next move. Enter with this exact format: [<row>, <column>]. If you don't want to move your position, type 'null'.");
         moveTime = true;
         return true;
       case "OK":
@@ -105,23 +113,29 @@ public class Client {
           System.out.println(type + " to Snarl! Here is information about the game: \n" + info);
           break;
         case "start-level":
-          int startLevelNum = Integer.parseInt(serverMessageAsJSON.getString("level"));
+          int startLevelNum = serverMessageAsJSON.getInt("level");
           System.out.println("You are starting on level: " + startLevelNum);
           System.out.println("Here is a list of all the players in the game:");
           System.out.println(serverMessageAsJSON.getJSONArray("players"));
           break;
         case "player-update":
+          System.out.println("~~~GAME UPDATE:~~~");
           JSONArray layout = serverMessageAsJSON.getJSONArray("layout");
           JSONArray objects = serverMessageAsJSON.getJSONArray("objects");
           JSONArray actors = serverMessageAsJSON.getJSONArray("actors");
-          JSONArray position = serverMessageAsJSON.getJSONArray("point");
-          String message = serverMessageAsJSON.getString("message");
-          System.out.println("Update on the game:");
+          JSONArray position = serverMessageAsJSON.getJSONArray("position");
           System.out.println("Your view layout: " + layout.toString());
           System.out.println("Objects near you: " + objects.toString());
           System.out.println("Actors near you: " + actors.toString());
           System.out.println("Your Position: " + position.toString());
-          System.out.println("Message: " + message);
+          if (serverMessageAsJSON.isNull("message")) {
+            System.out.println("Message: " + JSONObject.NULL);
+          }
+          else {
+            String message = serverMessageAsJSON.getString("message");
+            System.out.println("Message: " + message);
+          }
+
           break;
         case "end-level":
           String keyFinder = serverMessageAsJSON.getString("key");
@@ -163,7 +177,7 @@ public class Client {
         playerMoveJSON.put("to", move);
       }
       catch (JSONException e) {
-        System.out.print("Sorry, that was an invalid format. Please enter your move in this format: [x, y]");
+        System.out.print("Sorry, that was an invalid format. Please enter your move in this format: [<row>, <column>]");
         return "invalid";
       }
     }

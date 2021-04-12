@@ -1,0 +1,7 @@
+#!/bin/bash
+javac -cp ../../java-json.jar ../../src/Remote/Client.java
+jar cfm client.jar ../../MANIFESTCLIENT.MF ../../src/Remote/Client.class
+java -jar ./client.jar "$@"
+
+rm ../../src/Remote/Client.class
+rm client.jar

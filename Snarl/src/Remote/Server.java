@@ -22,21 +22,23 @@ import Level.TestLevel;
 import static java.lang.System.exit;
 
 public class Server {
-  String filename = "snarl.levels";
-  int numOfClients = 4;
-  int waitTimeSeconds = 60;
-  boolean observerView = false;
-  String IPAddress = "127.0.0.1";
-  int portNum = 45678;
-  int startLevelNum = 1;
-  GameManager manager;
+  static String filename = "snarl.levels";
+  static int numOfClients = 4;
+  static int waitTimeSeconds = 60;
+  static boolean observerView = false;
+  static String IPAddress = "127.0.0.1";
+  static int portNum = 45678;
+  static int startLevelNum = 1;
+  static GameManager manager;
 
-  public void main(String[] args) throws ParseException, JSONException, IOException {
+  public static void main(String[] args) throws ParseException, JSONException, IOException {
     ArrayList<String> argsList = new ArrayList<>(Arrays.asList(args));
     parseCommandLine(argsList);
 
     try {
+      System.out.println("DEBUG: Reading in JSON file...");
       ArrayList<JSONObject> levels = readFile(filename);
+      System.out.println("DEBUG: Initializing level and game manager...");
       manager = initializeLevelAndRegister(levels, startLevelNum, observerView);
     }
     catch (FileNotFoundException e) {
@@ -48,29 +50,39 @@ public class Server {
 
     try {
       ServerSocket serverSocket = new ServerSocket(portNum);
+      serverSocket.setSoTimeout(waitTimeSeconds * 1000);
+      System.out.println("DEBUG: Set up socket connection");
       while (clientCount < numOfClients) {
         try {
-          serverSocket.setSoTimeout(waitTimeSeconds * 100);
+          System.out.println("DEBUG: Waiting for connections...");
           Socket acceptSocket = serverSocket.accept();
+          System.out.println("DEBUG: Got a connection!");
           ClientThread clientThread = new ClientThread(acceptSocket, manager);
           clients.add(clientThread);
           clientThread.start();
           clientCount++;
         }
         catch (InterruptedIOException e) {
+          System.out.println("DEBUG: Timer ran out. Starting game with who we have.");
           break;
         }
       }
 
       registerAutomatedAdversaries();
+      System.out.println("observerView is: " + observerView);
+      manager.setObserverView(observerView);
 
+      System.out.println("DEBUG: Sending start level message to all clients.");
       for (ClientThread client : clients) {
         client.sendToClient("start-level", MessageType.LEVEL_START);
       }
 
-      /////
-      // loop through all client connections and play the game
-
+      manager.sendInitialUpdateToUsers();
+      manager.runGame();
+      System.out.println("DEBUG: Game's over. Closing.");
+      for (ClientThread c : clients) {
+        c.close();
+      }
       serverSocket.close();
     }
     catch (IOException var3) {
@@ -80,7 +92,7 @@ public class Server {
 
   }
 
-  private ArrayList<JSONObject> readFile(String filename) throws IOException, JSONException {
+  private static ArrayList<JSONObject> readFile(String filename) throws IOException, JSONException {
     ArrayList<JSONObject> jsonLevels = new ArrayList<>();
     BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
 
@@ -104,7 +116,7 @@ public class Server {
     return jsonLevels;
   }
 
-  private GameManager initializeLevelAndRegister(
+  private static GameManager initializeLevelAndRegister(
           ArrayList<JSONObject> levels, int startLevelNum, boolean observerView) throws JSONException {
     ArrayList<Level> listOfLevels = new ArrayList<>();
     for (JSONObject jsonLevel : levels) {
@@ -122,33 +134,19 @@ public class Server {
     return manager;
   }
 
-  private void registerAutomatedAdversaries() {
+  private static void registerAutomatedAdversaries() {
     int numOfZombies = (int) (Math.floor(startLevelNum / 2) + 1);
     int numOfGhosts = (int) Math.floor((startLevelNum - 1) / 2);
 
     for (int z=1; z<numOfZombies+1; z++) {
-      this.manager.registerAdversary("zombie" + z, "zombie");
+      manager.registerAdversary("zombie" + z, "zombie");
     }
     for (int g=1; g<numOfGhosts+1; g++) {
-      this.manager.registerAdversary("ghost" + g, "ghost");
+      manager.registerAdversary("ghost" + g, "ghost");
     }
   }
 
-  private static void runRemoteSnarlGame(GameManager manager) {
-    manager.runGame();
-    System.out.println("\nGame has ended.\n");
-
-    //rank player exited numbers
-    System.out.println("Players Ranked By Number Of Times Successfully Exited in the Game:");
-    System.out.println(manager.printPlayerExitedRankings());
-
-    //rank players based on keys found
-    System.out.println("\nPlayers Ranked By Number Of Keys Found in the Game:");
-    System.out.println(manager.printPlayerKeyFoundRankings());
-
-  }
-
-  private void parseCommandLine(ArrayList<String> argsList) {
+  private static void parseCommandLine(ArrayList<String> argsList) {
     if (argsList.contains("--levels")) {
       int index = argsList.indexOf("--levels");
       filename = argsList.get(index + 1);
@@ -163,7 +161,6 @@ public class Server {
     }
     if (argsList.contains("--observe")) {
       observerView = true;
-      numOfClients = 1;
     }
     if (argsList.contains("--address")) {
       int index = argsList.indexOf("--address");
