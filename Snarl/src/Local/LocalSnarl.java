@@ -120,6 +120,7 @@ public class LocalSnarl {
     runLocalSnarlGame(manager);
 
     scanner.close();
+    
   }
 
   private static void runLocalSnarlGame(GameManager manager) {

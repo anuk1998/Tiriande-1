@@ -144,6 +144,7 @@ public class GameManager {
      * Generate new adversaries and new positions for them.
      */
     private void resetForNewLevel() {
+
         // reset data structures for new level
         this.allCharacters = new LinkedHashSet<>();
         this.exitedPlayers = new ArrayList<>();
