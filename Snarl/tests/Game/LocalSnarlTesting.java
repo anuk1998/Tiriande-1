@@ -41,8 +41,9 @@ public class LocalSnarlTesting
     playerPositions.add(new Position(22,3));
 
     IAdversary zombie = level1.getAdversaryObjectFromName("meanie");
+    AdversaryMovement am = new AdversaryMovement(level1);
     zombie.setCharacterPosition(new Position(5,6));
-    assertEquals(new Position(5,7), gm.chooseZombieMove(zombie, playerPositions));
+    assertEquals(new Position(5,7), am.chooseZombieMove(zombie, playerPositions));
   }
 
   @Test
@@ -58,8 +59,9 @@ public class LocalSnarlTesting
     playerPositions.add(new Position(25,17));
 
     IAdversary ghost = level1.getAdversaryObjectFromName("scary");
+    AdversaryMovement am = new AdversaryMovement(level1);
     ghost.setCharacterPosition(new Position(5,6));
-    assertEquals(new Position(5,5), gm.chooseGhostMove(ghost, playerPositions));
+    assertEquals(new Position(5,5), am.chooseGhostMove(ghost, playerPositions));
   }
 
   @Test

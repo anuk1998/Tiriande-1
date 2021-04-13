@@ -20,22 +20,12 @@ public class Level {
 
   // Enum constants for actor and tile representations
   String VOID = TileType.VOID.toString();
-  String WALL = TileType.WALL.toString();
   String KEY = TileType.KEY.toString();
   String HALLWAY = TileType.HALLWAY.toString();
   String ROOM = TileType.ROOM.toString();
   String UNLOCKED_EXIT = TileType.UNLOCKED_EXIT.toString();
   String LOCKED_EXIT = TileType.LOCKED_EXIT.toString();
   String DOOR = TileType.DOOR.toString();
-
-  String PLAYER_1 = Avatars.PLAYER_1.toString();
-  String PLAYER_2 = Avatars.PLAYER_1.toString();
-  String PLAYER_3 = Avatars.PLAYER_1.toString();
-  String PLAYER_4 = Avatars.PLAYER_1.toString();
-  String GHOST = Avatars.GHOST.toString();
-  String ZOMBIE = Avatars.ZOMBIE.toString();
-  ;
-
 
   public Level() {
     levelNumOfRows = 40;
@@ -120,9 +110,9 @@ public class Level {
     if (character instanceof Player) {
       this.activePlayers.add((Player) character);
     }
-    else if(character instanceof IAdversary) {
+    else if (character instanceof IAdversary) {
       this.adversaries.add((IAdversary) character);
-      if (((IAdversary) character).getType().equals(ZOMBIE)) {
+      if (character instanceof Zombie) {
         Zombie zombie = (Zombie) character;
         zombie.setZombiesRoom(getBelongingRoom(placeLocation));
       }

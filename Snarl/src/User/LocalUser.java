@@ -62,8 +62,10 @@ public class LocalUser implements IUser {
     }
     else {
       if (isPlayerActive) {
+        System.out.println("\n--------------\n");
         System.out.println(character.getName() + ", it is your turn to make a move. You are currently at position " +
-                character.getCharacterPosition().toString() + " in the level. Here is your view:");
+                character.getCharacterPosition().toString() + " in the level. Your avatar is: " + character.getAvatar());
+        System.out.println("Here is your view:\n");
       } else {
         System.out.println("Sorry, " + character.getName() + ", you're no longer active in the game. No move for you! Here's the view of your last position:");
       }

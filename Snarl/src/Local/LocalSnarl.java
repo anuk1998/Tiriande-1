@@ -18,43 +18,36 @@ import Game.Registration;
 import Level.TestLevel;
 
 public class LocalSnarl {
+  private static GameManager manager;
+  private static String filename = "snarl.levels";
+  private static int numOfPlayers = 1;
+  private static int startLevelNum = 1;
+  private static boolean observerView = false;
+
   public static void main(String[] args) throws JSONException, IOException {
     ArrayList<String> argsList = new ArrayList<>(Arrays.asList(args));
-    String filename = "snarl.levels";
-    int numOfPlayers = 1;
-    int startLevelNum = 1;
-    boolean observerView = false;
 
-    if (argsList.contains("--levels")) {
-      int index = argsList.indexOf("--levels");
-      filename = argsList.get(index + 1);
-    }
-    if (argsList.contains("--players")) {
-      int index = argsList.indexOf("--players");
-      numOfPlayers = Integer.parseInt(argsList.get(index + 1));
-    }
-    if (argsList.contains("--start")) {
-      int index = argsList.indexOf("--start");
-      startLevelNum = Integer.parseInt(argsList.get(index + 1));
-    }
-    if (argsList.contains("--observe")) {
-      observerView = true;
-      numOfPlayers = 1;
-    }
+    parseCommandLine(argsList);
 
     try {
       ArrayList<JSONObject> levels = readFile(filename);
-      initializeLevelAndRegister(levels, numOfPlayers, startLevelNum, observerView);
+      initializeLevel(levels, startLevelNum, observerView);
+      registerPlayersToGame(numOfPlayers);
+      runLocalSnarlGame();
     }
     catch (FileNotFoundException e) {
+      System.out.println(filename);
       System.out.println("File not found.");
     }
   }
 
+  /**
+   * Reads in the given file and parses its contents as a series of JSON Objects and places each found
+   * object in a list.
+   */
   private static ArrayList<JSONObject> readFile(String filename) throws IOException, JSONException {
     ArrayList<JSONObject> jsonLevels = new ArrayList<>();
     BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
-
     int numOfLevels = Integer.parseInt(bufferedReader.readLine());
 
     StringBuilder allLevelObjs = new StringBuilder();
@@ -75,7 +68,13 @@ public class LocalSnarl {
     return jsonLevels;
   }
 
-  private static void initializeLevelAndRegister(ArrayList<JSONObject> levels, int numOfPlayers, int startLevelNum, boolean observerView) throws JSONException {
+  /**
+   * Initializes each level in the given list of levels to be represented as our Level type, then passes
+   * that resulting list to GameManager and initializes a GameManager instance for the game.
+   */
+  private static void initializeLevel(
+          ArrayList<JSONObject> levels, int startLevelNum,
+          boolean observerView) throws JSONException {
     ArrayList<Level> listOfLevels = new ArrayList<>();
     for (JSONObject jsonLevel : levels) {
       Level level = new Level();
@@ -87,8 +86,15 @@ public class LocalSnarl {
       System.out.println("Given starting level not valid. Will be starting at Level 1.");
       startLevelNum = 1;
     }
+    manager = new GameManager(listOfLevels, startLevelNum);
+    manager.setObserverView(observerView);
+  }
 
-    GameManager manager = new GameManager(listOfLevels, startLevelNum);
+  /**
+   * Registers the given number of players to the game by asking user for their name then formally
+   * registering them via the game manager.
+   */
+  private static void registerPlayersToGame(int numOfPlayers) {
     Scanner scanner = new Scanner(System.in);
 
     while (numOfPlayers > 0) {
@@ -106,25 +112,17 @@ public class LocalSnarl {
       }
       numOfPlayers--;
     }
-
-    int numOfZombies = (int) (Math.floor(startLevelNum / 2) + 1);
-    int numOfGhosts = (int) Math.floor((startLevelNum - 1) / 2);
-
-    for (int z=1; z<numOfZombies+1; z++) {
-      manager.registerAdversary("zombie" + z, "zombie");
-    }
-    for (int g=1; g<numOfGhosts+1; g++) {
-      manager.registerAdversary("ghost" + g, "ghost");
-    }
-    manager.setObserverView(observerView);
-    runLocalSnarlGame(manager);
-
-    scanner.close();
-    
+    System.out.println("--------------");
+    System.out.println("\nAll players have been registered. Game is starting!");
+    //registers automated adversaries
+    manager.registerAutomatedAdversaries();
   }
 
-  private static void runLocalSnarlGame(GameManager manager) {
-
+  /**
+   * Runs the localSnarl game by calling the runGame() method in game manager
+   * and prints out the player rankings once the game has ended
+   */
+  private static void runLocalSnarlGame() {
     manager.runGame();
     System.out.println("\nGame has ended.\n");
 
@@ -134,9 +132,30 @@ public class LocalSnarl {
 
     //rank players based on keys found
     System.out.println("\nPlayers Ranked By Number Of Keys Found in the Game:");
-    System.out.println(manager.printPlayerExitedOrKeyRankings(manager.getAllPlayers(), "key"));
-
+    String keyRankings = manager.printPlayerRankings(manager.getAllPlayers(), "key");
+    System.out.println(keyRankings);
   }
 
+  /**
+   * Parses the command line inputs and re-assigns variables as fit.
+   */
+  private static void parseCommandLine(ArrayList<String> argsList) {
+    if (argsList.contains("--levels")) {
+      int index = argsList.indexOf("--levels");
+      filename = argsList.get(index + 1);
+    }
+    if (argsList.contains("--players")) {
+      int index = argsList.indexOf("--players");
+      numOfPlayers = Integer.parseInt(argsList.get(index + 1));
+    }
+    if (argsList.contains("--start")) {
+      int index = argsList.indexOf("--start");
+      startLevelNum = Integer.parseInt(argsList.get(index + 1));
+    }
+    if (argsList.contains("--observe")) {
+      observerView = true;
+      numOfPlayers = 1;
+    }
+  }
 
 }

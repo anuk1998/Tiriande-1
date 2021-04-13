@@ -60,6 +60,7 @@ public class GameManager {
             }
             // Ask the player for a move and validate/execute that move
             else {
+                currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
                 gameStillGoing = playersMove(character, currentUser, playerIsActive);
             }
             // check if we're on the last character in the list and if so, loop back to the beginning
@@ -72,13 +73,12 @@ public class GameManager {
     }
 
     /**
-     * Returns a boolean indicating if the game is still going or not.
-     * @param moveStatus the status of the actor's most recent move
-     * @return a boolean true if the game is still going, false otherwise
+     *
+     *
+     * --------------------------PLAYING A LEVEL METHODS-----------------------------
+     *
+     *
      */
-    public boolean checkGameStatus(GameStatus moveStatus) {
-        return !moveStatus.toString().equals("GAME_WON") && !(moveStatus.toString().equals("GAME_LOST"));
-    }
 
     /**
      * Selects the given adversary's next move based on player locations.
@@ -97,7 +97,7 @@ public class GameManager {
                 break;
             }
             else {
-                chosenMove = chooseAdversaryMove(currentUser, (IAdversary) character);
+                chosenMove = am.chooseAdversaryMove(currentUser, (IAdversary) character);
                 moveStatus = callRuleChecker(character, chosenMove);
             }
         }
@@ -106,187 +106,53 @@ public class GameManager {
     }
 
     /**
-     * Requests a move from the given player and assesses its validity then executes it.
+     * Checks if a player is active and if so, requests a move from them. If observer view is enabled,
+     * the current level view is outputted to the user.
      */
     private boolean playersMove(ICharacter character, IUser currentUser, boolean playerIsActive) {
         if (playerIsActive) {
             if (observerView) {
-                System.out.println("In the observerView if statement");
                 currentUser.renderObserverView(this.currentLevel);
             }
             Position requestedMove = currentUser.getUserMove(character);
             GameStatus moveStatus = callRuleChecker(character, requestedMove);
-            int invalidCount = 0;
-            // Continues to ask for a move until the requested move from player is valid
-            while (moveStatus.toString().equals("INVALID")) {
-                invalidCount++;
-                if (invalidCount == 3) {
-                    currentUser.sendNoMoveUpdate();
-                    moveStatus = GameStatus.VALID;
-                    requestedMove = character.getCharacterPosition();
-                    break;
-                }
-                currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
-                requestedMove = currentUser.getUserMove(character);
-                moveStatus = callRuleChecker(character, requestedMove);
-            }
-            currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
-            boolean gameStillGoing = checkGameStatus(moveStatus);
-            parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character, currentUser);
-            sendUpdateToUsers(moveStatus.name(), character);
-            return gameStillGoing;
+            return getPlayerMoveAndExecute(requestedMove, moveStatus, character, currentUser);
         }
         return true;
     }
 
     /**
-     * Places all the players on new random positions in the new level.
-     * Generate new adversaries and new positions for them.
+     * Requests a move from the given player and assesses its validity then executes it. A player has
+     * three tries to give a valid move before losing their turn.
      */
-    private void resetForNewLevel() {
-
-        // reset data structures for new level
-        this.allCharacters = new LinkedHashSet<>();
-        this.exitedPlayers = new ArrayList<>();
-        this.expelledPlayers = new ArrayList<>();
-
-        // add all players in the game to the new level
-        addAllPlayersInGameToNewLevel();
-
-        int levelNum = this.allLevels.indexOf(this.currentLevel);
-        int numOfZombies = (int) (Math.floor((levelNum + 1) / 2) + 1);
-        int numOfGhosts = (int) Math.floor(levelNum / 2);
-
-        for (int z = 1; z < numOfZombies + 1; z++) {
-            registerAdversary("zombie" + z, "zombie");
-        }
-        for (int g = 1; g < numOfGhosts + 1; g++) {
-            registerAdversary("ghost" + g, "ghost");
-        }
-    }
-
-    /**
-     * Helper method for resetForNewLevel(). Adds all players in the game to the new level
-     */
-    public void addAllPlayersInGameToNewLevel() {
-        for (Player player : this.allPlayers.values()) {
-            Position randomPos = this.currentLevel.pickRandomPositionForCharacterInLevel();
-            currentLevel.addCharacter(player, randomPos);
-            allCharacters.add(player);
-        }
-    }
-
-    /**
-     * Chooses the given adversary's next move and then sends it to RuleChecker before being executed.
-     *
-     * @param currentUser current adversary's user instance
-     * @param character   adversary whose move it is
-     * @return a chosen position for the given adversary
-     */
-    public Position chooseAdversaryMove(IUser currentUser, IAdversary character) {
-        LocalUser user = (LocalUser) currentUser;
-        ArrayList<Position> playerPositions = user.getAllPlayerLocations(this.currentLevel);
-        Position chosenPosition;
-        if (character.getType().equals("zombie"))
-            chosenPosition = chooseZombieMove(character, playerPositions);
-        else chosenPosition = chooseGhostMove(character, playerPositions);
-        return chosenPosition;
-    }
-
-    /**
-     * Chooses the given Zombie's next move based on what other players are in its room. If there
-     * are no players in its room, a random cardinal position is chosen. If there are multiple players
-     * in the room, the zombie will move towards the closest one.
-     *
-     * @param character       the Zombie
-     * @param playerPositions list of all the players' positions
-     * @return a chosen position for the zombie to move to
-     */
-    public Position chooseZombieMove(IAdversary character, ArrayList<Position> playerPositions) {
-        Position chosenMove;
-        Zombie zom = (Zombie) character;
-        Position zomPos = zom.getCharacterPosition();
-        Room zombiesRoom = zom.getZombiesRoom();
-        ArrayList<Position> playersInRoomWithZombie = new ArrayList<>();
-
-        // determines which players are in the same room as the zombie and adds their positions to a list
-        playersInRoomWithZombie = positionsInSameRoom(zombiesRoom, playerPositions);
-        // Based on how many players are in the room with the Zombie, choose which player to attack
-        // and then subsequently which cardinal move is closest to that chosen player
-        ArrayList<Position> cardinalPositions = this.currentLevel.getAllAdjacentTiles(zomPos);
-        if (playersInRoomWithZombie.size() == 0) {
-            Random rand = new Random();
-            int cardinalIndex = rand.nextInt(cardinalPositions.size() - 1);
-            chosenMove = cardinalPositions.get(cardinalIndex);
-        } else if (playersInRoomWithZombie.size() == 1) {
-            chosenMove = getClosestPositionTo(cardinalPositions, playersInRoomWithZombie.get(0));
-        } else {
-            Position closestPlayerPos = getClosestPositionTo(playersInRoomWithZombie, zomPos);
-            chosenMove = getClosestPositionTo(cardinalPositions, closestPlayerPos);
-        }
-
-        return chosenMove;
-    }
-
-    /**
-     * Helper method for chooseZombieMove. Determines which positions from a given list of positions
-     * are in the same room as a given room and adds their position to a list
-     * @param compareRoom
-     * @param comparePositions
-     */
-
-    public ArrayList<Position> positionsInSameRoom(Room compareRoom, ArrayList<Position> comparePositions) {
-        ArrayList<Position> sameRoomPositions = new ArrayList<>();
-        for (Position playerPos : comparePositions) {
-            for (Position roomPos : compareRoom.getListOfAllPositionsLevelScale()) {
-                if (playerPos.toString().equals(roomPos.toString())) {
-                    sameRoomPositions.add(playerPos);
-                }
+    private boolean getPlayerMoveAndExecute(Position requestedMove, GameStatus moveStatus, ICharacter character, IUser currentUser) {
+        int invalidCount = 0;
+        // Continues to ask for a move until the requested move from player is valid
+        while (moveStatus.toString().equals("INVALID")) {
+            invalidCount++;
+            //if the player inputs 3 invalid moves, their turn is skipped and they remain in place
+            if (invalidCount == 3) {
+                currentUser.sendNoMoveUpdate();
+                moveStatus = GameStatus.VALID;
+                requestedMove = character.getCharacterPosition();
+                break;
             }
+            currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
+            requestedMove = currentUser.getUserMove(character);
+            moveStatus = callRuleChecker(character, requestedMove);
         }
-        return sameRoomPositions;
-    }
-    /**
-     * Chooses the given Ghost's next move based on what other players are closest to it by distance,
-     * regardless of what room they are in.
-     *
-     * @param character       the Ghost
-     * @param playerPositions list of all the players' positions
-     * @return a chosen position for the ghost to move to
-     */
-    public Position chooseGhostMove(IAdversary character, ArrayList<Position> playerPositions) {
-        Position playerPositionToAttack = getClosestPositionTo(playerPositions, character.getCharacterPosition());
-        ArrayList<Position> ghostAdjacentTiles = currentLevel.getAllAdjacentTiles(character.getCharacterPosition());
-        return getClosestPositionTo(ghostAdjacentTiles, playerPositionToAttack);
+        currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
+        boolean gameStillGoing = checkGameStatus(moveStatus);
+        parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character, currentUser);
+        sendUpdateToUsers(moveStatus.name(), character);
+        return gameStillGoing;
     }
 
     /**
-     * Determines which position in a given list that is closest to the given source position.
-     * Helper for chooseGhostMove and chooseZombieMove.
-     *
-     * @param positionsToCompare list of positions
-     * @param source             position to compare distance to
-     * @return the closest position in distance
+     * Requests a move from the given player and assesses its validity then executes it.
      */
-    public Position getClosestPositionTo(ArrayList<Position> positionsToCompare, Position source) {
-        HashMap<Position, Double> positionsAndDistances = new HashMap<>();
-        int sourceRow = source.getRow();
-        int sourceCol = source.getCol();
-
-        for (Position pos : positionsToCompare) {
-            double distance = Math.sqrt(Math.pow(sourceRow - pos.getRow(), 2) + Math.pow(sourceCol - pos.getCol(), 2));
-            positionsAndDistances.put(pos, distance);
-        }
-
-        Position closestPos = null;
-        double lowestDistance = 1000.0;
-        for (Map.Entry entry : positionsAndDistances.entrySet()) {
-            if ((double) entry.getValue() < lowestDistance) {
-                lowestDistance = (double) entry.getValue();
-                closestPos = (Position) entry.getKey();
-            }
-        }
-        return closestPos;
+    public boolean checkGameStatus(GameStatus moveStatus) {
+        return !moveStatus.toString().equals("GAME_WON") && !(moveStatus.toString().equals("GAME_LOST"));
     }
 
     /**
@@ -374,6 +240,14 @@ public class GameManager {
     }
 
     /**
+     *
+     *
+     * --------------------------END OF LEVEL/GAME METHODS-----------------------------
+     *
+     *
+     */
+
+    /**
      * Actions to conduct when the game has been won by the players.
      */
     private void gameWon(Position destination, ICharacter c) {
@@ -407,7 +281,7 @@ public class GameManager {
         currentLevel.playerPassedThroughExit(c);
         addToListOfExitedOrExpelled(p2, c);
         resurrectPlayers();
-        this.currentLevel = this.allLevels.get(getNewLevel());
+        this.currentLevel = this.allLevels.get(getNewLevelNum());
         this.isNewLevel = true;
     }
 
@@ -457,6 +331,17 @@ public class GameManager {
     }
 
     /**
+     * Helper method for resetForNewLevel(). Adds all players in the game to the new level
+     */
+    public void addAllPlayersInGameToNewLevel() {
+        for (Player player : this.allPlayers.values()) {
+            Position randomPos = this.currentLevel.pickRandomPositionForCharacterInLevel();
+            currentLevel.addCharacter(player, randomPos);
+            allCharacters.add(player);
+        }
+    }
+
+    /**
      * Resurrects all expelled players once the level has been won by players, so that they can all
      * move onto the next level.
      */
@@ -469,17 +354,12 @@ public class GameManager {
     }
 
     /**
-     * Randomly chooses the avatar for that new player from a list of avatars.
      *
-     * @param newPlayer the current player we're registering
+     *
+     * --------------------------GAME REGISTRATION METHODS-----------------------------
+     *
+     *
      */
-    public void assignPlayerAvatar(Player newPlayer) {
-        Random rand = new Random();
-        int randomIndex = rand.nextInt(playerAvatars.size());
-        String randomAvatar = playerAvatars.get(randomIndex);
-        newPlayer.setAvatar(randomAvatar);
-        playerAvatars.remove(randomAvatar);
-    }
 
     /**
      * Registers a player with a given unique name and add them to the level.
@@ -518,6 +398,22 @@ public class GameManager {
     }
 
     /**
+     * Helper method for resetNewLevel(). Creates the correct amount of adversaries for the new level.
+     */
+    public void registerAutomatedAdversaries() {
+        int levelNum = this.allLevels.indexOf(this.currentLevel);
+        int numOfZombies = (int) (Math.floor((levelNum + 1) / 2) + 1);
+        int numOfGhosts = (int) Math.floor(levelNum / 2);
+
+        for (int z = 1; z < numOfZombies + 1; z++) {
+            registerAdversary("zombie" + z, "zombie");
+        }
+        for (int g = 1; g < numOfGhosts + 1; g++) {
+            registerAdversary("ghost" + g, "ghost");
+        }
+    }
+
+    /**
      * Registers an adversary with a given unique name and add them to the level.
      *
      * @param name the name of adversary to register
@@ -539,6 +435,14 @@ public class GameManager {
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
     }
+
+    /**
+     *
+     *
+     * --------------------------USER/OBSERVER METHODS-----------------------------
+     *
+     *
+     */
 
 
 
@@ -562,9 +466,6 @@ public class GameManager {
         }
     }
 
-
-
-
     /**
      * Sends a series of updates about the game state to all observers, including the character whose turn it is,
      * where they requested to move, the status of that move, and lists representing other information about the level.
@@ -577,20 +478,24 @@ public class GameManager {
     }
 
     /**
-     * Creates a connection between the remote user and game manager
-     * @param name
-     * @param conn
+     * Creates a connection between the remote user and game manager.
      */
     public void passConnectionToRemoteUser(String name, ClientThread conn) {
         RemoteUser user = (RemoteUser) getUserByName(name);
         user.setRemoteUserConnection(conn);
     }
 
+    /**
+     *
+     *
+     * --------------------------GETTERS AND SETTERS -----------------------------
+     *
+     *
+     */
+
 
     /**
      * Sets the observer view to whatever boolean is given.
-     *
-     * @param isObserverView boolean indicating if we want the observer view
      */
     public void setObserverView(boolean isObserverView) {
         this.observerView = isObserverView;
@@ -598,9 +503,6 @@ public class GameManager {
 
     /**
      * Returns the IUser object based on the current character's name.
-     *
-     * @param name the name of the character whose turn it is
-     * @return the IUser object for the corresponding character
      */
     public IUser getUserByName(String name) {
         IUser currentUser = null;
@@ -614,9 +516,6 @@ public class GameManager {
 
     /**
      * Returns a Player object based on a given avatar.
-     *
-     * @param avatar a String avatar that represents a player on the level board
-     * @return a Player object or null if no player exists for that avatar
      */
     public Player getPlayerFromAvatar(String avatar) {
         for (Player p : allPlayers.values()) {
@@ -629,10 +528,7 @@ public class GameManager {
 
     /**
      * Returns the ICharacter associated with a given userName
-     * @param userName
-     * @return
      */
-
     private ICharacter getPlayerFromName(String userName) {
         Player p = allPlayers.get(userName);
         return p;
