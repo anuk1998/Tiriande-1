@@ -69,15 +69,14 @@ public class LocalSnarlTesting
     ArrayList<Level> listOfLevels = new ArrayList<>();
     listOfLevels.add(level1);
     GameManager gm = new GameManager(listOfLevels, 1);
+    AdversaryMovement am = new AdversaryMovement(level1);
     ArrayList<Position> positionsToCompare = new ArrayList<>();
     positionsToCompare.add(new Position(2,3));
     positionsToCompare.add(new Position(5,3));
     positionsToCompare.add(new Position(7,9));
     positionsToCompare.add(new Position(2,7));
 
-    assertEquals(new Position(2,3), gm.getClosestPositionTo(positionsToCompare, new Position(1,3)));
-
-
+    assertEquals(new Position(2,3), am.getClosestPositionTo(positionsToCompare, new Position(1,3)));
   }
 
   public static void createInitialGameBoard() {

@@ -127,8 +127,9 @@ public class LocalSnarl {
     System.out.println("\nGame has ended.\n");
 
     //rank player exited numbers
-    System.out.println("Players Ranked By Number Of Times Successfully Exited in the Game:");
-    System.out.println(manager.printPlayerExitedOrKeyRankings(manager.getAllPlayers(), "exited"));
+    System.out.println("\nPlayers Ranked By Number Of Times Successfully Exited in the Game:");
+    String exitRankings = manager.printPlayerRankings(manager.getAllPlayers(), "exited");
+    System.out.println(exitRankings);
 
     //rank players based on keys found
     System.out.println("\nPlayers Ranked By Number Of Keys Found in the Game:");

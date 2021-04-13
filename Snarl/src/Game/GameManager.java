@@ -84,7 +84,9 @@ public class GameManager {
      * Selects the given adversary's next move based on player locations.
      */
     private boolean adversarysMove(ICharacter character, IUser currentUser) {
-        Position chosenMove = chooseAdversaryMove(currentUser, (IAdversary) character);
+        AdversaryMovement am = new AdversaryMovement(this.currentLevel);
+        Position chosenMove = am.chooseAdversaryMove(currentUser, (IAdversary) character);
+
         GameStatus moveStatus = callRuleChecker(character, chosenMove);
         int invalidCount = 0;
         // generate a new move until we get one that's not invalid
@@ -149,7 +151,9 @@ public class GameManager {
     }
 
     /**
-     * Requests a move from the given player and assesses its validity then executes it.
+     * Returns a boolean indicating if the game is still going or not.
+     * @param moveStatus the status of the actor's most recent move
+     * @return a boolean true if the game is still going, false otherwise
      */
     public boolean checkGameStatus(GameStatus moveStatus) {
         return !moveStatus.toString().equals("GAME_WON") && !(moveStatus.toString().equals("GAME_LOST"));
@@ -236,7 +240,7 @@ public class GameManager {
                 break;
             default:
         }
-        currentUser.sendMoveUpdate(moveStatus, destination, c);
+
     }
 
     /**
@@ -302,7 +306,7 @@ public class GameManager {
      *
      * @return a list-as-string
      */
-    public String printPlayerExitedOrKeyRankings(HashMap<String,Player> allPlayers, String exitedOrKey) {
+    public String printPlayerRankings(HashMap<String,Player> allPlayers, String exitedOrKey) {
         HashMap<String, Integer> playerExitedOrExpelledNumbers = new HashMap<>();
 
         for (Player p : allPlayers.values()) {
@@ -312,22 +316,36 @@ public class GameManager {
             else if (exitedOrKey.equals("key")){
                 playerExitedOrExpelledNumbers.put(p.getName(), p.getNumOfKeysFound());
             }
-
         }
         HashMap<String, Integer> playerExitedNumbersSorted = playerExitedOrExpelledNumbers.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
         return playerExitedNumbersSorted.toString();
     }
 
     /**
-     * Gets a new index for the allLevels list to generate a new level to be played.
      *
-     * @return a number representing
+     *
+     * --------------------------LEVEL RESET METHODS-----------------------------
+     *
+     *
      */
-    private int getNewLevel() {
-        return this.allLevels.indexOf(this.currentLevel) + 1;
+
+    /**
+     * Places all the players on new random positions in the new level.
+     * Generate new adversaries and new positions for them.
+     */
+    private void resetForNewLevel() {
+        // reset data structures for new level
+        this.allCharacters = new LinkedHashSet<>();
+        this.exitedPlayers = new ArrayList<>();
+        this.expelledPlayers = new ArrayList<>();
+
+        // add all players in the game to the new level
+        addAllPlayersInGameToNewLevel();
+
+        //register appropriate number of adversaries to new level
+        registerAutomatedAdversaries();
     }
 
     /**
@@ -376,7 +394,6 @@ public class GameManager {
             assignPlayerAvatar(newPlayer);
             allPlayers.put(name, newPlayer);
             allCharacters.add(newPlayer);
-
             Position randomPos = currentLevel.pickRandomPositionForCharacterInLevel();
             currentLevel.addCharacter(newPlayer, randomPos);
             return Registration.REGISTERED;
@@ -386,15 +403,17 @@ public class GameManager {
         }
     }
 
-    private void addUser(String name, Registration playerType) {
-        IUser user;
-        if (playerType.equals(Registration.LOCAL)) {
-            user = new LocalUser(name);
-        }
-        else {
-            user = new RemoteUser(name);
-        }
-        this.users.add(user);
+    /**
+     * Randomly chooses the avatar for that new player from a list of avatars.
+     *
+     * @param newPlayer the current player we're registering
+     */
+    public void assignPlayerAvatar(Player newPlayer) {
+        Random rand = new Random();
+        int randomIndex = rand.nextInt(playerAvatars.size());
+        String randomAvatar = playerAvatars.get(randomIndex);
+        newPlayer.setAvatar(randomAvatar);
+        playerAvatars.remove(randomAvatar);
     }
 
     /**
@@ -423,14 +442,12 @@ public class GameManager {
         IAdversary adversary = null;
         if (type.equalsIgnoreCase("zombie")) {
             adversary = new Zombie(name);
-            LocalUser user = new LocalUser(name);
-            this.users.add(user);
         }
         else if (type.equalsIgnoreCase("ghost")) {
             adversary = new Ghost(name);
-            LocalUser user = new LocalUser(name);
-            this.users.add(user);
         }
+        LocalUser user = new LocalUser(name);
+        this.users.add(user);
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
@@ -444,7 +461,16 @@ public class GameManager {
      *
      */
 
-
+    private void addUser(String name, Registration playerType) {
+        IUser user;
+        if (playerType.equals(Registration.LOCAL)) {
+            user = new LocalUser(name);
+        }
+        else {
+            user = new RemoteUser(name);
+        }
+        this.users.add(user);
+    }
 
     public void sendInitialUpdateToUsers() {
         for (IUser user : users) {
@@ -567,5 +593,14 @@ public class GameManager {
      */
     public Level getCurrentLevel() {
         return this.currentLevel;
+    }
+
+    /**
+     * Gets a new index for the allLevels list to generate a new level to be played.
+     *
+     * @return a number representing
+     */
+    private int getNewLevelNum() {
+        return this.allLevels.indexOf(this.currentLevel) + 1;
     }
 }
