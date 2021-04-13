@@ -150,14 +150,9 @@ public class GameManager {
         this.expelledPlayers = new ArrayList<>();
 
         // add all players in the game to the new level
-        for (Player player : this.allPlayers.values()) {
-            Position randomPos = this.currentLevel.pickRandomPositionForCharacterInLevel();
-            currentLevel.addCharacter(player, randomPos);
-            allCharacters.add(player);
-        }
+        addAllPlayersInGameToNewLevel();
 
         int levelNum = this.allLevels.indexOf(this.currentLevel);
-
         int numOfZombies = (int) (Math.floor((levelNum + 1) / 2) + 1);
         int numOfGhosts = (int) Math.floor(levelNum / 2);
 
@@ -166,6 +161,17 @@ public class GameManager {
         }
         for (int g = 1; g < numOfGhosts + 1; g++) {
             registerAdversary("ghost" + g, "ghost");
+        }
+    }
+
+    /**
+     * Helper method for resetForNewLevel(). Adds all players in the game to the new level
+     */
+    public void addAllPlayersInGameToNewLevel() {
+        for (Player player : this.allPlayers.values()) {
+            Position randomPos = this.currentLevel.pickRandomPositionForCharacterInLevel();
+            currentLevel.addCharacter(player, randomPos);
+            allCharacters.add(player);
         }
     }
 
@@ -183,7 +189,6 @@ public class GameManager {
         if (character.getType().equals("zombie"))
             chosenPosition = chooseZombieMove(character, playerPositions);
         else chosenPosition = chooseGhostMove(character, playerPositions);
-
         return chosenPosition;
     }
 
@@ -204,13 +209,7 @@ public class GameManager {
         ArrayList<Position> playersInRoomWithZombie = new ArrayList<>();
 
         // determines which players are in the same room as the zombie and adds their positions to a list
-        for (Position playerPos : playerPositions) {
-            for (Position roomPos : zombiesRoom.getListOfAllPositionsLevelScale()) {
-                if (playerPos.toString().equals(roomPos.toString())) {
-                    playersInRoomWithZombie.add(playerPos);
-                }
-            }
-        }
+        playersInRoomWithZombie = positionsInSameRoom(zombiesRoom, playerPositions);
         // Based on how many players are in the room with the Zombie, choose which player to attack
         // and then subsequently which cardinal move is closest to that chosen player
         ArrayList<Position> cardinalPositions = this.currentLevel.getAllAdjacentTiles(zomPos);
@@ -228,6 +227,24 @@ public class GameManager {
         return chosenMove;
     }
 
+    /**
+     * Helper method for chooseZombieMove. Determines which positions from a given list of positions
+     * are in the same room as a given room and adds their position to a list
+     * @param compareRoom
+     * @param comparePositions
+     */
+
+    public ArrayList<Position> positionsInSameRoom(Room compareRoom, ArrayList<Position> comparePositions) {
+        ArrayList<Position> sameRoomPositions = new ArrayList<>();
+        for (Position playerPos : comparePositions) {
+            for (Position roomPos : compareRoom.getListOfAllPositionsLevelScale()) {
+                if (playerPos.toString().equals(roomPos.toString())) {
+                    sameRoomPositions.add(playerPos);
+                }
+            }
+        }
+        return sameRoomPositions;
+    }
     /**
      * Chooses the given Ghost's next move based on what other players are closest to it by distance,
      * regardless of what room they are in.
@@ -406,42 +423,27 @@ public class GameManager {
     }
 
     /**
-     * Creates a list of the players' rankings during the Game, based on the number of times they exited.
+     * Creates a list of the players' rankings during the Game, based on the number of times they exited or found keys.
      *
      * @return a list-as-string
      */
-    public String printPlayerExitedRankings() {
-        HashMap<String, Integer> playerExitedNumbers = new HashMap<>();
+    public String printPlayerExitedOrKeyRankings(HashMap<String,Player> allPlayers, String exitedOrKey) {
+        HashMap<String, Integer> playerExitedOrExpelledNumbers = new HashMap<>();
 
-        for (Player p : this.allPlayers.values()) {
-            playerExitedNumbers.put(p.getName(), p.getNumOfTimesExited());
+        for (Player p : allPlayers.values()) {
+            if(exitedOrKey.equals("exited")) {
+                playerExitedOrExpelledNumbers.put(p.getName(), p.getNumOfTimesExited());
+            }
+            else if (exitedOrKey.equals("key")){
+                playerExitedOrExpelledNumbers.put(p.getName(), p.getNumOfKeysFound());
+            }
+
         }
-
-        HashMap<String, Integer> playerExitedNumbersSorted = playerExitedNumbers.entrySet().stream()
+        HashMap<String, Integer> playerExitedNumbersSorted = playerExitedOrExpelledNumbers.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
         return playerExitedNumbersSorted.toString();
-    }
-
-    /**
-     * Creates a list of the players' rankings during the Game, based on the number of times they
-     * collected a key.
-     *
-     * @return a list-as-string
-     */
-    public String printPlayerKeyFoundRankings() {
-        HashMap<String, Integer> playerKeyNumbers = new HashMap<>();
-
-        for (Player p : this.allPlayers.values()) {
-            playerKeyNumbers.put(p.getName(), p.getNumOfKeysFound());
-        }
-
-        HashMap<String, Integer> playerKeyNumbersSorted = playerKeyNumbers.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
-
-        return playerKeyNumbersSorted.toString();
     }
 
     /**
@@ -537,21 +539,7 @@ public class GameManager {
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
     }
 
-    /**
-     * Returns the IUser object based on the current character's name.
-     *
-     * @param name the name of the character whose turn it is
-     * @return the IUser object for the corresponding character
-     */
-    public IUser getUserByName(String name) {
-        IUser currentUser = null;
-        for (IUser u : this.users) {
-            if (u.getUserName().equals(name)) {
-                currentUser = u;
-            }
-        }
-        return currentUser;
-    }
+
 
     public void sendInitialUpdateToUsers() {
         for (IUser user : users) {
@@ -573,10 +561,8 @@ public class GameManager {
         }
     }
 
-    private ICharacter getPlayerFromName(String userName) {
-        Player p = allPlayers.get(userName);
-        return p;
-    }
+
+
 
     /**
      * Sends a series of updates about the game state to all observers, including the character whose turn it is,
@@ -590,12 +576,39 @@ public class GameManager {
     }
 
     /**
+     * Creates a connection between the remote user and game manager
+     * @param name
+     * @param conn
+     */
+    public void passConnectionToRemoteUser(String name, ClientThread conn) {
+        RemoteUser user = (RemoteUser) getUserByName(name);
+        user.setRemoteUserConnection(conn);
+    }
+
+
+    /**
      * Sets the observer view to whatever boolean is given.
      *
      * @param isObserverView boolean indicating if we want the observer view
      */
     public void setObserverView(boolean isObserverView) {
         this.observerView = isObserverView;
+    }
+
+    /**
+     * Returns the IUser object based on the current character's name.
+     *
+     * @param name the name of the character whose turn it is
+     * @return the IUser object for the corresponding character
+     */
+    public IUser getUserByName(String name) {
+        IUser currentUser = null;
+        for (IUser u : this.users) {
+            if (u.getUserName().equals(name)) {
+                currentUser = u;
+            }
+        }
+        return currentUser;
     }
 
     /**
@@ -611,6 +624,17 @@ public class GameManager {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the ICharacter associated with a given userName
+     * @param userName
+     * @return
+     */
+
+    private ICharacter getPlayerFromName(String userName) {
+        Player p = allPlayers.get(userName);
+        return p;
     }
 
     /**
@@ -647,11 +671,4 @@ public class GameManager {
     public Level getCurrentLevel() {
         return this.currentLevel;
     }
-
-    public void passConnectionToRemoteUser(String name, ClientThread conn) {
-        RemoteUser user = (RemoteUser) getUserByName(name);
-        user.setRemoteUserConnection(conn);
-    }
-
-
 }
