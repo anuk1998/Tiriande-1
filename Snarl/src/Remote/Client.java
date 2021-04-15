@@ -62,7 +62,7 @@ public class Client {
 
     }
     catch (Exception var3) {
-      var3.printStackTrace();
+      System.out.println("Server closed the connection. Game over.");
     }
   }
 
@@ -110,9 +110,10 @@ public class Client {
       switch (type) {
         case "welcome":
           String info = serverMessageAsJSON.getString("info");
-          System.out.println(type + " to Snarl! Here is information about the game: \n" + info);
+          System.out.println(type + " to Snarl! Here is information about the game:\n" + info);
           break;
         case "start-level":
+          System.out.println("~~~LEVEL STARTING:~~~");
           int startLevelNum = serverMessageAsJSON.getInt("level");
           System.out.println("You are starting on level: " + startLevelNum);
           System.out.println("Here is a list of all the players in the game:");
@@ -122,11 +123,17 @@ public class Client {
           System.out.println("~~~GAME UPDATE:~~~");
           JSONArray layout = serverMessageAsJSON.getJSONArray("layout");
           JSONArray objects = serverMessageAsJSON.getJSONArray("objects");
-          JSONArray actors = serverMessageAsJSON.getJSONArray("actors");
           JSONArray position = serverMessageAsJSON.getJSONArray("position");
+
           System.out.println("Your view layout: " + layout.toString());
           System.out.println("Objects near you: " + objects.toString());
-          System.out.println("Actors near you: " + actors.toString());
+          if (serverMessageAsJSON.isNull("actors")) {
+            System.out.println("Actors near you: []");
+          }
+          else {
+            JSONArray actors = serverMessageAsJSON.getJSONArray("actors");
+            System.out.println("Actors near you: " + actors.toString());
+          }
           System.out.println("Your Position: " + position.toString());
           if (serverMessageAsJSON.isNull("message")) {
             System.out.println("Message: " + JSONObject.NULL);
@@ -135,9 +142,9 @@ public class Client {
             String message = serverMessageAsJSON.getString("message");
             System.out.println("Message: " + message);
           }
-
           break;
         case "end-level":
+          System.out.println("~~~END OF LEVEL:~~~");
           String keyFinder = serverMessageAsJSON.getString("key");
           JSONArray exitedPlayers = serverMessageAsJSON.getJSONArray("exits");
           JSONArray ejectedPlayers = serverMessageAsJSON.getJSONArray("ejects");

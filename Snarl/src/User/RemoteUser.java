@@ -1,7 +1,5 @@
 package User;
 
-import org.json.JSONException;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -69,6 +67,24 @@ public class RemoteUser implements IUser {
     return adversaryLocations;
   }
 
+  public void sendEndLevelMessage() {
+    if (clientConnection != null) {
+      clientConnection.sendToClient("end-level", MessageType.END_LEVEL);
+    }
+  }
+
+  public void sendEndGameMessage() {
+    if (clientConnection != null) {
+      clientConnection.sendToClient("end-game", MessageType.END_GAME);
+    }
+  }
+
+  public void sendStartLevelMessage(int levelNum) {
+    if (clientConnection != null) {
+      clientConnection.sendToClient(Integer.toString(levelNum), MessageType.LEVEL_START);
+    }
+  }
+
   public void sendPlayerUpdateMessage(String moveStatus, ICharacter movedCharacter, ICharacter thisCharacter) {
     if (clientConnection != null) {
       clientConnection.sendPlayerUpdateMessage(moveStatus, movedCharacter, thisCharacter, this);
@@ -118,9 +134,8 @@ public class RemoteUser implements IUser {
 
   @Override
   public void renderObserverView(Level currentLevel) {
-    System.out.println("In render observer view");
     if (clientConnection != null) {
-      clientConnection.sendToClient("Here is the level observer view:" + currentLevel.renderLevel(), MessageType.OBSERVER_VIEW);
+      clientConnection.sendToClient("Here is the level observer view:\n" + currentLevel.renderLevel(), MessageType.OBSERVER_VIEW);
     }
   }
 

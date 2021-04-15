@@ -37,7 +37,8 @@ public class RuleCheckerPlayer implements IRuleChecker {
             status = GameStatus.VALID;
             if (isOccupiedByAdversary(destination)) {
                 status = encountersOppositeCharacter();
-            } else if (currentLevel.getKeyPositionInLevel().equals(destination)) {
+            } else if (currentLevel.getKeyPositionInLevel().equals(destination)
+                    && !currentLevel.getKeyFound()) {
                 status = GameStatus.KEY_FOUND;
             } else if (currentLevel.getExitPositionInLevel().equals(destination)) {
                 status = exitTileIsLandedOn();
@@ -174,8 +175,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
       }
       return GameStatus.VALID;
     }
-
-
 
     /**
      * Returns whether or not the exit tile is unlocked.

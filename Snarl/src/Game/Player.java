@@ -7,7 +7,7 @@ public class Player implements ICharacter{
     boolean isExpelled;
     int numOfTimesExited = 0;
     int numOfKeysFound = 0;
-
+    int numOfTimesExpelled = 0;
 
     public Player(String n) {
         this.name = n;
@@ -28,6 +28,10 @@ public class Player implements ICharacter{
 
     public void increaseNumOfTimesExited() {
         this.numOfTimesExited++;
+    }
+
+    public void increaseNumOfTimesExpelled() {
+        this.numOfTimesExpelled++;
     }
 
     public void setIsExpelled(boolean expel) {

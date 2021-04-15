@@ -17,6 +17,7 @@ import org.json.JSONTokener;
 import Game.GameManager;
 import Game.Level;
 import Game.MessageType;
+import Game.UpdateType;
 import Level.TestLevel;
 
 import static java.lang.System.exit;
@@ -36,9 +37,9 @@ public class Server {
     parseCommandLine(argsList);
 
     try {
-      System.out.println("DEBUG: Reading in JSON file...");
+      System.out.println("INFO: Reading in JSON file...");
       ArrayList<JSONObject> levels = readFile(filename);
-      System.out.println("DEBUG: Initializing level and game manager...");
+      System.out.println("INFO: Initializing level and game manager...");
       manager = initializeLevelAndRegister(levels, startLevelNum, observerView);
     }
     catch (FileNotFoundException e) {
@@ -49,37 +50,37 @@ public class Server {
     int clientCount = 0;
 
     try {
+      System.out.println("INFO: Setting up socket connection");
       ServerSocket serverSocket = new ServerSocket(portNum);
       serverSocket.setSoTimeout(waitTimeSeconds * 1000);
-      System.out.println("DEBUG: Set up socket connection");
       while (clientCount < numOfClients) {
         try {
-          System.out.println("DEBUG: Waiting for connections...");
+          System.out.println("INFO: Waiting for connections...");
           Socket acceptSocket = serverSocket.accept();
-          System.out.println("DEBUG: Got a connection!");
+          System.out.println("INFO: Got a connection!");
           ClientThread clientThread = new ClientThread(acceptSocket, manager);
           clients.add(clientThread);
           clientThread.start();
           clientCount++;
+          System.out.println("INFO: Registered client.");
         }
         catch (InterruptedIOException e) {
-          System.out.println("DEBUG: Timer ran out. Starting game with who we have.");
+          System.out.println("INFO: Timer ran out. Starting game with who we have.");
           break;
         }
       }
 
       registerAutomatedAdversaries();
-      System.out.println("observerView is: " + observerView);
       manager.setObserverView(observerView);
 
-      System.out.println("DEBUG: Sending start level message to all clients.");
+      System.out.println("INFO: Sending start level message to all clients.");
       for (ClientThread client : clients) {
-        client.sendToClient("start-level", MessageType.LEVEL_START);
+        client.sendToClient("1", MessageType.LEVEL_START);
       }
 
-      manager.sendInitialUpdateToUsers();
+      manager.sendUpdateToUsers(UpdateType.START_ROUND, "", null);
       manager.runGame();
-      System.out.println("DEBUG: Game's over. Closing.");
+      System.out.println("INFO: Game's over. Closing.");
       for (ClientThread c : clients) {
         c.close();
       }

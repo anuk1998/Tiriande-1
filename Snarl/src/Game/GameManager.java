@@ -49,6 +49,7 @@ public class GameManager {
             if (isNewLevel) {
                 resetForNewLevel();
                 isNewLevel = false;
+
             }
             ICharacter character = (ICharacter) allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
@@ -60,7 +61,7 @@ public class GameManager {
             }
             // Ask the player for a move and validate/execute that move
             else {
-                currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
+                //currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
                 gameStillGoing = playersMove(character, currentUser, playerIsActive);
             }
             // check if we're on the last character in the list and if so, loop back to the beginning
@@ -70,6 +71,7 @@ public class GameManager {
                 index++;
             }
         }
+        sendUpdateToUsers(UpdateType.END_GAME, "", null);
     }
 
     /**
@@ -146,7 +148,7 @@ public class GameManager {
         currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
         boolean gameStillGoing = checkGameStatus(moveStatus);
         parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character, currentUser);
-        sendUpdateToUsers(moveStatus.name(), character);
+        sendUpdateToUsers(UpdateType.PLAYER_UPDATE, moveStatus.name(), character);
         return gameStillGoing;
     }
 
@@ -284,6 +286,7 @@ public class GameManager {
         currentLevel.restoreCharacterTile(c);
         currentLevel.playerPassedThroughExit(c);
         addToListOfExitedOrExpelled(p2, c);
+        sendUpdateToUsers(UpdateType.END_LEVEL, "", c);
         resurrectPlayers();
         this.currentLevel = this.allLevels.get(getNewLevelNum());
         this.isNewLevel = true;
@@ -472,22 +475,30 @@ public class GameManager {
         this.users.add(user);
     }
 
-    public void sendInitialUpdateToUsers() {
+    public void sendUpdateToUsers(UpdateType type, String moveStatus, ICharacter character) {
         for (IUser user : users) {
             if (user instanceof RemoteUser) {
                 RemoteUser ru = (RemoteUser) user;
                 ICharacter usersCharacter = getPlayerFromName(user.getUserName());
-                ru.sendInitialUpdate(usersCharacter);
-            }
-        }
-    }
-
-    private void sendUpdateToUsers(String moveStatus, ICharacter character) {
-        for (IUser user : users) {
-            if (user instanceof RemoteUser) {
-                RemoteUser ru = (RemoteUser) user;
-                ICharacter usersCharacter = getPlayerFromName(user.getUserName());
-                ru.sendPlayerUpdateMessage(moveStatus, character, usersCharacter);
+                switch (type) {
+                    case START_LEVEL:
+                        ru.sendStartLevelMessage(this.allLevels.indexOf(this.currentLevel));
+                        break;
+                    case START_ROUND:
+                        ru.sendInitialUpdate(usersCharacter);
+                        break;
+                    case PLAYER_UPDATE:
+                        ru.sendPlayerUpdateMessage(moveStatus, character, usersCharacter);
+                        break;
+                    case END_LEVEL:
+                        ru.sendEndLevelMessage();
+                        break;
+                    case END_GAME:
+                        ru.sendEndGameMessage();
+                        break;
+                    default:
+                        System.out.println("DEBUG: THERE IS A VERY BIG PROBLEM");
+                }
             }
         }
     }

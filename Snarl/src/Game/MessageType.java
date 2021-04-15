@@ -6,5 +6,7 @@ public enum MessageType {
   RESULT,
   NO_MOVE,
   OBSERVER_VIEW,
-  LEVEL_START
+  LEVEL_START,
+  END_LEVEL,
+  END_GAME
 }

@@ -267,7 +267,12 @@ public class TestManager {
 
     // add actors field
     JSONArray actorsList = detectActorsInView(layout, level, player, manager);
-    playerUpdate.put("actors", actorsList);
+    if (actorsList == null) {
+      playerUpdate.put("actors", JSONObject.NULL);
+    }
+    else {
+      playerUpdate.put("actors", actorsList);
+    }
 
     return playerUpdate;
   }
@@ -334,15 +339,15 @@ public class TestManager {
    *
    * @param layout String[][] of the player's view
    * @param level the current Level being played
-   * @param player
    * @param manager the GameManager instance
    * @return a JSONArray representing the actors in view
    */
   private static JSONArray detectActorsInView(String[][] layout, Level level, ICharacter player, GameManager manager) throws JSONException {
-    System.out.println(player);
     Position playerPos = player.getCharacterPosition();
-    System.out.println(playerPos);
     Position playerPosInLayout = getPlayerPosInLayout(layout, player);
+    if (playerPosInLayout == null) {
+      return null;
+    }
     int rowDiff = playerPos.getRow() - playerPosInLayout.getRow();
     int colDiff = playerPos.getCol() - playerPosInLayout.getCol();
 

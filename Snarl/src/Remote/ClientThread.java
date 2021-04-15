@@ -62,16 +62,33 @@ public class ClientThread extends Thread {
             type.equals(MessageType.RESULT)) {
       output.println(message);
     }
+    else if (type.equals(MessageType.END_LEVEL)) {
+      output.println(makeEndLevelMessage().toString());
+    }
     else if (type.equals(MessageType.OBSERVER_VIEW)) {
       output.println("observe");
       output.println(message);
     }
-    else {
-      output.println(makeStartLevelMessage().toString());
+    else if (type.equals(MessageType.LEVEL_START)) {
+      output.println(makeStartLevelMessage(Integer.parseInt(message)).toString());
     }
   }
 
-  private JSONObject makeStartLevelMessage() {
+  private JSONObject makeEndLevelMessage() {
+    JSONObject endLevel = new JSONObject();
+    try {
+      endLevel.put("type", "end-level");
+      endLevel.put("key", manager.getPlayerWhoFoundKey());
+      endLevel.put("exits", manager.getExitedPlayers().toString());
+      endLevel.put("ejects", manager.getExpelledPlayers().toString());
+    }
+    catch (JSONException e) {
+      return null;
+    }
+    return endLevel;
+  }
+
+  public JSONObject makeStartLevelMessage(int levelNum) {
     JSONArray names = new JSONArray();
     for (String p : this.manager.getAllPlayers().keySet()) {
       names.put(p);
@@ -79,7 +96,7 @@ public class ClientThread extends Thread {
     JSONObject startLevel = new JSONObject();
     try {
       startLevel.put("type", "start-level");
-      startLevel.put("level", 1);
+      startLevel.put("level", levelNum);
       startLevel.put("players", names);
     }
     catch (JSONException e) {
@@ -92,7 +109,7 @@ public class ClientThread extends Thread {
     try {
       TestManager tm = new TestManager();
       JSONObject playerUpdate = tm.formPlayerUpdate(this.manager, this.manager.getCurrentLevel(), usersCharacter, remoteUser);
-      playerUpdate.put("message", JSONObject.NULL);
+      playerUpdate.put("message", "Your avatar for the game is: " + usersCharacter.getAvatar());
       output.println(playerUpdate.toString());
     }
     catch (JSONException e) {

@@ -217,6 +217,7 @@ public class Level {
   public void expelPlayer(Player p) {
     this.activePlayers.remove(p);
     p.setIsExpelled(true);
+    p.increaseNumOfTimesExpelled();
   }
 
   // Helper method for expelPlayer when called in GameManager, returns the player at a given position
@@ -295,6 +296,10 @@ public class Level {
   // Returns if the level exit is locked or not
   public boolean getExitLocked() {
     return this.exitLocked;
+  }
+
+  public boolean getKeyFound() {
+    return this.keyFound;
   }
 
   public ArrayList<String> getListOfDoorPositions() {
