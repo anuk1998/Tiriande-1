@@ -17,6 +17,7 @@ import Game.Position;
 import Game.Registration;
 import User.RemoteUser;
 import Manager.TestManager;
+import Game.Player;
 
 public class ClientThread extends Thread {
   private Socket socket;
@@ -39,7 +40,6 @@ public class ClientThread extends Thread {
       String message = input.readLine();
       Registration status = manager.registerPlayer(message, Registration.REMOTE);
       while (status.toString().equals("DUPLICATE_NAME")) {
-        output.println("That name is already in use. Please give another name:");
         message = input.readLine();
         status = manager.registerPlayer(message, Registration.REMOTE);
       }
@@ -72,6 +72,38 @@ public class ClientThread extends Thread {
     else if (type.equals(MessageType.LEVEL_START)) {
       output.println(makeStartLevelMessage(Integer.parseInt(message)).toString());
     }
+    else if (type.equals(MessageType.END_GAME)){
+      output.println(makeEndGameMessage());
+    }
+  }
+
+  private JSONObject makeEndGameMessage() {
+    JSONObject endGame = new JSONObject();
+    try{
+      endGame.put("type", "end-game");
+      endGame.put("scores", playerScoresList());
+    }
+    catch (JSONException e) {
+      return null;
+    }
+    return endGame;
+  }
+
+  private JSONArray playerScoresList() {
+    JSONArray playerScoresList = new JSONArray();
+    for (Player p : manager.getAllPlayers().values()) {
+      JSONObject playerScore = new JSONObject();
+      try {
+        playerScore.put("type", "player-score");
+        playerScore.put("name", p.getName());
+        playerScore.put("exits", p.getNumOfTimesExited());
+        playerScore.put("ejects", p.getNumOfTimesExpelled());
+        playerScore.put("key", p.getNumOfKeysFound());
+        playerScoresList.put(playerScore);
+      } catch (JSONException ignored) {
+      }
+    }
+    return playerScoresList;
   }
 
   private JSONObject makeEndLevelMessage() {

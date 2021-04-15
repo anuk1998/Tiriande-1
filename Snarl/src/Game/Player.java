@@ -22,6 +22,10 @@ public class Player implements ICharacter{
         return this.numOfKeysFound;
     }
 
+    public int getNumOfTimesExpelled() {
+        return this.numOfTimesExpelled;
+    }
+
     public void increaseNumOfKeysFound() {
         this.numOfKeysFound++;
     }

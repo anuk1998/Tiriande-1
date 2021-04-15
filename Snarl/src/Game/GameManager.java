@@ -31,6 +31,7 @@ public class GameManager {
     int startLevel;
     boolean isNewLevel = false;
     boolean observerView = false;
+    String playerWhoFoundKey = "";
 
     public GameManager(ArrayList<Level> allLevels, int startLevel) {
         this.allLevels = allLevels;
@@ -209,6 +210,7 @@ public class GameManager {
             case "KEY_FOUND":
                 currentLevel.moveCharacter(c, destination);
                 currentLevel.openExitTile();
+                this.playerWhoFoundKey = c.getName();
                 ((Player) c).increaseNumOfKeysFound();
                 break;
             case "PLAYER_SELF_ELIMINATES":
@@ -339,10 +341,12 @@ public class GameManager {
      * Generate new adversaries and new positions for them.
      */
     private void resetForNewLevel() {
+        System.out.println("Congrats! You have advanced to the next level");
         // reset data structures for new level
         this.allCharacters = new LinkedHashSet<>();
         this.exitedPlayers = new ArrayList<>();
         this.expelledPlayers = new ArrayList<>();
+        this.playerWhoFoundKey = "";
 
         // add all players in the game to the new level
         addAllPlayersInGameToNewLevel();
@@ -613,5 +617,12 @@ public class GameManager {
      */
     private int getNewLevelNum() {
         return this.allLevels.indexOf(this.currentLevel) + 1;
+    }
+
+    /**
+     * Getter for playerWhoFoundKey
+     */
+    public String getPlayerWhoFoundKey() {
+        return this.playerWhoFoundKey;
     }
 }
