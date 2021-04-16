@@ -32,6 +32,9 @@ public class ClientThread extends Thread {
 
   @Override
   public void run() {
+  }
+
+  public boolean registerClient() {
     try {
       input = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
       output = new PrintWriter(socket.getOutputStream(), true);
@@ -40,6 +43,8 @@ public class ClientThread extends Thread {
       String message = input.readLine();
       Registration status = manager.registerPlayer(message, Registration.REMOTE);
       while (status.toString().equals("DUPLICATE_NAME")) {
+        output.println("Name already in use.");
+        output.println("name");
         message = input.readLine();
         status = manager.registerPlayer(message, Registration.REMOTE);
       }
@@ -48,6 +53,7 @@ public class ClientThread extends Thread {
     catch (IOException | JSONException e) {
       e.printStackTrace();
     }
+    return true;
   }
 
   private JSONObject serverWelcomeMessage() throws JSONException {
@@ -109,10 +115,16 @@ public class ClientThread extends Thread {
   private JSONObject makeEndLevelMessage() {
     JSONObject endLevel = new JSONObject();
     try {
+      for (Player p : manager.getExitedPlayers()) {
+        exitedPlayersJSONArray.put(p.getName());
+      }
+      for (Player p : manager.getExpelledPlayers()) {
+        ejectedPlayersJSONArray.put(p.getName());
+      }
       endLevel.put("type", "end-level");
       endLevel.put("key", manager.getPlayerWhoFoundKey());
-      endLevel.put("exits", manager.getExitedPlayers().toString());
-      endLevel.put("ejects", manager.getExpelledPlayers().toString());
+      endLevel.put("exits", exitedPlayersJSONArray);
+      endLevel.put("ejects", ejectedPlayersJSONArray);
     }
     catch (JSONException e) {
       return null;
@@ -153,7 +165,12 @@ public class ClientThread extends Thread {
     try {
       TestManager tm = new TestManager();
       JSONObject playerUpdate = tm.formPlayerUpdate(this.manager, this.manager.getCurrentLevel(), thisCharacter, user);
-      playerUpdate.put("message", movedCharacter.getName() + " made a move and the status of that move was: " + moveStatus);
+      if (moveStatus.equals("PLAYER_EXPELLED")) {
+        playerUpdate.put("message", movedCharacter.getName() + " got expelled from the level.");
+      }
+      else {
+        playerUpdate.put("message", movedCharacter.getName() + " made a move and the status of that move was: " + moveStatus);
+      }
       output.println(playerUpdate.toString());
     }
     catch (JSONException e) {

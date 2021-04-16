@@ -10,9 +10,9 @@ public class RuleCheckerPlayer implements IRuleChecker {
     String VOID = TileType.VOID.toString();
     String WALL = TileType.WALL.toString();
     String PLAYER_1 = Avatars.PLAYER_1.toString();
-    String PLAYER_2 = Avatars.PLAYER_1.toString();
-    String PLAYER_3 = Avatars.PLAYER_1.toString();
-    String PLAYER_4 = Avatars.PLAYER_1.toString();
+    String PLAYER_2 = Avatars.PLAYER_2.toString();
+    String PLAYER_3 = Avatars.PLAYER_3.toString();
+    String PLAYER_4 = Avatars.PLAYER_4.toString();
     String GHOST = Avatars.GHOST.toString();
     String ZOMBIE = Avatars.ZOMBIE.toString();
     String UNLOCKED_EXIT = TileType.UNLOCKED_EXIT.toString();
@@ -205,6 +205,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
      */
     @Override
     public GameStatus encountersOppositeCharacter() {
+        this.player.increaseNumOfTimesExpelled();
         // checks if the player self-eliminating is the last active player in the level
         if (currentLevel.getActivePlayers().size() == 1) {
             //and everyone else is expelled
@@ -217,6 +218,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
                 if (isLastLevel()) {
                     return GameStatus.GAME_WON;
                 }
+                this.player.setIsExpelled(true);
                 return GameStatus.LEVEL_WON;
             }
         }

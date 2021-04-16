@@ -206,7 +206,7 @@ public class TestManager {
       }
       // actually send the move to the game manager and have them perform whatever action that needs to be done
       // based on what kind of move it is (result)
-      manager.parseMoveStatusAndDoAction(result.name(), newMove, player, null);
+      manager.parseMoveStatusAndDoAction(result.name(), newMove, player);
       gameStillGoing = manager.checkGameStatus(result);
     }
 

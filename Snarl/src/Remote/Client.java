@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Scanner;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,10 +57,8 @@ public class Client {
             invalid = false;
           }
           output.println(reply);
-          //output.flush();
         }
       }
-
     }
     catch (Exception var3) {
       System.out.println("Server closed the connection. Game over.");
@@ -83,21 +82,26 @@ public class Client {
         moveTime = true;
         return true;
       case "OK":
+        System.out.println("~~~MOVE STATUS:~~~");
         System.out.println("The requested move was valid.");
         return false;
       case "Key":
+        System.out.println("~~~MOVE STATUS:~~~");
         System.out.println("You found the key!");
         return false;
       case "Exit":
+        System.out.println("~~~MOVE STATUS:~~~");
         System.out.println("You have successfully passed through the exit!");
         return false;
       case "Eject":
+        System.out.println("~~~PLAYER STATUS:~~~");
         System.out.println("You have been ejected :(");
         return false;
       case "Invalid":
-        System.out.println("Sorry, that is an invalid move. Try another one.");
-        invalid = true;
-        return true;
+        System.out.println("~~~MOVE STATUS:~~~");
+        System.out.println("Sorry, that is an invalid move.");
+        //invalid = true;
+        return false;
     }
     return parsedServerMessageAsJSON(serverMessage);
   }
@@ -145,25 +149,15 @@ public class Client {
           break;
         case "end-level":
           System.out.println("~~~END OF LEVEL:~~~");
-          String keyFinder = serverMessageAsJSON.getString("key");
-          JSONArray exitedPlayers = serverMessageAsJSON.getJSONArray("exits");
-          JSONArray ejectedPlayers = serverMessageAsJSON.getJSONArray("ejects");
-          System.out.println(keyFinder + " found the key.");
-          System.out.println("Here is a list of the players who were expelled by an adversary:\n" +
-                  ejectedPlayers);
-          System.out.println("Here is a list of the players who exited successfully:\n" +
-                  exitedPlayers);
+          endLevelMessageHelper(serverMessageAsJSON);
           break;
         case "end-game":
-          JSONArray scores = serverMessageAsJSON.getJSONArray("scores");
-          System.out.println("Here is a list of each player's scores: ");
-          for (int i = 0; i < scores.length(); i++) {
-            System.out.println(scores.getJSONObject(i).toString());
-          }
+          System.out.println("~~~GAME OVER:~~~");
+          endGameMessageHelper(serverMessageAsJSON);
           break;
       }
     } catch (JSONException jsonException) {
-      jsonException.printStackTrace();
+      System.out.println(serverMessage);
     }
     return false;
   }
@@ -173,7 +167,7 @@ public class Client {
     playerMoveJSON.put("type", "move");
     if (playerMove.equals("null")) {
       try {
-        playerMoveJSON.put("to", "null");
+        playerMoveJSON.put("to", JSONObject.NULL);
       } catch (JSONException e) {
         e.printStackTrace();
       }

@@ -106,19 +106,19 @@ public class TestState {
       switch (tile) {
         case "G":
         case "Z":
-          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), point, player, null);
+          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), point, player);
           outputArray = outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "ejected");
           break;
         case "O":
-          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_EXITED.name(), point, player, null);
+          gameManager.parseMoveStatusAndDoAction(GameStatus.PLAYER_EXITED.name(), point, player);
           outputArray = outputPlayerEjectedOrExitedMessage(outputArray, player, level, stateObject, "exited");
           break;
         case "*":
-          gameManager.parseMoveStatusAndDoAction(GameStatus.KEY_FOUND.name(), point, player, null);
+          gameManager.parseMoveStatusAndDoAction(GameStatus.KEY_FOUND.name(), point, player);
           outputArray = outputRegularMoveMessage(outputArray, level, stateObject, false);
           break;
         default:
-          gameManager.parseMoveStatusAndDoAction(GameStatus.VALID.name(), point, player, null);
+          gameManager.parseMoveStatusAndDoAction(GameStatus.VALID.name(), point, player);
           outputArray = outputRegularMoveMessage(outputArray, level, stateObject, true);
       }
     }

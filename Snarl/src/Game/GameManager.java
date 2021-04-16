@@ -50,7 +50,8 @@ public class GameManager {
             if (isNewLevel) {
                 resetForNewLevel();
                 isNewLevel = false;
-
+                sendUpdateToUsers(UpdateType.START_LEVEL, "", null);
+                sendUpdateToUsers(UpdateType.START_ROUND, "", null);
             }
             ICharacter character = (ICharacter) allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
@@ -58,6 +59,7 @@ public class GameManager {
 
             // Move the adversary automatically
             if (character instanceof IAdversary) {
+                System.out.println("DEBUG: It is an adversary's move");
                 gameStillGoing = adversarysMove(character, currentUser);
             }
             // Ask the player for a move and validate/execute that move
@@ -91,6 +93,7 @@ public class GameManager {
         Position chosenMove = am.chooseAdversaryMove(currentUser, (IAdversary) character);
 
         GameStatus moveStatus = callRuleChecker(character, chosenMove);
+        System.out.println("DEBUG: moveStatus from adversary's chosen move is: " + moveStatus);
         int invalidCount = 0;
         // generate a new move until we get one that's not invalid
         while (moveStatus.toString().equals("INVALID")) {
@@ -106,7 +109,8 @@ public class GameManager {
                 moveStatus = callRuleChecker(character, chosenMove);
             }
         }
-        parseMoveStatusAndDoAction(moveStatus.name(), chosenMove, character, currentUser);
+        System.out.println("DEBUG: The moveStatus (after checking invalid move) is " + moveStatus);
+        parseMoveStatusAndDoAction(moveStatus.name(), chosenMove, character);
         return checkGameStatus(moveStatus);
     }
 
@@ -116,10 +120,16 @@ public class GameManager {
      */
     private boolean playersMove(ICharacter character, IUser currentUser, boolean playerIsActive) {
         if (playerIsActive) {
+            System.out.println("DEBUG: It is " + character.getName() + "'s turn.");
             if (observerView) {
                 currentUser.renderObserverView(this.currentLevel);
             }
             Position requestedMove = currentUser.getUserMove(character);
+            if (requestedMove == null) {
+                this.currentLevel.restoreCharacterTile(character);
+                sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_SELF_ELIMINATES.name(), character);
+                return true;
+            }
             GameStatus moveStatus = callRuleChecker(character, requestedMove);
             return getPlayerMoveAndExecute(requestedMove, moveStatus, character, currentUser);
         }
@@ -148,7 +158,7 @@ public class GameManager {
         }
         currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
         boolean gameStillGoing = checkGameStatus(moveStatus);
-        parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character, currentUser);
+        parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character);
         sendUpdateToUsers(UpdateType.PLAYER_UPDATE, moveStatus.name(), character);
         return gameStillGoing;
     }
@@ -191,6 +201,7 @@ public class GameManager {
         } else if (character instanceof IAdversary) {
             IRuleChecker rcAdversary;
             if (((IAdversary) character).getType().equals("zombie")) {
+                System.out.println("DEBUG: Sending requestedMove to RuleCheckerAdversary");
                 rcAdversary = new RuleCheckerZombie(this, currentLevel, (IAdversary) character);
             } else rcAdversary = new RuleCheckerGhost(this, currentLevel, (IAdversary) character);
 
@@ -202,7 +213,7 @@ public class GameManager {
     /**
      * Parses the given GameStatus type and applies specific actions to the level/game based on which type of move it is.
      */
-    public void parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c, IUser currentUser) {
+    public void parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c) {
         switch (moveStatus) {
             case "VALID":
                 currentLevel.moveCharacter(c, destination);
@@ -219,10 +230,7 @@ public class GameManager {
                 expelledPlayers.add((Player) c);
                 break;
             case "PLAYER_EXPELLED":
-                Player p = currentLevel.playerAtGivenPosition(destination);
-                currentLevel.expelPlayer(p);
-                expelledPlayers.add(p);
-                currentLevel.moveCharacter(c, destination);
+                playerExpelled(destination, c);
                 break;
             case "PLAYER_EXITED":
                 currentLevel.restoreCharacterTile(c);
@@ -244,7 +252,17 @@ public class GameManager {
                 break;
             default:
         }
+    }
 
+    private void playerExpelled(Position destination, ICharacter c) {
+        Player p = currentLevel.playerAtGivenPosition(destination);
+        currentLevel.expelPlayer(p);
+        expelledPlayers.add(p);
+        p.increaseNumOfTimesExpelled();
+        currentLevel.moveCharacter(c, destination);
+        IUser playerUser = getUserByName(p.getName());
+        playerUser.sendMoveUpdate(GameStatus.PLAYER_EXPELLED.name(), null, null);
+        sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_EXPELLED.name(), p);
     }
 
     /**
@@ -259,7 +277,6 @@ public class GameManager {
      * Actions to conduct when the game has been won by the players.
      */
     private void gameWon(Position destination, ICharacter c) {
-        Player p3 = currentLevel.playerAtGivenPosition(destination);
         currentLevel.restoreCharacterTile(c);
         currentLevel.playerPassedThroughExit(c);
         addToListOfExitedOrExpelled(p3, c);
@@ -284,25 +301,31 @@ public class GameManager {
      * Actions to conduct when the level has been won.
      */
     private void levelWon(Position destination, ICharacter c) {
-        Player p2 = currentLevel.playerAtGivenPosition(destination);
+        addToListOfExitedOrExpelled(destination, c);
         currentLevel.restoreCharacterTile(c);
-        currentLevel.playerPassedThroughExit(c);
-        addToListOfExitedOrExpelled(p2, c);
-        sendUpdateToUsers(UpdateType.END_LEVEL, "", c);
+        currentLevel.playerLeavesTheLevel(c);
         resurrectPlayers();
         this.currentLevel = this.allLevels.get(getNewLevelNum());
         this.isNewLevel = true;
     }
 
     /**
-     * Adds the given character to the list of exited players if they are a player and they left the game,
+     * Adds the given character to the list of exited players if
      * or to the list of expelled players if the character is an adversary.
      */
-    private void addToListOfExitedOrExpelled(Player p,ICharacter c) {
-        if (c instanceof Player) {
-            exitedPlayers.add((Player) c);
-        } else {
-            expelledPlayers.add(p);
+    public void addToListOfExitedOrExpelled(Position destination, ICharacter c) {
+        if (c instanceof IAdversary) {
+            Player p2 = currentLevel.playerAtGivenPosition(destination);
+            this.currentLevel.expelPlayer(p2);
+            expelledPlayers.add(p2);
+        }
+        else {
+            if (((Player) c).getIsExpelled()) {
+                expelledPlayers.add((Player) c);
+            }
+            else {
+                exitedPlayers.add((Player) c);
+            }
         }
     }
 
@@ -486,7 +509,7 @@ public class GameManager {
                 ICharacter usersCharacter = getPlayerFromName(user.getUserName());
                 switch (type) {
                     case START_LEVEL:
-                        ru.sendStartLevelMessage(this.allLevels.indexOf(this.currentLevel));
+                        ru.sendStartLevelMessage(this.allLevels.indexOf(this.currentLevel) + 1);
                         break;
                     case START_ROUND:
                         ru.sendInitialUpdate(usersCharacter);
@@ -501,7 +524,6 @@ public class GameManager {
                         ru.sendEndGameMessage();
                         break;
                     default:
-                        System.out.println("DEBUG: THERE IS A VERY BIG PROBLEM");
                 }
             }
         }

@@ -46,7 +46,7 @@ public class StateTesting {
   public static void testParseMoveDoAction() {
     assertEquals(true, gm.checkGameStatus(GameStatus.INVALID));
     Position ghostPos = level1.getAdversaryObjectFromName("scary").getCharacterPosition();
-    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), ghostPos, level1.getPlayerObjectFromName("Carl"), null);
+    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), ghostPos, level1.getPlayerObjectFromName("Carl"));
     assertEquals(null, level1.getPlayerObjectFromName("Carl"));
   }
 
@@ -64,7 +64,7 @@ public class StateTesting {
     // checking active status after Player has been expelled
     IAdversary evil = new Ghost("evil");
     level1.addCharacter(evil, new Position(bob.getCharacterPosition().getRow() - 1, bob.getCharacterPosition().getCol()));
-    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), evil.getCharacterPosition(), bob, null);
+    gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES.name(), evil.getCharacterPosition(), bob);
     assertEquals(false, gm.checkPlayerActiveStatus(bob));
   }
 

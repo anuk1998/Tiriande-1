@@ -62,13 +62,18 @@ public class Server {
           clients.add(clientThread);
           clientThread.start();
           clientCount++;
-          System.out.println("INFO: Registered client.");
         }
         catch (InterruptedIOException e) {
           System.out.println("INFO: Timer ran out. Starting game with who we have.");
           break;
         }
       }
+
+      for (ClientThread client : clients) {
+        boolean isRegistered = client.registerClient();
+        System.out.println("INFO: Registered client: " + isRegistered);
+      }
+      System.out.println("INFO: Done registering all clients.");
 
       registerAutomatedAdversaries();
       manager.setObserverView(observerView);

@@ -163,6 +163,9 @@ public class RemoteUser implements IUser {
   @Override
   public Position getUserMove(ICharacter character) {
     Position newPos = null;
+    if (clientConnection == null) {
+      return null;
+    }
     try {
       Position move = clientConnection.getMoveFromClient("move", MessageType.MOVE);
       if (move == null) {

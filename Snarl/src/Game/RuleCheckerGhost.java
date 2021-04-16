@@ -9,9 +9,9 @@ public class RuleCheckerGhost implements IRuleChecker {
 
     // Tile/Actor representation constants
     String PLAYER_1 = Avatars.PLAYER_1.toString();
-    String PLAYER_2 = Avatars.PLAYER_1.toString();
-    String PLAYER_3 = Avatars.PLAYER_1.toString();
-    String PLAYER_4 = Avatars.PLAYER_1.toString();
+    String PLAYER_2 = Avatars.PLAYER_2.toString();
+    String PLAYER_3 = Avatars.PLAYER_3.toString();
+    String PLAYER_4 = Avatars.PLAYER_4.toString();
     String GHOST = Avatars.GHOST.toString();
     String ZOMBIE = Avatars.ZOMBIE.toString();
     String WALL = TileType.WALL.toString();
