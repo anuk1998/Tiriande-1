@@ -217,7 +217,6 @@ public class Level {
   public void expelPlayer(Player p) {
     this.activePlayers.remove(p);
     p.setIsExpelled(true);
-    p.increaseNumOfTimesExpelled();
   }
 
   // Helper method for expelPlayer when called in GameManager, returns the player at a given position
@@ -253,7 +252,7 @@ public class Level {
   }
 
   // Method that handles when a player successfully passes through the exit by removing them from active players list
-  public void playerPassedThroughExit(ICharacter c) {
+  public void playerLeavesTheLevel(ICharacter c) {
     this.getActivePlayers().remove(c);
   }
 

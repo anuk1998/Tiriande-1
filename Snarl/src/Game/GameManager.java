@@ -234,7 +234,7 @@ public class GameManager {
                 break;
             case "PLAYER_EXITED":
                 currentLevel.restoreCharacterTile(c);
-                currentLevel.playerPassedThroughExit(c);
+                currentLevel.playerLeavesTheLevel(c);
                 exitedPlayers.add((Player) c);
                 break;
             case "GHOST_TRANSPORTS":
@@ -278,23 +278,15 @@ public class GameManager {
      */
     private void gameWon(Position destination, ICharacter c) {
         currentLevel.restoreCharacterTile(c);
-        currentLevel.playerPassedThroughExit(c);
-        addToListOfExitedOrExpelled(p3, c);
+        addToListOfExitedOrExpelled(destination, c);
     }
 
     /**
      * Actions to conduct when the game has been lost by the players.
      */
     private void gameLost(Position destination, ICharacter c) {
-        Player p4 = currentLevel.playerAtGivenPosition(destination);
         currentLevel.restoreCharacterTile(c);
-        if (c instanceof Player) {
-            currentLevel.expelPlayer((Player) c);
-            expelledPlayers.add((Player) c);
-        } else {
-            currentLevel.expelPlayer(p4);
-            expelledPlayers.add(p4);
-        }
+        addToListOfExitedOrExpelled(destination,c);
     }
 
     /**
@@ -364,7 +356,7 @@ public class GameManager {
      * Generate new adversaries and new positions for them.
      */
     private void resetForNewLevel() {
-        System.out.println("Congrats! You have advanced to the next level");
+        sendUpdateToUsers(UpdateType.END_LEVEL, "", null);
         // reset data structures for new level
         this.allCharacters = new LinkedHashSet<>();
         this.exitedPlayers = new ArrayList<>();

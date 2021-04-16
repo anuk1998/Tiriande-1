@@ -104,7 +104,7 @@ public class ClientThread extends Thread {
         playerScore.put("name", p.getName());
         playerScore.put("exits", p.getNumOfTimesExited());
         playerScore.put("ejects", p.getNumOfTimesExpelled());
-        playerScore.put("key", p.getNumOfKeysFound());
+        playerScore.put("keys", p.getNumOfKeysFound());
         playerScoresList.put(playerScore);
       } catch (JSONException ignored) {
       }
@@ -114,6 +114,9 @@ public class ClientThread extends Thread {
 
   private JSONObject makeEndLevelMessage() {
     JSONObject endLevel = new JSONObject();
+    JSONArray exitedPlayersJSONArray = new JSONArray();
+    JSONArray ejectedPlayersJSONArray = new JSONArray();
+
     try {
       for (Player p : manager.getExitedPlayers()) {
         exitedPlayersJSONArray.put(p.getName());

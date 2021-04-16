@@ -118,34 +118,11 @@ public class Client {
           break;
         case "start-level":
           System.out.println("~~~LEVEL STARTING:~~~");
-          int startLevelNum = serverMessageAsJSON.getInt("level");
-          System.out.println("You are starting on level: " + startLevelNum);
-          System.out.println("Here is a list of all the players in the game:");
-          System.out.println(serverMessageAsJSON.getJSONArray("players"));
+          startLevelMessageHelper(serverMessageAsJSON);
           break;
         case "player-update":
           System.out.println("~~~GAME UPDATE:~~~");
-          JSONArray layout = serverMessageAsJSON.getJSONArray("layout");
-          JSONArray objects = serverMessageAsJSON.getJSONArray("objects");
-          JSONArray position = serverMessageAsJSON.getJSONArray("position");
-
-          System.out.println("Your view layout: " + layout.toString());
-          System.out.println("Objects near you: " + objects.toString());
-          if (serverMessageAsJSON.isNull("actors")) {
-            System.out.println("Actors near you: []");
-          }
-          else {
-            JSONArray actors = serverMessageAsJSON.getJSONArray("actors");
-            System.out.println("Actors near you: " + actors.toString());
-          }
-          System.out.println("Your Position: " + position.toString());
-          if (serverMessageAsJSON.isNull("message")) {
-            System.out.println("Message: " + JSONObject.NULL);
-          }
-          else {
-            String message = serverMessageAsJSON.getString("message");
-            System.out.println("Message: " + message);
-          }
+          playerUpdateMessageHelper(serverMessageAsJSON);
           break;
         case "end-level":
           System.out.println("~~~END OF LEVEL:~~~");
@@ -160,6 +137,82 @@ public class Client {
       System.out.println(serverMessage);
     }
     return false;
+  }
+
+  private void endGameMessageHelper(JSONObject serverMessageAsJSON) {
+    try {
+      JSONArray scores = serverMessageAsJSON.getJSONArray("scores");
+      System.out.println("Here is a list of each player's scores: ");
+      for (int i = 0; i < scores.length(); i++) {
+        String name = scores.getJSONObject(i).getString("name");
+        int exits = scores.getJSONObject(i).getInt("exits");
+        int ejects = scores.getJSONObject(i).getInt("ejects");
+        int keys = scores.getJSONObject(i).getInt("keys");
+        System.out.println("Player: " + name);
+        System.out.println("Number of times exited: " + exits);
+        System.out.println("Number of times ejected: " + ejects);
+        System.out.println("Number of keys found: " + keys);
+        System.out.println("---------------");
+      }
+    }
+    catch (JSONException jsonException) {
+      jsonException.printStackTrace();
+    }
+  }
+
+  private void endLevelMessageHelper(JSONObject serverMessageAsJSON) {
+    try {
+      String keyFinder = serverMessageAsJSON.getString("key");
+      JSONArray exitedPlayers = serverMessageAsJSON.getJSONArray("exits");
+      JSONArray ejectedPlayers = serverMessageAsJSON.getJSONArray("ejects");
+      System.out.println(keyFinder + " found the key.");
+      System.out.println("Here is a list of the players who were expelled by an adversary:\n" +
+              ejectedPlayers.toString());
+      System.out.println("Here is a list of the players who exited successfully:\n" +
+              exitedPlayers.toString());
+    }
+    catch (JSONException jsonException) {
+      jsonException.printStackTrace();
+    }
+  }
+
+  private void playerUpdateMessageHelper(JSONObject serverMessageAsJSON) {
+    try {
+      JSONArray layout = serverMessageAsJSON.getJSONArray("layout");
+      JSONArray objects = serverMessageAsJSON.getJSONArray("objects");
+      JSONArray position = serverMessageAsJSON.getJSONArray("position");
+
+      System.out.println("Your view layout: " + layout.toString());
+      System.out.println("Objects near you: " + objects.toString());
+      if (serverMessageAsJSON.isNull("actors")) {
+        System.out.println("Actors near you: []");
+      } else {
+        JSONArray actors = serverMessageAsJSON.getJSONArray("actors");
+        System.out.println("Actors near you: " + actors.toString());
+      }
+      System.out.println("Your Position: " + position.toString());
+      if (serverMessageAsJSON.isNull("message")) {
+        System.out.println("Message: " + JSONObject.NULL);
+      } else {
+        String message = serverMessageAsJSON.getString("message");
+        System.out.println("Message: " + message);
+      }
+    }
+    catch(JSONException jsonException ){
+      jsonException.printStackTrace();
+    }
+  }
+
+  private void startLevelMessageHelper(JSONObject serverMessageAsJSON) {
+    try {
+      int startLevelNum = serverMessageAsJSON.getInt("level");
+      System.out.println("You are starting on level: " + startLevelNum);
+      System.out.println("Here is a list of all the players in the game:");
+      System.out.println(serverMessageAsJSON.getJSONArray("players"));
+    }
+    catch(JSONException jsonException ){
+      jsonException.printStackTrace();
+    }
   }
 
   private String parsePlayerMoveMessageAsJSON(String playerMove) throws JSONException {

@@ -78,6 +78,7 @@ public class Server {
       registerAutomatedAdversaries();
       manager.setObserverView(observerView);
 
+
       System.out.println("INFO: Sending start level message to all clients.");
       for (ClientThread client : clients) {
         client.sendToClient("1", MessageType.LEVEL_START);
@@ -85,6 +86,7 @@ public class Server {
 
       manager.sendUpdateToUsers(UpdateType.START_ROUND, "", null);
       manager.runGame();
+
       System.out.println("INFO: Game's over. Closing.");
       for (ClientThread c : clients) {
         c.close();

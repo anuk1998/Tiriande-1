@@ -142,7 +142,8 @@ public class RemoteUser implements IUser {
   @Override
   public void sendNoMoveUpdate() {
     if (clientConnection != null) {
-      clientConnection.sendToClient("You've run out of chances. No move for you this turn.", MessageType.NO_MOVE);
+      clientConnection.sendToClient("You've run out of chances. No move for you this turn." +
+                      " You will remain in your current position", MessageType.NO_MOVE);
     }
   }
 
