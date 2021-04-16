@@ -100,6 +100,46 @@ public class Server {
 
   }
 
+  private static void getConnections(ServerSocket serverSocket, ArrayList<ClientThread> clients, int clientCount) throws IOException {
+    System.out.println("INFO: Setting up socket connection");
+    serverSocket.setSoTimeout(waitTimeSeconds * 1000);
+    while (clientCount < numOfClients) {
+      try {
+        System.out.println("INFO: Waiting for connections...");
+        Socket acceptSocket = serverSocket.accept();
+        System.out.println("INFO: Got a connection!");
+        ClientThread clientThread = new ClientThread(acceptSocket, manager);
+        clients.add(clientThread);
+        clientThread.start();
+        clientCount++;
+      }
+      catch (InterruptedIOException e) {
+        System.out.println("INFO: Timer ran out. Starting game with who we have.");
+        break;
+      }
+    }
+  }
+
+  private static void playTheGame(ArrayList<ClientThread> clients) {
+    for (ClientThread client : clients) {
+      boolean isRegistered = client.registerClient();
+      System.out.println("INFO: Registered client: " + isRegistered);
+    }
+    System.out.println("INFO: Done registering all clients.");
+
+    registerAutomatedAdversaries();
+    manager.setObserverView(observerView);
+
+
+    System.out.println("INFO: Sending start level message to all clients.");
+    for (ClientThread client : clients) {
+      client.sendToClient("1", MessageType.LEVEL_START);
+    }
+
+    manager.sendUpdateToUsers(UpdateType.START_ROUND, "", null);
+    manager.runGame();
+  }
+
   private static ArrayList<JSONObject> readFile(String filename) throws IOException, JSONException {
     ArrayList<JSONObject> jsonLevels = new ArrayList<>();
     BufferedReader bufferedReader = new BufferedReader(new FileReader(filename));
