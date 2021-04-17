@@ -39,21 +39,55 @@ public class ClientThread extends Thread {
       input = new BufferedReader(new InputStreamReader(this.socket.getInputStream()));
       output = new PrintWriter(socket.getOutputStream(), true);
       output.println(serverWelcomeMessage());
-      output.println("name");
-      String message = input.readLine();
-      Registration status = manager.registerPlayer(message, Registration.REMOTE);
-      while (status.toString().equals("DUPLICATE_NAME")) {
-        output.println("Name already in use.");
-        output.println("name");
-        message = input.readLine();
-        status = manager.registerPlayer(message, Registration.REMOTE);
+      output.println("actor-type");
+      String actorType = input.readLine();
+      if (actorType.equals("A")) {
+        registerAsAdversary();
       }
-      manager.passConnectionToRemoteUser(message, this);
+      else {
+        output.println("name");
+        String name = input.readLine();
+        Registration status = manager.registerPlayer(name, Registration.REMOTE);
+        while (status.equals(Registration.DUPLICATE_NAME)) {
+          output.println("Name already in use.");
+          output.println("name");
+          name = input.readLine();
+          status = manager.registerPlayer(name, Registration.REMOTE);
+        }
+        manager.passConnectionToRemoteUser(name, this);
+      }
+
     }
     catch (IOException | JSONException e) {
       e.printStackTrace();
     }
     return true;
+  }
+
+  private void registerAsAdversary() throws IOException {
+    output.println("adversary-type");
+    String adversaryType = input.readLine();
+    output.println("name");
+    String name = input.readLine();
+    if (adversaryType.equals("G")) {
+      Registration status = manager.registerAdversary(name, "ghost", Registration.REMOTE);
+      while (status.equals(Registration.DUPLICATE_NAME)) {
+        output.println("Name already in use.");
+        output.println("name");
+        String newName = input.readLine();
+        status = manager.registerAdversary(newName, "ghost", Registration.REMOTE);
+      }
+    }
+    else {
+      Registration status = manager.registerAdversary(name, "zombie", Registration.REMOTE);
+      while (status.equals(Registration.DUPLICATE_NAME)) {
+        output.println("Name already in use.");
+        output.println("name");
+        String newName = input.readLine();
+        status = manager.registerAdversary(newName, "zombie", Registration.REMOTE);
+      }
+    }
+    manager.passConnectionToRemoteUser(name, this);
   }
 
   private JSONObject serverWelcomeMessage() throws JSONException {

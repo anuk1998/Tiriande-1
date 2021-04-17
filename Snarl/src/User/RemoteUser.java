@@ -32,6 +32,7 @@ public class RemoteUser implements IUser {
   public void sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
     if (clientConnection != null) {
       switch (moveStatus) {
+        case "GHOST_TRANSPORTS":
         case "VALID":
           clientConnection.sendToClient("OK", MessageType.RESULT);
           break;

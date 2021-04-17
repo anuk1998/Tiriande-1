@@ -200,12 +200,9 @@ public class RuleCheckerPlayer implements IRuleChecker {
     /**
      * Returns the appropriate GameStatus when a player encounters an IAdversary based on if they get expelled
      * and if they are the last player to get expelled.
-     *
-     * @return GameStatus.GAME_LOST or GameStatus.PLAYER_SELF_ELIMINATES
      */
     @Override
     public GameStatus encountersOppositeCharacter() {
-        this.player.increaseNumOfTimesExpelled();
         // checks if the player self-eliminating is the last active player in the level
         if (currentLevel.getActivePlayers().size() == 1) {
             //and everyone else is expelled
@@ -222,6 +219,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
                 return GameStatus.LEVEL_WON;
             }
         }
+        this.player.increaseNumOfTimesExpelled();
         return GameStatus.PLAYER_SELF_ELIMINATES;
     }
 

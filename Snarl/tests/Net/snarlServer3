@@ -1,0 +1,12 @@
+#!/bin/bash
+echo "INFO: Launching server... Not accepting connections yet."
+# compile all the Game components as class files for dependency adding
+javac -cp ../../java-json.jar:../../bin -d ../../bin ../../src/Game/GameManager.java ../../src/Game/UpdateType.java ../../src/User/RemoteUser.java ../../src/Remote/ClientThread.java ../../src/Game/MessageType.java ../../src/Game/Level.java ../../src/Game/ICharacter.java ../../src/Game/Position.java ../../src/Game/Registration.java ../../src/Manager/TestManager.java ../../src/Game/Zombie.java ../../src/Game/Avatars.java ../../src/Game/TileType.java ../../src/Game/RuleCheckerGhost.java ../../src/Game/RuleCheckerZombie.java ../../src/Game/RuleCheckerPlayer.java ../../src/Game/IRuleChecker.java ../../src/Game/Ghost.java ../../src/Game/GameStatus.java ../../src/Game/AdversaryMovement.java ../../src/Game/IAdversary.java ../../src/Game/Player.java ../../src/Game/Hallway.java ../../src/Game/Position.java ../../src/Game/Room.java ../../src/Common/IUser.java ../../src/Common/IObserver.java ../../src/User/LocalUser.java ../../src/Observer/LocalObserver.java ../../src/Level/TestLevel.java > NUL
+
+# make class file for testing suite, create jar file, then execute program
+javac -cp ../../java-json.jar:../../bin -d ../../bin ../../src/Remote/Server.java > NUL
+jar cfm server.jar ../../MANIFESTSERVER.MF -C ../../bin/ .
+java -jar ./server.jar "$@"
+
+rm NUL
+rm server.jar

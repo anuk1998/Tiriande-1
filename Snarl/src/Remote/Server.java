@@ -17,6 +17,7 @@ import org.json.JSONTokener;
 import Game.GameManager;
 import Game.Level;
 import Game.MessageType;
+import Game.Registration;
 import Game.UpdateType;
 import Level.TestLevel;
 
@@ -52,6 +53,11 @@ public class Server {
     try {
       ServerSocket serverSocket = new ServerSocket(portNum);
       getConnections(serverSocket, clients, clientCount);
+      if (clients.size() == 0) {
+        serverSocket.close();
+        System.out.println("No one registered. Time has ran out. Goodbye.");
+        exit(1);
+      }
       playTheGame(clients);
       System.out.println("INFO: Game's over. Closing.");
       for (ClientThread c : clients) {
@@ -95,7 +101,6 @@ public class Server {
 
     registerAutomatedAdversaries();
     manager.setObserverView(observerView);
-
 
     System.out.println("INFO: Sending start level message to all clients.");
     for (ClientThread client : clients) {
@@ -153,10 +158,10 @@ public class Server {
     int numOfGhosts = (int) Math.floor((startLevelNum - 1) / 2);
 
     for (int z=1; z<numOfZombies+1; z++) {
-      manager.registerAdversary("zombie" + z, "zombie");
+      manager.registerAdversary("zombie" + z, "zombie", Registration.LOCAL);
     }
     for (int g=1; g<numOfGhosts+1; g++) {
-      manager.registerAdversary("ghost" + g, "ghost");
+      manager.registerAdversary("ghost" + g, "ghost", Registration.LOCAL);
     }
   }
 

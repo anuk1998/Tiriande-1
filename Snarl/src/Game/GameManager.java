@@ -59,7 +59,6 @@ public class GameManager {
 
             // Move the adversary automatically
             if (character instanceof IAdversary) {
-                System.out.println("DEBUG: It is an adversary's move");
                 gameStillGoing = adversarysMove(character, currentUser);
             }
             // Ask the player for a move and validate/execute that move
@@ -89,14 +88,21 @@ public class GameManager {
      * Selects the given adversary's next move based on player locations.
      */
     private boolean adversarysMove(ICharacter character, IUser currentUser) {
+        Position chosenMove = null;
         AdversaryMovement am = new AdversaryMovement(this.currentLevel);
-        Position chosenMove = am.chooseAdversaryMove(currentUser, (IAdversary) character);
+        if (currentUser instanceof LocalUser) {
+            chosenMove = am.chooseAdversaryMove(currentUser, (IAdversary) character);
+        }
+        else {
+            currentUser.renderObserverView(this.currentLevel);
+            chosenMove = currentUser.getUserMove(character);
+        }
 
         GameStatus moveStatus = callRuleChecker(character, chosenMove);
         System.out.println("DEBUG: moveStatus from adversary's chosen move is: " + moveStatus);
         int invalidCount = 0;
         // generate a new move until we get one that's not invalid
-        while (moveStatus.toString().equals("INVALID")) {
+        while (moveStatus.equals(GameStatus.INVALID)) {
             invalidCount++;
             // if there are no valid moves in any cardinal direction, keep the adversary stationary
             if (invalidCount == 4) {
@@ -111,6 +117,7 @@ public class GameManager {
         }
         System.out.println("DEBUG: The moveStatus (after checking invalid move) is " + moveStatus);
         parseMoveStatusAndDoAction(moveStatus.name(), chosenMove, character);
+        currentUser.sendMoveUpdate(moveStatus.toString(), chosenMove, character);
         return checkGameStatus(moveStatus);
     }
 
@@ -143,7 +150,7 @@ public class GameManager {
     private boolean getPlayerMoveAndExecute(Position requestedMove, GameStatus moveStatus, ICharacter character, IUser currentUser) {
         int invalidCount = 0;
         // Continues to ask for a move until the requested move from player is valid
-        while (moveStatus.toString().equals("INVALID")) {
+        while (moveStatus.equals(GameStatus.INVALID)) {
             invalidCount++;
             //if the player inputs 3 invalid moves, their turn is skipped and they remain in place
             if (invalidCount == 3) {
@@ -309,13 +316,16 @@ public class GameManager {
         if (c instanceof IAdversary) {
             Player p2 = currentLevel.playerAtGivenPosition(destination);
             this.currentLevel.expelPlayer(p2);
+            p2.increaseNumOfTimesExpelled();
             expelledPlayers.add(p2);
         }
         else {
             if (((Player) c).getIsExpelled()) {
+                ((Player)c).increaseNumOfTimesExpelled();
                 expelledPlayers.add((Player) c);
             }
             else {
+                ((Player)c).increaseNumOfTimesExited();
                 exitedPlayers.add((Player) c);
             }
         }
@@ -358,26 +368,30 @@ public class GameManager {
     private void resetForNewLevel() {
         sendUpdateToUsers(UpdateType.END_LEVEL, "", null);
         // reset data structures for new level
-        this.allCharacters = new LinkedHashSet<>();
+        //this.allCharacters = new LinkedHashSet<>();
         this.exitedPlayers = new ArrayList<>();
         this.expelledPlayers = new ArrayList<>();
         this.playerWhoFoundKey = "";
 
         // add all players in the game to the new level
-        addAllPlayersInGameToNewLevel();
+        addAllClientsInGameToNewLevel();
 
         //register appropriate number of adversaries to new level
-        registerAutomatedAdversaries();
+        // TODO: determine if there are enough remote adversaries for the level, if not, register
+        // TODO: automated adversaries to fill in the gaps (don't reset allCharacters completely, just keep adding adversaries with each level)
+        //registerAutomatedAdversaries();
     }
 
     /**
      * Helper method for resetForNewLevel(). Adds all players in the game to the new level
      */
-    public void addAllPlayersInGameToNewLevel() {
-        for (Player player : this.allPlayers.values()) {
+    public void addAllClientsInGameToNewLevel() {
+        for (IUser user : this.users) {
+            String name = user.getUserName();
+            ICharacter character = getActorFromName(name);
             Position randomPos = this.currentLevel.pickRandomPositionForCharacterInLevel();
-            currentLevel.addCharacter(player, randomPos);
-            allCharacters.add(player);
+            currentLevel.addCharacter(character, randomPos);
+            allCharacters.add(character);
         }
     }
 
@@ -447,10 +461,10 @@ public class GameManager {
         int numOfGhosts = (int) Math.floor(levelNum / 2);
 
         for (int z = 1; z < numOfZombies + 1; z++) {
-            registerAdversary("zombie" + z, "zombie");
+            registerAdversary("zombie" + z, "zombie", Registration.LOCAL);
         }
         for (int g = 1; g < numOfGhosts + 1; g++) {
-            registerAdversary("ghost" + g, "ghost");
+            registerAdversary("ghost" + g, "ghost", Registration.LOCAL);
         }
     }
 
@@ -460,7 +474,10 @@ public class GameManager {
      * @param name the name of adversary to register
      * @param type which type of adversary it is
      */
-    public void registerAdversary(String name, String type) {
+    public Registration registerAdversary(String name, String type, Registration adversaryType) {
+        if (allCharacters.contains(name)) {
+            return Registration.DUPLICATE_NAME;
+        }
         IAdversary adversary = null;
         if (type.equalsIgnoreCase("zombie")) {
             adversary = new Zombie(name);
@@ -468,11 +485,11 @@ public class GameManager {
         else if (type.equalsIgnoreCase("ghost")) {
             adversary = new Ghost(name);
         }
-        LocalUser user = new LocalUser(name);
-        this.users.add(user);
+        addUser(name, adversaryType);
         this.allCharacters.add(adversary);
         Position pickedPos = currentLevel.pickRandomPositionForCharacterInLevel();
         currentLevel.addCharacter(adversary, new Position(pickedPos.getRow(), pickedPos.getCol()));
+        return Registration.REGISTERED;
     }
 
     /**
@@ -498,7 +515,7 @@ public class GameManager {
         for (IUser user : users) {
             if (user instanceof RemoteUser) {
                 RemoteUser ru = (RemoteUser) user;
-                ICharacter usersCharacter = getPlayerFromName(user.getUserName());
+                ICharacter usersCharacter = getActorFromName(user.getUserName());
                 switch (type) {
                     case START_LEVEL:
                         ru.sendStartLevelMessage(this.allLevels.indexOf(this.currentLevel) + 1);
@@ -584,9 +601,13 @@ public class GameManager {
     /**
      * Returns the ICharacter associated with a given userName
      */
-    private ICharacter getPlayerFromName(String userName) {
-        Player p = allPlayers.get(userName);
-        return p;
+    private ICharacter getActorFromName(String userName) {
+        for (ICharacter character : allCharacters) {
+            if (character.getName().equals(userName)) {
+                return character;
+            }
+        }
+        return null;
     }
 
     /**

@@ -92,7 +92,7 @@ public class TestManager {
     int type = 1;
     for (int i=0; i< positionList.size(); i++) {
       if (i >= nameListArr.length()) {
-        manager.registerAdversary("adv" + type, "zombie");
+        manager.registerAdversary("adv" + type, "zombie", Registration.LOCAL);
         level.moveCharacter(level.getAdversaryObjectFromName("adv" + type), positionList.get(i));
         type++;
         continue;
@@ -357,18 +357,20 @@ public class TestManager {
         String colTile = layout[i][j];
         if (colTile.equals("Z") || colTile.equals("G")) {
           Position advPosInLevel = new Position(i + rowDiff, j + colDiff);
-          IAdversary adv = level.adversaryAtGivenPosition(advPosInLevel);
+          if (!advPosInLevel.toString().equals(playerPos.toString())) {
+            IAdversary adv = level.adversaryAtGivenPosition(advPosInLevel);
 
-          JSONObject actorObj = new JSONObject();
-          actorObj.put("name", adv.getName());
-          actorObj.put("type", adv.getType());
+            JSONObject actorObj = new JSONObject();
+            actorObj.put("name", adv.getName());
+            actorObj.put("type", adv.getType());
 
-          JSONArray actorPos = new JSONArray();
-          actorPos.put(adv.getCharacterPosition().getRow());
-          actorPos.put(adv.getCharacterPosition().getCol());
-          actorObj.put("position", actorPos);
+            JSONArray actorPos = new JSONArray();
+            actorPos.put(adv.getCharacterPosition().getRow());
+            actorPos.put(adv.getCharacterPosition().getCol());
+            actorObj.put("position", actorPos);
 
-          actorsArray.put(actorObj);
+            actorsArray.put(actorObj);
+          }
         }
         else if ((colTile.equals("@") || colTile.equals("¤") || colTile.equals("$") || colTile.equals("~"))
                 && !(colTile.equals(player.getAvatar()))) {

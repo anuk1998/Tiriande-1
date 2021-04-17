@@ -248,8 +248,8 @@ public class StateTesting {
     gm.registerPlayer("Anu", Registration.LOCAL);
 
     //register adversaries and add them to the board
-    gm.registerAdversary("scary", "ghost");
-    gm.registerAdversary("bloody", "zombie");
+    gm.registerAdversary("scary", "ghost", Registration.LOCAL);
+    gm.registerAdversary("bloody", "zombie", Registration.LOCAL);
 
     System.out.println(level1.renderLevel());
   }
