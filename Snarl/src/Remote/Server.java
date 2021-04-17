@@ -50,43 +50,9 @@ public class Server {
     int clientCount = 0;
 
     try {
-      System.out.println("INFO: Setting up socket connection");
       ServerSocket serverSocket = new ServerSocket(portNum);
-      serverSocket.setSoTimeout(waitTimeSeconds * 1000);
-      while (clientCount < numOfClients) {
-        try {
-          System.out.println("INFO: Waiting for connections...");
-          Socket acceptSocket = serverSocket.accept();
-          System.out.println("INFO: Got a connection!");
-          ClientThread clientThread = new ClientThread(acceptSocket, manager);
-          clients.add(clientThread);
-          clientThread.start();
-          clientCount++;
-        }
-        catch (InterruptedIOException e) {
-          System.out.println("INFO: Timer ran out. Starting game with who we have.");
-          break;
-        }
-      }
-
-      for (ClientThread client : clients) {
-        boolean isRegistered = client.registerClient();
-        System.out.println("INFO: Registered client: " + isRegistered);
-      }
-      System.out.println("INFO: Done registering all clients.");
-
-      registerAutomatedAdversaries();
-      manager.setObserverView(observerView);
-
-
-      System.out.println("INFO: Sending start level message to all clients.");
-      for (ClientThread client : clients) {
-        client.sendToClient("1", MessageType.LEVEL_START);
-      }
-
-      manager.sendUpdateToUsers(UpdateType.START_ROUND, "", null);
-      manager.runGame();
-
+      getConnections(serverSocket, clients, clientCount);
+      playTheGame(clients);
       System.out.println("INFO: Game's over. Closing.");
       for (ClientThread c : clients) {
         c.close();
