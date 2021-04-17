@@ -57,7 +57,7 @@ public class GameManager {
             boolean playerIsActive = checkPlayerActiveStatus(character);
             IUser currentUser = getUserByName(character.getName());
 
-            // Move the adversary automatically
+            // Move the adversary
             if (character instanceof IAdversary) {
                 gameStillGoing = adversarysMove(character, currentUser);
             }
@@ -109,9 +109,13 @@ public class GameManager {
                 moveStatus = GameStatus.VALID;
                 chosenMove = character.getCharacterPosition();
                 break;
-            }
-            else {
-                chosenMove = am.chooseAdversaryMove(currentUser, (IAdversary) character);
+            } else {
+                if(currentUser instanceof LocalUser) {
+                    chosenMove = am.chooseAdversaryMove(currentUser, (IAdversary) character);
+                }
+                else {
+                    chosenMove = currentUser.getUserMove(character);
+                }
                 moveStatus = callRuleChecker(character, chosenMove);
             }
         }
@@ -120,6 +124,7 @@ public class GameManager {
         currentUser.sendMoveUpdate(moveStatus.toString(), chosenMove, character);
         return checkGameStatus(moveStatus);
     }
+
 
     /**
      * Checks if a player is active and if so, requests a move from them. If observer view is enabled,
@@ -235,6 +240,7 @@ public class GameManager {
                 currentLevel.restoreCharacterTile(c);
                 currentLevel.expelPlayer((Player) c);
                 expelledPlayers.add((Player) c);
+
                 break;
             case "PLAYER_EXPELLED":
                 playerExpelled(destination, c);

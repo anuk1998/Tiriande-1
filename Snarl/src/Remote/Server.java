@@ -99,7 +99,7 @@ public class Server {
     }
     System.out.println("INFO: Done registering all clients.");
 
-    registerAutomatedAdversaries();
+    //registerAutomatedAdversaries();
     manager.setObserverView(observerView);
 
     System.out.println("INFO: Sending start level message to all clients.");

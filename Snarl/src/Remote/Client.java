@@ -70,6 +70,14 @@ public class Client {
       case "name":
         System.out.println("Please enter your name for the game:");
         return true;
+      case "actor-type":
+        System.out.println("Would you like to register as a player or an adversary? " +
+                "Type 'P' for player or 'A' for adversary");
+        return true;
+      case "adversary-type":
+        System.out.println("Would you like to register as a ghost or a zombie? " +
+                "Enter 'G' for ghost or 'Z' for zombie");
+        return true;
       case "observe":
         String str;
         while ((str = input.readLine()) != null && str.length() != 0) {
