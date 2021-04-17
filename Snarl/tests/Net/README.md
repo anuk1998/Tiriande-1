@@ -1,6 +1,7 @@
 ## Snarl Instructions
 
-*Note: For this milestone, we were not able to test on the Khoury servers due to Java issues, which the Professor is aware of and deemed to be out of our control. 
+#### Note: 
+For this milestone, we were not able to test on the Khoury servers due to Java Memory issues on the server, which the Professor is aware of and deemed to be out of our control. 
 
 To play our Snarl game, you must first connect to the server via `./snarlServer`. We added information
 statements on the server-side to update the person launching the server about what's going on. 
