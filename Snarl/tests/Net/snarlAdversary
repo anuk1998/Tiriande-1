@@ -6,4 +6,3 @@ java -jar ./client.jar "$@"
 
 rm ../../src/Remote/Client.class 2>/dev/null &&
 rm client.jar
-

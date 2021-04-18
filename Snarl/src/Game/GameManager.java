@@ -22,6 +22,7 @@ public class GameManager {
     ArrayList<String> playerAvatars = new ArrayList<>(Arrays.asList(avatars));
     LinkedHashMap<String, Player> allPlayers = new LinkedHashMap<>();
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
+    ArrayList<IAdversary> remoteAdversaries = new ArrayList<>();
     ArrayList<Player> exitedPlayers = new ArrayList<>();
     ArrayList<Player> expelledPlayers = new ArrayList<>();
     ArrayList<Level> allLevels;
@@ -374,7 +375,6 @@ public class GameManager {
     private void resetForNewLevel() {
         sendUpdateToUsers(UpdateType.END_LEVEL, "", null);
         // reset data structures for new level
-        //this.allCharacters = new LinkedHashSet<>();
         this.exitedPlayers = new ArrayList<>();
         this.expelledPlayers = new ArrayList<>();
         this.playerWhoFoundKey = "";
@@ -382,10 +382,8 @@ public class GameManager {
         // add all players in the game to the new level
         addAllClientsInGameToNewLevel();
 
-        //register appropriate number of adversaries to new level
-        // TODO: determine if there are enough remote adversaries for the level, if not, register
-        // TODO: automated adversaries to fill in the gaps (don't reset allCharacters completely, just keep adding adversaries with each level)
-        //registerAutomatedAdversaries();
+        // register appropriate number of adversaries to new level, if some are needed
+        registerAutomatedAdversaries();
     }
 
     /**
@@ -463,14 +461,30 @@ public class GameManager {
      */
     public void registerAutomatedAdversaries() {
         int levelNum = this.allLevels.indexOf(this.currentLevel);
-        int numOfZombies = (int) (Math.floor((levelNum + 1) / 2) + 1);
-        int numOfGhosts = (int) Math.floor(levelNum / 2);
+        int numOfZombiesNeeded = (int) (Math.floor((levelNum + 1) / 2) + 1);
+        int numOfGhostsNeeded = (int) Math.floor(levelNum / 2);
+        int numOfZombiesToFill = numOfZombiesNeeded;
+        int numOfGhostsToFill = numOfGhostsNeeded;
 
-        for (int z = 1; z < numOfZombies + 1; z++) {
-            registerAdversary("zombie" + z, "zombie", Registration.LOCAL);
+        int currentNumOfZombies = 0;
+        int currentNumOfGhosts = 0;
+        for (ICharacter character : allCharacters) {
+            if (character instanceof Zombie) {
+                numOfZombiesToFill--;
+                currentNumOfZombies++;
+            }
+            if (character instanceof Ghost) {
+                numOfGhostsToFill--;
+                currentNumOfGhosts++;
+            }
         }
-        for (int g = 1; g < numOfGhosts + 1; g++) {
-            registerAdversary("ghost" + g, "ghost", Registration.LOCAL);
+        if (currentNumOfZombies + currentNumOfGhosts != numOfZombiesNeeded + numOfGhostsNeeded) {
+            for (int z = 1; z < numOfZombiesToFill + 1; z++) {
+                registerAdversary("zombie" + z, "zombie", Registration.LOCAL);
+            }
+            for (int g = 1; g < numOfGhostsToFill + 1; g++) {
+                registerAdversary("ghost" + g, "ghost", Registration.LOCAL);
+            }
         }
     }
 
@@ -481,8 +495,10 @@ public class GameManager {
      * @param type which type of adversary it is
      */
     public Registration registerAdversary(String name, String type, Registration adversaryType) {
-        if (allCharacters.contains(name)) {
-            return Registration.DUPLICATE_NAME;
+        for (ICharacter character : allCharacters) {
+            if (character.getName().equals(name)) {
+                return Registration.DUPLICATE_NAME;
+            }
         }
         IAdversary adversary = null;
         if (type.equalsIgnoreCase("zombie")) {
@@ -490,6 +506,10 @@ public class GameManager {
         }
         else if (type.equalsIgnoreCase("ghost")) {
             adversary = new Ghost(name);
+        }
+
+        if (adversaryType.equals(Registration.REMOTE)) {
+            remoteAdversaries.add(adversary);
         }
         addUser(name, adversaryType);
         this.allCharacters.add(adversary);
@@ -665,5 +685,12 @@ public class GameManager {
      */
     public String getPlayerWhoFoundKey() {
         return this.playerWhoFoundKey;
+    }
+
+    /**
+     * Get the list of remote adversaries.
+     */
+    public ArrayList<IAdversary> getRemoteAdversaries() {
+        return this.remoteAdversaries;
     }
 }

@@ -43,6 +43,9 @@ public class RemoteUser implements IUser {
           clientConnection.sendToClient("Key", MessageType.RESULT);
           break;
         case "PLAYER_EXPELLED":
+          if (c instanceof IAdversary) clientConnection.sendToClient("Killed", MessageType.RESULT);
+          else clientConnection.sendToClient("Eject", MessageType.RESULT);
+          break;
         case "PLAYER_SELF_ELIMINATES":
           clientConnection.sendToClient("Eject", MessageType.RESULT);
           break;

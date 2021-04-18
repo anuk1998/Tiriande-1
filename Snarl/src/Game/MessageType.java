@@ -1,7 +1,7 @@
 package Game;
 
 public enum MessageType {
-  UPDATE,
+  TERMINATE,
   MOVE,
   RESULT,
   NO_MOVE,

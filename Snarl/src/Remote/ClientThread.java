@@ -45,16 +45,7 @@ public class ClientThread extends Thread {
         registerAsAdversary();
       }
       else {
-        output.println("name");
-        String name = input.readLine();
-        Registration status = manager.registerPlayer(name, Registration.REMOTE);
-        while (status.equals(Registration.DUPLICATE_NAME)) {
-          output.println("Name already in use.");
-          output.println("name");
-          name = input.readLine();
-          status = manager.registerPlayer(name, Registration.REMOTE);
-        }
-        manager.passConnectionToRemoteUser(name, this);
+        registerAsPlayer();
       }
 
     }
@@ -90,6 +81,19 @@ public class ClientThread extends Thread {
     manager.passConnectionToRemoteUser(name, this);
   }
 
+  private void registerAsPlayer() throws IOException {
+    output.println("name");
+    String name = input.readLine();
+    Registration status = manager.registerPlayer(name, Registration.REMOTE);
+    while (status.equals(Registration.DUPLICATE_NAME)) {
+      output.println("Name already in use.");
+      output.println("name");
+      name = input.readLine();
+      status = manager.registerPlayer(name, Registration.REMOTE);
+    }
+    manager.passConnectionToRemoteUser(name, this);
+  }
+
   private JSONObject serverWelcomeMessage() throws JSONException {
     JSONObject welcome = new JSONObject();
     welcome.put("type", "welcome");
@@ -114,6 +118,9 @@ public class ClientThread extends Thread {
     }
     else if (type.equals(MessageType.END_GAME)){
       output.println(makeEndGameMessage());
+    }
+    else if (type.equals(MessageType.TERMINATE)){
+      output.println(message);
     }
   }
 

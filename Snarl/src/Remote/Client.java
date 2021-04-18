@@ -16,6 +16,8 @@ public class Client {
   static int port = 45678;
   boolean moveTime = false;
   boolean invalid = false;
+  boolean actorType = false;
+  boolean adversaryType = false;
 
   public static void main(String[] args) {
     ArrayList<String> argsList = new ArrayList<>(Arrays.asList(args));
@@ -47,6 +49,20 @@ public class Client {
         boolean isResponseNeeded = parseServerMessage(serverMessage);
         if (isResponseNeeded) {
           String reply = sc.nextLine();
+          if (actorType) {
+            while (!reply.equalsIgnoreCase("P") && !reply.equalsIgnoreCase("A")) {
+              System.out.println("Invalid type. Try again.");
+              reply = sc.nextLine();
+            }
+            actorType = false;
+          }
+          if (adversaryType) {
+            while (!reply.equalsIgnoreCase("G") && !reply.equalsIgnoreCase("Z")) {
+              System.out.println("Invalid type. Try again.");
+              reply = sc.nextLine();
+            }
+            adversaryType = false;
+          }
           if (moveTime || invalid) {
             reply = parsePlayerMoveMessageAsJSON(reply);
             while (reply.equals("invalid")) {
@@ -73,10 +89,12 @@ public class Client {
       case "actor-type":
         System.out.println("Would you like to register as a player or an adversary? " +
                 "Type 'P' for player or 'A' for adversary");
+        actorType = true;
         return true;
       case "adversary-type":
         System.out.println("Would you like to register as a ghost or a zombie? " +
                 "Enter 'G' for ghost or 'Z' for zombie");
+        adversaryType = true;
         return true;
       case "observe":
         String str;
@@ -86,7 +104,8 @@ public class Client {
         return false;
       case "move":
         System.out.println("~~~YOUR MOVE:~~~");
-        System.out.println("Please supply a position for your next move. Enter with this exact format: [<row>, <column>]. If you don't want to move your position, type 'null'.");
+        System.out.println("Please supply a position for your next move. Enter with this exact format: [<row>, <column>].");
+        System.out.println("If you are a player, type 'null' if you don't wish to move your position.");
         moveTime = true;
         return true;
       case "OK":
@@ -104,6 +123,10 @@ public class Client {
       case "Eject":
         System.out.println("~~~PLAYER STATUS:~~~");
         System.out.println("You have been ejected :(");
+        return false;
+      case "Killed":
+        System.out.println("~~~PLAYER STATUS:~~~");
+        System.out.println("You have ejected a player.");
         return false;
       case "Invalid":
         System.out.println("~~~MOVE STATUS:~~~");

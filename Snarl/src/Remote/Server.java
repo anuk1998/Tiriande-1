@@ -25,7 +25,8 @@ import static java.lang.System.exit;
 
 public class Server {
   static String filename = "snarl.levels";
-  static int numOfClients = 4;
+  static int numOfPlayers = 4;
+  static int numOfAdversaries = 0;
   static int waitTimeSeconds = 60;
   static boolean observerView = false;
   static String IPAddress = "127.0.0.1";
@@ -75,7 +76,7 @@ public class Server {
   private static void getConnections(ServerSocket serverSocket, ArrayList<ClientThread> clients, int clientCount) throws IOException {
     System.out.println("INFO: Setting up socket connection");
     serverSocket.setSoTimeout(waitTimeSeconds * 1000);
-    while (clientCount < numOfClients) {
+    while (clientCount < numOfPlayers + numOfAdversaries) {
       try {
         System.out.println("INFO: Waiting for connections...");
         Socket acceptSocket = serverSocket.accept();
@@ -99,7 +100,15 @@ public class Server {
     }
     System.out.println("INFO: Done registering all clients.");
 
-    //registerAutomatedAdversaries();
+    if (manager.getAllPlayers().size() == 0) {
+      for (ClientThread client : clients) {
+        client.sendToClient("No players registered. Goodbye.", MessageType.TERMINATE);
+      }
+      exit(1);
+    }
+    if (manager.getRemoteAdversaries().size() == 0) {
+      registerAutomatedAdversaries();
+    }
     manager.setObserverView(observerView);
 
     System.out.println("INFO: Sending start level message to all clients.");
@@ -170,9 +179,13 @@ public class Server {
       int index = argsList.indexOf("--levels");
       filename = argsList.get(index + 1);
     }
-    if (argsList.contains("--clients")) {
-      int index = argsList.indexOf("--clients");
-      numOfClients = Integer.parseInt(argsList.get(index + 1));
+    if (argsList.contains("--players")) {
+      int index = argsList.indexOf("--players");
+      numOfPlayers = Integer.parseInt(argsList.get(index + 1));
+    }
+    if (argsList.contains("--adversaries")) {
+      int index = argsList.indexOf("--adversaries");
+      numOfAdversaries = Integer.parseInt(argsList.get(index + 1));
     }
     if (argsList.contains("--wait")) {
       int index = argsList.indexOf("--wait");
