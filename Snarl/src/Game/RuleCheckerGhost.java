@@ -5,7 +5,6 @@ import java.util.HashSet;
 public class RuleCheckerGhost implements IRuleChecker {
     Level currentLevel;
     IAdversary adversary;
-    GameManager gm;
 
     // Tile/Actor representation constants
     String PLAYER_1 = Avatars.PLAYER_1.toString();
@@ -17,10 +16,9 @@ public class RuleCheckerGhost implements IRuleChecker {
     String WALL = TileType.WALL.toString();
     String VOID = TileType.VOID.toString();
     
-    public RuleCheckerGhost(GameManager gm, Level currentLevel, IAdversary adversary) {
+    public RuleCheckerGhost(Level currentLevel, IAdversary adversary) {
         this.currentLevel = currentLevel;
         this.adversary = adversary;
-        this.gm = gm;
     }
 
     @Override
@@ -53,7 +51,7 @@ public class RuleCheckerGhost implements IRuleChecker {
                 return GameStatus.GAME_LOST;
             }
             // checks that at least one player has passed through the level exit
-            else if (gm.getExitedPlayers().size() > 0) {
+            else if (this.currentLevel.getExitedPlayers().size() > 0) {
                 //it is the last level
                 if (this.currentLevel.getIsLastLevelOfGame()) {
                     return GameStatus.GAME_WON;

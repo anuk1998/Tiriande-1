@@ -122,8 +122,8 @@ public class GameManager {
             }
         }
         System.out.println("DEBUG: The moveStatus (after checking invalid move) is " + moveStatus);
-        parseMoveStatusAndDoAction(moveStatus.name(), chosenMove, character);
-        currentUser.sendMoveUpdate(moveStatus.toString(), chosenMove, character);
+        parseMoveStatusAndDoAction(moveStatus, chosenMove, character);
+        currentUser.sendMoveUpdate(moveStatus, chosenMove, character);
         return checkGameStatus(moveStatus);
     }
 
@@ -189,7 +189,8 @@ public class GameManager {
      */
     public boolean checkPlayerActiveStatus(ICharacter character) {
         if (character instanceof Player) {
-            return !exitedPlayers.contains(character) && !expelledPlayers.contains(character);
+            return !(this.currentLevel.getExitedPlayers()).contains(character) &&
+                    !(this.currentLevel.getExpelledPlayers()).contains(character);
         }
         return true;
     }
@@ -249,10 +250,10 @@ public class GameManager {
             case LEVEL_WON:
                 levelWon(destination, c);
                 break;
-            case "GAME_WON":
+            case GAME_WON:
                 gameWon(destination, c);
                 break;
-            case "GAME_LOST":
+            case GAME_LOST:
                 gameLost(destination, c);
                 break;
             default:
@@ -338,14 +339,14 @@ public class GameManager {
     /**
      * Creates a list of the players' rankings during the Game, based on the number of times they exited or found keys.
      */
-    public String printPlayerRankings(HashMap<String,Player> allPlayers, String exitedOrKey) {
+    public String printPlayerRankings(HashMap<String,Player> allPlayers, TileType exitedOrKey) {
         HashMap<String, Integer> playerExitedOrExpelledNumbers = new HashMap<>();
 
         for (Player p : allPlayers.values()) {
-            if(exitedOrKey.equals("exited")) {
+            if (exitedOrKey.equals(TileType.UNLOCKED_EXIT)) {
                 playerExitedOrExpelledNumbers.put(p.getName(), p.getNumOfTimesExited());
             }
-            else if (exitedOrKey.equals("key")){
+            else if (exitedOrKey.equals(TileType.KEY)){
                 playerExitedOrExpelledNumbers.put(p.getName(), p.getNumOfKeysFound());
             }
         }
@@ -469,10 +470,10 @@ public class GameManager {
 
         if (currentNumOfZombies + currentNumOfGhosts != numOfZombiesNeeded + numOfGhostsNeeded) {
             for (int z = 1; z < numOfZombiesToFill + 1; z++) {
-                registerAdversary("zombie" + z, "zombie", Registration.LOCAL);
+                registerAdversary(ZOMBIE_NAME + z, Avatars.ZOMBIE, Registration.LOCAL);
             }
             for (int g = 1; g < numOfGhostsToFill + 1; g++) {
-                registerAdversary("ghost" + g, "ghost", Registration.LOCAL);
+                registerAdversary(GHOST_NAME + g, Avatars.GHOST, Registration.LOCAL);
             }
         }
     }
@@ -480,17 +481,17 @@ public class GameManager {
     /**
      * Registers an adversary with a given unique name and add them to the level.
      */
-    public Registration registerAdversary(String name, String type, Registration adversaryType) {
+    public Registration registerAdversary(String name, Avatars type, Registration adversaryType) {
         for (ICharacter character : allCharacters) {
             if (character.getName().equals(name)) {
                 return Registration.DUPLICATE_NAME;
             }
         }
         IAdversary adversary = null;
-        if (type.equalsIgnoreCase("zombie")) {
+        if (type.equals(Avatars.ZOMBIE)) {
             adversary = new Zombie(name);
         }
-        else if (type.equalsIgnoreCase("ghost")) {
+        else if (type.equals(Avatars.GHOST)) {
             adversary = new Ghost(name);
         }
 
@@ -640,13 +641,6 @@ public class GameManager {
      */
     public LinkedHashMap<String, Player> getAllPlayers() {
         return this.allPlayers;
-    }
-
-    /**
-     * Returns the list of exitedPlayers
-     */
-    public ArrayList<Player> getExitedPlayers() {
-        return this.exitedPlayers;
     }
 
     /**

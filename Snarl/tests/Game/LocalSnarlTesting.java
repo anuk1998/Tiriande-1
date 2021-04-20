@@ -33,7 +33,7 @@ public class LocalSnarlTesting
     ArrayList<Level> listOfLevels = new ArrayList<>();
     listOfLevels.add(level1);
     GameManager gm = new GameManager(listOfLevels, 1);
-    gm.registerAdversary("meanie", "zombie", Registration.LOCAL);
+    gm.registerAdversary("meanie", Avatars.ZOMBIE, Registration.LOCAL);
 
     ArrayList<Position> playerPositions = new ArrayList<>();
     playerPositions.add(new Position(5,7));
@@ -51,7 +51,7 @@ public class LocalSnarlTesting
     ArrayList<Level> listOfLevels = new ArrayList<>();
     listOfLevels.add(level1);
     GameManager gm = new GameManager(listOfLevels, 1);
-    gm.registerAdversary("scary", "ghost", Registration.LOCAL);
+    gm.registerAdversary("scary", Avatars.GHOST, Registration.LOCAL);
 
     ArrayList<Position> playerPositions = new ArrayList<>();
     playerPositions.add(new Position(4,2));

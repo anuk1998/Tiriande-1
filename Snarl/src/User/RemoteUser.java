@@ -90,7 +90,7 @@ public class RemoteUser implements IUser {
     }
   }
 
-  public void sendPlayerUpdateMessage(String moveStatus, ICharacter movedCharacter, ICharacter thisCharacter) {
+  public void sendPlayerUpdateMessage(GameStatus moveStatus, ICharacter movedCharacter, ICharacter thisCharacter) {
     if (clientConnection != null) {
       clientConnection.sendPlayerUpdateMessage(moveStatus, movedCharacter, thisCharacter, this);
     }

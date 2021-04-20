@@ -5,7 +5,6 @@ import java.util.HashSet;
 public class RuleCheckerPlayer implements IRuleChecker {
     Level currentLevel;
     Player player;
-    GameManager gm;
 
     String VOID = TileType.VOID.toString();
     String WALL = TileType.WALL.toString();
@@ -20,7 +19,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
     public RuleCheckerPlayer(Level currentLevel, Player player) {
         this.currentLevel = currentLevel;
         this.player = player;
-        this.gm = manager;
     }
 
     /**
@@ -163,8 +161,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
       if (isExitUnlocked()) {
         // if it is the last player exiting through the exit tile
         if (currentLevel.getActivePlayers().size() == 1) {
-            if (isLastLevel()) {
-                this.player.increaseNumOfTimesExited();
+            if (this.currentLevel.getIsLastLevelOfGame()) {
                 return GameStatus.GAME_WON;
             }
             return GameStatus.LEVEL_WON;
@@ -194,13 +191,13 @@ public class RuleCheckerPlayer implements IRuleChecker {
         // checks if the player self-eliminating is the last active player in the level
         if (this.currentLevel.getActivePlayers().size() == 1) {
             //and everyone else is expelled
-            if (gm.getExpelledPlayers().size() == gm.getAllPlayers().size() - 1) {
+            if (this.currentLevel.getExpelledPlayers().size() == this.currentLevel.getNumOfPlayers() - 1) {
                 return GameStatus.GAME_LOST;
             }
             //at least one player has passed through the level exit
-            else if (gm.getExitedPlayers().size() > 0) {
+            else if (this.currentLevel.getExitedPlayers().size() > 0) {
                 //it is the last level
-                if (isLastLevel()) {
+                if (this.currentLevel.getIsLastLevelOfGame()) {
                     return GameStatus.GAME_WON;
                 }
                 this.player.setIsExpelled(true);

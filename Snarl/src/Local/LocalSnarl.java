@@ -15,6 +15,7 @@ import java.util.Scanner;
 import Game.GameManager;
 import Game.Level;
 import Game.Registration;
+import Game.TileType;
 import Level.TestLevel;
 
 public class LocalSnarl {
@@ -128,12 +129,12 @@ public class LocalSnarl {
 
     //rank player exited numbers
     System.out.println("\nPlayers Ranked By Number Of Times Successfully Exited in the Game:");
-    String exitRankings = manager.printPlayerRankings(manager.getAllPlayers(), "exited");
+    String exitRankings = manager.printPlayerRankings(manager.getAllPlayers(), TileType.UNLOCKED_EXIT);
     System.out.println(exitRankings);
 
     //rank players based on keys found
     System.out.println("\nPlayers Ranked By Number Of Keys Found in the Game:");
-    String keyRankings = manager.printPlayerRankings(manager.getAllPlayers(), "key");
+    String keyRankings = manager.printPlayerRankings(manager.getAllPlayers(), TileType.KEY);
     System.out.println(keyRankings);
   }
 

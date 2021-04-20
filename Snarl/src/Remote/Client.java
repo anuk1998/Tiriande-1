@@ -145,7 +145,8 @@ public class Client {
       switch (type) {
         case "welcome":
           String info = serverMessageAsJSON.getString("info");
-          System.out.println(type + " to Snarl! Here is information about the game:\n" + info);
+          System.out.println("Welcome to Snarl! Here is information about the game:\n" + info);
+          System.out.println();
           break;
         case "start-level":
           System.out.println("~~~LEVEL STARTING:~~~");

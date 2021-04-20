@@ -18,6 +18,7 @@ import Game.Registration;
 import User.RemoteUser;
 import Manager.TestManager;
 import Game.Player;
+import Game.*;
 
 public class ClientThread extends Thread {
   private Socket socket;
@@ -61,21 +62,21 @@ public class ClientThread extends Thread {
     output.println("name");
     String name = input.readLine();
     if (adversaryType.equals("G")) {
-      Registration status = manager.registerAdversary(name, "ghost", Registration.REMOTE);
+      Registration status = manager.registerAdversary(name, Avatars.GHOST, Registration.REMOTE);
       while (status.equals(Registration.DUPLICATE_NAME)) {
         output.println("Name already in use.");
         output.println("name");
         String newName = input.readLine();
-        status = manager.registerAdversary(newName, "ghost", Registration.REMOTE);
+        status = manager.registerAdversary(newName, Avatars.GHOST, Registration.REMOTE);
       }
     }
     else {
-      Registration status = manager.registerAdversary(name, "zombie", Registration.REMOTE);
+      Registration status = manager.registerAdversary(name, Avatars.ZOMBIE, Registration.REMOTE);
       while (status.equals(Registration.DUPLICATE_NAME)) {
         output.println("Name already in use.");
         output.println("name");
         String newName = input.readLine();
-        status = manager.registerAdversary(newName, "zombie", Registration.REMOTE);
+        status = manager.registerAdversary(newName, Avatars.ZOMBIE, Registration.REMOTE);
       }
     }
     manager.passConnectionToRemoteUser(name, this);
@@ -160,10 +161,12 @@ public class ClientThread extends Thread {
     JSONArray exitedPlayersJSONArray = new JSONArray();
     JSONArray ejectedPlayersJSONArray = new JSONArray();
     try {
-      for (Player p : manager.getExitedPlayers()) {
+      System.out.println("Level's list of exited players: " + manager.getLevelsExitedPlayers().toString());
+      System.out.println("Level's list of expelled players: " + manager.getLevelsExpelledPlayers().toString());
+      for (Player p : manager.getLevelsExitedPlayers()) {
         exitedPlayersJSONArray.put(p.getName());
       }
-      for (Player p : manager.getExpelledPlayers()) {
+      for (Player p : manager.getLevelsExpelledPlayers()) {
         ejectedPlayersJSONArray.put(p.getName());
       }
       endLevel.put("type", "end-level");
@@ -206,11 +209,11 @@ public class ClientThread extends Thread {
     }
   }
 
-  public void sendPlayerUpdateMessage(String moveStatus, ICharacter movedCharacter, ICharacter thisCharacter, RemoteUser user) {
+  public void sendPlayerUpdateMessage(GameStatus moveStatus, ICharacter movedCharacter, ICharacter thisCharacter, RemoteUser user) {
     try {
       TestManager tm = new TestManager();
       JSONObject playerUpdate = tm.formPlayerUpdate(this.manager, this.manager.getCurrentLevel(), thisCharacter, user);
-      if (moveStatus.equals("PLAYER_EXPELLED")) {
+      if (moveStatus.equals(GameStatus.PLAYER_EXPELLED)) {
         playerUpdate.put("message", movedCharacter.getName() + " got expelled from the level.");
       }
       else {

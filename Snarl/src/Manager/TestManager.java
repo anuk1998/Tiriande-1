@@ -20,6 +20,7 @@ import Game.Registration;
 import Level.TestLevel;
 import User.LocalUser;
 import User.RemoteUser;
+import Game.*;
 
 public class TestManager {
   private static JSONArray managerUpdates = new JSONArray();
@@ -92,7 +93,7 @@ public class TestManager {
     int type = 1;
     for (int i=0; i< positionList.size(); i++) {
       if (i >= nameListArr.length()) {
-        manager.registerAdversary("adv" + type, "zombie", Registration.LOCAL);
+        manager.registerAdversary("adv" + type, Avatars.ZOMBIE, Registration.LOCAL);
         level.moveCharacter(level.getAdversaryObjectFromName("adv" + type), positionList.get(i));
         type++;
         continue;

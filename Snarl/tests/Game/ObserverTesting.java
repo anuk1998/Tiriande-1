@@ -204,8 +204,8 @@ public class ObserverTesting {
     gm.registerPlayer("Hermione Granger", Registration.LOCAL);
 
     //register adversaries for observer testing purposes
-    gm.registerAdversary("meanie", "ghost", Registration.LOCAL);
-    gm.registerAdversary("supermeanie", "zombie", Registration.LOCAL);
+    gm.registerAdversary("meanie", Avatars.GHOST, Registration.LOCAL);
+    gm.registerAdversary("supermeanie", Avatars.ZOMBIE, Registration.LOCAL);
 
   }
 
