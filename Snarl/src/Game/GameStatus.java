@@ -1,7 +1,7 @@
 package Game;
 
 public enum GameStatus {
-    DEFAULT,
+    NONE,
     VALID, 
     INVALID, 
     KEY_FOUND, 

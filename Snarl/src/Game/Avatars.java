@@ -11,7 +11,7 @@ public enum Avatars {
 
   private final String name;
 
-  private Avatars(String s) {
+  Avatars(String s) {
     name = s;
   }
 

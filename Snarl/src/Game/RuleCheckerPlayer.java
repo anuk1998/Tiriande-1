@@ -17,7 +17,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
     String ZOMBIE = Avatars.ZOMBIE.toString();
     String UNLOCKED_EXIT = TileType.UNLOCKED_EXIT.toString();
 
-    public RuleCheckerPlayer(GameManager manager, Level currentLevel, Player player) {
+    public RuleCheckerPlayer(Level currentLevel, Player player) {
         this.currentLevel = currentLevel;
         this.player = player;
         this.gm = manager;
@@ -167,10 +167,8 @@ public class RuleCheckerPlayer implements IRuleChecker {
                 this.player.increaseNumOfTimesExited();
                 return GameStatus.GAME_WON;
             }
-            this.player.increaseNumOfTimesExited();
             return GameStatus.LEVEL_WON;
         }
-        this.player.increaseNumOfTimesExited();
         return GameStatus.PLAYER_EXITED;
       }
       return GameStatus.VALID;
@@ -186,16 +184,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
         return currentLevel.getTileInLevel(exitPos).equals(UNLOCKED_EXIT);
     }
 
-    /**
-     * Checks if the current level is the last level in the list.
-     *
-     * @return true if the game is on the last level, false if not
-     */
-    @Override
-    public boolean isLastLevel() {
-        return gm.getAllLevels().indexOf(this.currentLevel) == gm.getAllLevels().size() - 1;
-    }
-
 
     /**
      * Returns the appropriate GameStatus when a player encounters an IAdversary based on if they get expelled
@@ -204,7 +192,7 @@ public class RuleCheckerPlayer implements IRuleChecker {
     @Override
     public GameStatus encountersOppositeCharacter() {
         // checks if the player self-eliminating is the last active player in the level
-        if (currentLevel.getActivePlayers().size() == 1) {
+        if (this.currentLevel.getActivePlayers().size() == 1) {
             //and everyone else is expelled
             if (gm.getExpelledPlayers().size() == gm.getAllPlayers().size() - 1) {
                 return GameStatus.GAME_LOST;
@@ -219,7 +207,6 @@ public class RuleCheckerPlayer implements IRuleChecker {
                 return GameStatus.LEVEL_WON;
             }
         }
-        this.player.increaseNumOfTimesExpelled();
         return GameStatus.PLAYER_SELF_ELIMINATES;
     }
 

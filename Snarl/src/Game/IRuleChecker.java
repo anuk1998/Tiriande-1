@@ -8,6 +8,4 @@ public interface IRuleChecker {
     boolean isCharactersCurrentPosition(Position destPoint);
     boolean isNCardinalTilesAway(Position destPoint, int maxTilesAway);
     boolean isOnLevelPlane(Position destPoint);
-    boolean isLastLevel();
-
 }

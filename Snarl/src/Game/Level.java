@@ -11,7 +11,11 @@ public class Level {
   Position exitLevelPosition;
   boolean exitLocked = true;
   boolean keyFound = false;
+  int numOfPlayers = 0;
+  boolean isLastLevelOfGame = false;
   Set<Player> activePlayers = new HashSet<Player>();
+  ArrayList<Player> exitedPlayers = new ArrayList<>();
+  ArrayList<Player> expelledPlayers = new ArrayList<>();
   Set<IAdversary> adversaries = new HashSet<IAdversary>();
   HashMap<String, Room> listOfDoorsInLevel = new HashMap<String, Room>();
   Set<Hallway> listOfHallwaysInLevel = new HashSet<>();
@@ -109,6 +113,7 @@ public class Level {
     character.setCharacterPosition(new Position(placeLocation.getRow(), placeLocation.getCol()));
     if (character instanceof Player) {
       this.activePlayers.add((Player) character);
+      this.numOfPlayers++;
     }
     else if (character instanceof IAdversary) {
       this.adversaries.add((IAdversary) character);
@@ -215,7 +220,10 @@ public class Level {
 
   // Expels the given player from the level
   public void expelPlayer(Player p) {
+    System.out.println("TO REMOVE: we are in expel player");
     this.activePlayers.remove(p);
+    this.expelledPlayers.add(p);
+    System.out.println("TO REMOVE: expelled players so far: " + this.expelledPlayers.toString());
     p.setIsExpelled(true);
   }
 
@@ -253,7 +261,10 @@ public class Level {
 
   // Method that handles when a player successfully passes through the exit by removing them from active players list
   public void playerLeavesTheLevel(ICharacter c) {
-    this.getActivePlayers().remove(c);
+    System.out.println("TO REMOVE: we are in expel player");
+    this.activePlayers.remove(c);
+    this.exitedPlayers.add((Player)c);
+    System.out.println("TO REMOVE: exited players so far: " + this.exitedPlayers.toString());
   }
 
   /**
@@ -304,6 +315,28 @@ public class Level {
   public ArrayList<String> getListOfDoorPositions() {
     return new ArrayList<String>(this.listOfDoorsInLevel.keySet());
   }
+
+  public boolean getIsLastLevelOfGame() {
+    return this.isLastLevelOfGame;
+  }
+
+  public void setIsLastLevelOfGame(boolean isLastLevel) {
+    this.isLastLevelOfGame = isLastLevel;
+  }
+
+  public int getNumOfPlayers() {
+    return this.numOfPlayers;
+  }
+
+  public ArrayList<Player> getExpelledPlayers() {
+    return this.expelledPlayers;
+  }
+
+  public ArrayList<Player> getExitedPlayers() {
+    return this.exitedPlayers;
+  }
+
+
 
   /**
    *

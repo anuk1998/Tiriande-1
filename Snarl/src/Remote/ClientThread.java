@@ -97,7 +97,9 @@ public class ClientThread extends Thread {
   private JSONObject serverWelcomeMessage() throws JSONException {
     JSONObject welcome = new JSONObject();
     welcome.put("type", "welcome");
-    welcome.put("info", "Version: 1\nServer Group Owner: Tiriande\nTo Knows:\n- Players get maximum 3 chances to make a valid move, otherwise they lose their turn\n");
+    welcome.put("info", "Version: 1\nServer Group Owner: Tiriande\nTo Knows:\n- Players get maximum 3 chances to make a valid move, otherwise they lose their turn\n" +
+            "- Players are represented by one of these avatars: '~', '$', '@', ¤\n- Ghosts are represented by a 'G', and zombies are represented by a 'Z'\n" +
+            "- Traversable tiles are represented by a '.', walls are represented by a '■', the key is represented by a '*', and the exit is represented by a '●'\n");
     return welcome;
   }
 
@@ -157,7 +159,6 @@ public class ClientThread extends Thread {
     JSONObject endLevel = new JSONObject();
     JSONArray exitedPlayersJSONArray = new JSONArray();
     JSONArray ejectedPlayersJSONArray = new JSONArray();
-
     try {
       for (Player p : manager.getExitedPlayers()) {
         exitedPlayersJSONArray.put(p.getName());

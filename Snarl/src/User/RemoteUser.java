@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import Common.IUser;
+import Game.GameStatus;
 import Game.ICharacter;
 import Game.Level;
 import Game.MessageType;
@@ -29,27 +30,27 @@ public class RemoteUser implements IUser {
   }
 
   @Override
-  public void sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
+  public void sendMoveUpdate(GameStatus moveStatus, Position destination, ICharacter c){
     if (clientConnection != null) {
       switch (moveStatus) {
-        case "GHOST_TRANSPORTS":
-        case "VALID":
+        case GHOST_TRANSPORTS:
+        case VALID:
           clientConnection.sendToClient("OK", MessageType.RESULT);
           break;
-        case "INVALID":
+        case INVALID:
           clientConnection.sendToClient("Invalid", MessageType.RESULT);
           break;
-        case "KEY_FOUND":
+        case KEY_FOUND:
           clientConnection.sendToClient("Key", MessageType.RESULT);
           break;
-        case "PLAYER_EXPELLED":
+        case PLAYER_EXPELLED:
           if (c instanceof IAdversary) clientConnection.sendToClient("Killed", MessageType.RESULT);
           else clientConnection.sendToClient("Eject", MessageType.RESULT);
           break;
-        case "PLAYER_SELF_ELIMINATES":
+        case PLAYER_SELF_ELIMINATES:
           clientConnection.sendToClient("Eject", MessageType.RESULT);
           break;
-        case "PLAYER_EXITED":
+        case PLAYER_EXITED:
           clientConnection.sendToClient("Exit", MessageType.RESULT);
           break;
       }

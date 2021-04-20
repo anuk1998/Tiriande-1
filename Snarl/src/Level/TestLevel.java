@@ -126,7 +126,7 @@ public class TestLevel {
 
   // builds the JSON output for the program
   private static void constructOutput(JSONObject output, Position point, Level level) throws JSONException {
-    IRuleChecker rcPlayer = new RuleCheckerPlayer(null, level, null);
+    IRuleChecker rcPlayer = new RuleCheckerPlayer(level, null);
     boolean isTraversable = rcPlayer.isTileTraversable(point);
     output.put("traversable", isTraversable); // adds first field
 

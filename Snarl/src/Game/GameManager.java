@@ -18,13 +18,13 @@ import java.util.stream.Collectors;
 
 
 public class GameManager {
+    String ZOMBIE_NAME = "zombie";
+    String GHOST_NAME = "ghost";
     String[] avatars = {Avatars.PLAYER_1.toString(), Avatars.PLAYER_2.toString(), Avatars.PLAYER_3.toString(), Avatars.PLAYER_4.toString()};
     ArrayList<String> playerAvatars = new ArrayList<>(Arrays.asList(avatars));
     LinkedHashMap<String, Player> allPlayers = new LinkedHashMap<>();
     LinkedHashSet<ICharacter> allCharacters = new LinkedHashSet<>();
     ArrayList<IAdversary> remoteAdversaries = new ArrayList<>();
-    ArrayList<Player> exitedPlayers = new ArrayList<>();
-    ArrayList<Player> expelledPlayers = new ArrayList<>();
     ArrayList<Level> allLevels;
     Level currentLevel;
     ArrayList<IObserver> observers = new ArrayList<>();
@@ -32,7 +32,7 @@ public class GameManager {
     int startLevel;
     boolean isNewLevel = false;
     boolean observerView = false;
-    String playerWhoFoundKey = "";
+    String playerWhoFoundKey = null;
 
     public GameManager(ArrayList<Level> allLevels, int startLevel) {
         this.allLevels = allLevels;
@@ -51,8 +51,9 @@ public class GameManager {
             if (isNewLevel) {
                 resetForNewLevel();
                 isNewLevel = false;
-                sendUpdateToUsers(UpdateType.START_LEVEL, "", null);
-                sendUpdateToUsers(UpdateType.START_ROUND, "", null);
+                index = 0;
+                sendUpdateToUsers(UpdateType.START_LEVEL, GameStatus.NONE, null);
+                sendUpdateToUsers(UpdateType.START_ROUND, GameStatus.NONE, null);
             }
             ICharacter character = (ICharacter) allCharacters.toArray()[index];
             boolean playerIsActive = checkPlayerActiveStatus(character);
@@ -74,7 +75,7 @@ public class GameManager {
                 index++;
             }
         }
-        sendUpdateToUsers(UpdateType.END_GAME, "", null);
+        sendUpdateToUsers(UpdateType.END_GAME, GameStatus.NONE, null);
     }
 
     /**
@@ -89,7 +90,7 @@ public class GameManager {
      * Selects the given adversary's next move based on player locations.
      */
     private boolean adversarysMove(ICharacter character, IUser currentUser) {
-        Position chosenMove = null;
+        Position chosenMove;
         AdversaryMovement am = new AdversaryMovement(this.currentLevel);
         if (currentUser instanceof LocalUser) {
             chosenMove = am.chooseAdversaryMove(currentUser, (IAdversary) character);
@@ -140,7 +141,7 @@ public class GameManager {
             Position requestedMove = currentUser.getUserMove(character);
             if (requestedMove == null) {
                 this.currentLevel.restoreCharacterTile(character);
-                sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_SELF_ELIMINATES.name(), character);
+                sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_SELF_ELIMINATES, character);
                 return true;
             }
             GameStatus moveStatus = callRuleChecker(character, requestedMove);
@@ -165,32 +166,26 @@ public class GameManager {
                 requestedMove = character.getCharacterPosition();
                 break;
             }
-            currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
+            currentUser.sendMoveUpdate(moveStatus, requestedMove, character);
             requestedMove = currentUser.getUserMove(character);
             moveStatus = callRuleChecker(character, requestedMove);
         }
-        currentUser.sendMoveUpdate(moveStatus.toString(), requestedMove, character);
+        currentUser.sendMoveUpdate(moveStatus, requestedMove, character);
         boolean gameStillGoing = checkGameStatus(moveStatus);
-        parseMoveStatusAndDoAction(moveStatus.name(), requestedMove, character);
-        sendUpdateToUsers(UpdateType.PLAYER_UPDATE, moveStatus.name(), character);
+        parseMoveStatusAndDoAction(moveStatus, requestedMove, character);
+        sendUpdateToUsers(UpdateType.PLAYER_UPDATE, moveStatus, character);
         return gameStillGoing;
     }
 
     /**
      * Returns a boolean indicating if the game is still going or not.
-     * @param moveStatus the status of the actor's most recent move
-     * @return a boolean true if the game is still going, false otherwise
      */
     public boolean checkGameStatus(GameStatus moveStatus) {
-        return !moveStatus.toString().equals("GAME_WON") && !(moveStatus.toString().equals("GAME_LOST"));
+        return !moveStatus.equals(GameStatus.GAME_WON) && !(moveStatus.equals(GameStatus.GAME_LOST));
     }
 
     /**
      * Checks if the current user is a Player who has been expelled from the game.
-     *
-     * @param character the user whose turn it is
-     * @return Returns true if the Player has been expelled/are no longer active, false if the Player is
-     * still active or if the character is an Adversary (i.e. ghost, zombie)
      */
     public boolean checkPlayerActiveStatus(ICharacter character) {
         if (character instanceof Player) {
@@ -201,23 +196,20 @@ public class GameManager {
 
     /**
      * Calls the RuleChecker Interface depending on if the user is a Player or an Adversary.
-     *
-     * @param character     the character whose turn it is
-     * @param requestedMove the goal Position the character wants to move to
-     * @return the GameStatus depending on what kind of move it is
+     * Returns a GameStatus that indicates what kind of move the requested move was/ how it impacted the game.
      */
     public GameStatus callRuleChecker(ICharacter character, Position requestedMove) {
-        GameStatus moveStatus = GameStatus.DEFAULT;
+        GameStatus moveStatus;
         if (character instanceof Player) {
-            RuleCheckerPlayer rcPlayer = new RuleCheckerPlayer(this, currentLevel, (Player) character);
+            RuleCheckerPlayer rcPlayer = new RuleCheckerPlayer(currentLevel, (Player) character);
             moveStatus = rcPlayer.runRuleChecker(requestedMove);
-        } else if (character instanceof IAdversary) {
-            IRuleChecker rcAdversary;
-            if (((IAdversary) character).getType().equals("zombie")) {
-                System.out.println("DEBUG: Sending requestedMove to RuleCheckerAdversary");
-                rcAdversary = new RuleCheckerZombie(this, currentLevel, (IAdversary) character);
-            } else rcAdversary = new RuleCheckerGhost(this, currentLevel, (IAdversary) character);
-
+        }
+        else if (character instanceof Zombie) {
+            IRuleChecker rcAdversary = new RuleCheckerZombie(currentLevel, (IAdversary) character);
+            moveStatus = rcAdversary.runRuleChecker(requestedMove);
+        }
+        else {
+            IRuleChecker rcAdversary = new RuleCheckerGhost(currentLevel, (IAdversary) character);
             moveStatus = rcAdversary.runRuleChecker(requestedMove);
         }
         return moveStatus;
@@ -226,36 +218,35 @@ public class GameManager {
     /**
      * Parses the given GameStatus type and applies specific actions to the level/game based on which type of move it is.
      */
-    public void parseMoveStatusAndDoAction(String moveStatus, Position destination, ICharacter c) {
+    public void parseMoveStatusAndDoAction(GameStatus moveStatus, Position destination, ICharacter c) {
         switch (moveStatus) {
-            case "VALID":
-                currentLevel.moveCharacter(c, destination);
+            case VALID:
+                this.currentLevel.moveCharacter(c, destination);
                 break;
-            case "KEY_FOUND":
-                currentLevel.moveCharacter(c, destination);
-                currentLevel.openExitTile();
+            case KEY_FOUND:
+                this.currentLevel.moveCharacter(c, destination);
+                this.currentLevel.openExitTile();
                 this.playerWhoFoundKey = c.getName();
                 ((Player) c).increaseNumOfKeysFound();
                 break;
-            case "PLAYER_SELF_ELIMINATES":
-                currentLevel.restoreCharacterTile(c);
-                currentLevel.expelPlayer((Player) c);
-                expelledPlayers.add((Player) c);
-
+            case PLAYER_SELF_ELIMINATES:
+                this.currentLevel.restoreCharacterTile(c);
+                this.currentLevel.expelPlayer((Player) c);
+                ((Player) c).increaseNumOfTimesExpelled();
                 break;
-            case "PLAYER_EXPELLED":
+            case PLAYER_EXPELLED:
                 playerExpelled(destination, c);
                 break;
-            case "PLAYER_EXITED":
-                currentLevel.restoreCharacterTile(c);
-                currentLevel.playerLeavesTheLevel(c);
-                exitedPlayers.add((Player) c);
+            case PLAYER_EXITED:
+                this.currentLevel.restoreCharacterTile(c);
+                this.currentLevel.playerLeavesTheLevel(c);
+                ((Player) c).increaseNumOfTimesExited();
                 break;
-            case "GHOST_TRANSPORTS":
-                Position newGhostPos = currentLevel.pickRandomPositionForCharacterInLevel();
+            case GHOST_TRANSPORTS:
+                Position newGhostPos = this.currentLevel.pickRandomPositionForCharacterInLevel();
                 currentLevel.moveCharacter(c, newGhostPos);
                 break;
-            case "LEVEL_WON":
+            case LEVEL_WON:
                 levelWon(destination, c);
                 break;
             case "GAME_WON":
@@ -265,18 +256,21 @@ public class GameManager {
                 gameLost(destination, c);
                 break;
             default:
+                System.out.println("Something went wrong.");
         }
     }
 
+    /**
+     * Actions to conduct when a player has been expelled by an adversary.
+     */
     private void playerExpelled(Position destination, ICharacter c) {
         Player p = currentLevel.playerAtGivenPosition(destination);
         currentLevel.expelPlayer(p);
-        expelledPlayers.add(p);
         p.increaseNumOfTimesExpelled();
         currentLevel.moveCharacter(c, destination);
         IUser playerUser = getUserByName(p.getName());
-        playerUser.sendMoveUpdate(GameStatus.PLAYER_EXPELLED.name(), null, null);
-        sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_EXPELLED.name(), p);
+        playerUser.sendMoveUpdate(GameStatus.PLAYER_EXPELLED, null, null);
+        sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_EXPELLED, p);
     }
 
     /**
@@ -291,7 +285,7 @@ public class GameManager {
      * Actions to conduct when the game has been won by the players.
      */
     private void gameWon(Position destination, ICharacter c) {
-        currentLevel.restoreCharacterTile(c);
+        this.currentLevel.restoreCharacterTile(c);
         addToListOfExitedOrExpelled(destination, c);
     }
 
@@ -299,7 +293,7 @@ public class GameManager {
      * Actions to conduct when the game has been lost by the players.
      */
     private void gameLost(Position destination, ICharacter c) {
-        currentLevel.restoreCharacterTile(c);
+        this.currentLevel.restoreCharacterTile(c);
         addToListOfExitedOrExpelled(destination,c);
     }
 
@@ -308,10 +302,14 @@ public class GameManager {
      */
     private void levelWon(Position destination, ICharacter c) {
         addToListOfExitedOrExpelled(destination, c);
-        currentLevel.restoreCharacterTile(c);
-        currentLevel.playerLeavesTheLevel(c);
+        this.currentLevel.restoreCharacterTile(c);
+        sendUpdateToUsers(UpdateType.END_LEVEL, GameStatus.NONE, null);
         resurrectPlayers();
-        this.currentLevel = this.allLevels.get(getNewLevelNum());
+        int newLevelIndex = getNewLevelNum();
+        this.currentLevel = this.allLevels.get(newLevelIndex);
+        if (newLevelIndex == this.allLevels.size() - 1) {
+            this.currentLevel.setIsLastLevelOfGame(true);
+        }
         this.isNewLevel = true;
     }
 
@@ -324,24 +322,21 @@ public class GameManager {
             Player p2 = currentLevel.playerAtGivenPosition(destination);
             this.currentLevel.expelPlayer(p2);
             p2.increaseNumOfTimesExpelled();
-            expelledPlayers.add(p2);
         }
         else {
             if (((Player) c).getIsExpelled()) {
                 ((Player)c).increaseNumOfTimesExpelled();
-                expelledPlayers.add((Player) c);
+                this.currentLevel.expelPlayer((Player) c);
             }
             else {
                 ((Player)c).increaseNumOfTimesExited();
-                exitedPlayers.add((Player) c);
+                this.currentLevel.playerLeavesTheLevel(c);
             }
         }
     }
 
     /**
      * Creates a list of the players' rankings during the Game, based on the number of times they exited or found keys.
-     *
-     * @return a list-as-string
      */
     public String printPlayerRankings(HashMap<String,Player> allPlayers, String exitedOrKey) {
         HashMap<String, Integer> playerExitedOrExpelledNumbers = new HashMap<>();
@@ -373,11 +368,8 @@ public class GameManager {
      * Generate new adversaries and new positions for them.
      */
     private void resetForNewLevel() {
-        sendUpdateToUsers(UpdateType.END_LEVEL, "", null);
         // reset data structures for new level
-        this.exitedPlayers = new ArrayList<>();
-        this.expelledPlayers = new ArrayList<>();
-        this.playerWhoFoundKey = "";
+        this.playerWhoFoundKey = null;
 
         // add all players in the game to the new level
         addAllClientsInGameToNewLevel();
@@ -421,8 +413,6 @@ public class GameManager {
 
     /**
      * Registers a player with a given unique name and add them to the level.
-     *
-     * @param name the name of player to register
      */
     public Registration registerPlayer(String name, Registration playerType) {
         if (allPlayers.containsKey(name)) {
@@ -445,8 +435,6 @@ public class GameManager {
 
     /**
      * Randomly chooses the avatar for that new player from a list of avatars.
-     *
-     * @param newPlayer the current player we're registering
      */
     public void assignPlayerAvatar(Player newPlayer) {
         Random rand = new Random();
@@ -460,7 +448,7 @@ public class GameManager {
      * Helper method for resetNewLevel(). Creates the correct amount of adversaries for the new level.
      */
     public void registerAutomatedAdversaries() {
-        int levelNum = this.allLevels.indexOf(this.currentLevel);
+        int levelNum = this.allLevels.indexOf(this.currentLevel) + 1;
         int numOfZombiesNeeded = (int) (Math.floor((levelNum + 1) / 2) + 1);
         int numOfGhostsNeeded = (int) Math.floor(levelNum / 2);
         int numOfZombiesToFill = numOfZombiesNeeded;
@@ -478,6 +466,7 @@ public class GameManager {
                 currentNumOfGhosts++;
             }
         }
+
         if (currentNumOfZombies + currentNumOfGhosts != numOfZombiesNeeded + numOfGhostsNeeded) {
             for (int z = 1; z < numOfZombiesToFill + 1; z++) {
                 registerAdversary("zombie" + z, "zombie", Registration.LOCAL);
@@ -490,9 +479,6 @@ public class GameManager {
 
     /**
      * Registers an adversary with a given unique name and add them to the level.
-     *
-     * @param name the name of adversary to register
-     * @param type which type of adversary it is
      */
     public Registration registerAdversary(String name, String type, Registration adversaryType) {
         for (ICharacter character : allCharacters) {
@@ -526,6 +512,9 @@ public class GameManager {
      *
      */
 
+    /**
+     * Adds a user to the level -- the tie from the game state to the client/player playing the game.
+     */
     private void addUser(String name, Registration playerType) {
         IUser user;
         if (playerType.equals(Registration.LOCAL)) {
@@ -537,7 +526,10 @@ public class GameManager {
         this.users.add(user);
     }
 
-    public void sendUpdateToUsers(UpdateType type, String moveStatus, ICharacter character) {
+    /**
+     * Sends specific update methods to all users depending on the update type input.
+     */
+    public void sendUpdateToUsers(UpdateType type, GameStatus moveStatus, ICharacter character) {
         for (IUser user : users) {
             if (user instanceof RemoteUser) {
                 RemoteUser ru = (RemoteUser) user;
@@ -586,7 +578,7 @@ public class GameManager {
     /**
      *
      *
-     * --------------------------GETTERS AND SETTERS -----------------------------
+     * --------------------------GETTERS AND SETTERS-----------------------------
      *
      *
      */
@@ -625,7 +617,7 @@ public class GameManager {
     }
 
     /**
-     * Returns the ICharacter associated with a given userName
+     * Returns the ICharacter associated with a given user name.
      */
     private ICharacter getActorFromName(String userName) {
         for (ICharacter character : allCharacters) {
@@ -634,13 +626,6 @@ public class GameManager {
             }
         }
         return null;
-    }
-
-    /**
-     * Returns the list of expelled players.
-     */
-    public ArrayList<Player> getExpelledPlayers(){
-        return this.expelledPlayers;
     }
 
     /**
@@ -665,23 +650,29 @@ public class GameManager {
     }
 
     /**
-     * Returns the current level of the game
+     * Returns the current level of the game.
      */
     public Level getCurrentLevel() {
         return this.currentLevel;
     }
 
+    public ArrayList<Player> getLevelsExitedPlayers() {
+        return this.currentLevel.getExitedPlayers();
+    }
+
+    public ArrayList<Player> getLevelsExpelledPlayers() {
+        return this.currentLevel.getExpelledPlayers();
+    }
+
     /**
      * Gets a new index for the allLevels list to generate a new level to be played.
-     *
-     * @return a number representing
      */
     private int getNewLevelNum() {
         return this.allLevels.indexOf(this.currentLevel) + 1;
     }
 
     /**
-     * Getter for playerWhoFoundKey
+     * Returns the name of the player who found the key.
      */
     public String getPlayerWhoFoundKey() {
         return this.playerWhoFoundKey;

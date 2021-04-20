@@ -26,9 +26,12 @@ public class AdversaryMovement {
     LocalUser user = (LocalUser) currentUser;
     ArrayList<Position> playerPositions = user.getAllPlayerLocations(this.level);
     Position chosenPosition;
-    if (character.getType().equals("zombie"))
+    if (character instanceof Zombie) {
       chosenPosition = chooseZombieMove(character, playerPositions);
-    else chosenPosition = chooseGhostMove(character, playerPositions);
+    }
+    else {
+      chosenPosition = chooseGhostMove(character, playerPositions);
+    }
     return chosenPosition;
   }
 

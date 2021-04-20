@@ -49,13 +49,13 @@ public class RuleCheckerGhost implements IRuleChecker {
         // checks if the player being expelled is the last active player in the level
         if (currentLevel.getActivePlayers().size() == 1) {
             // and everyone else is expelled
-            if (gm.getExpelledPlayers().size() == gm.getAllPlayers().size() - 1) {
+            if (this.currentLevel.getExpelledPlayers().size() == this.currentLevel.getNumOfPlayers() - 1) {
                 return GameStatus.GAME_LOST;
             }
             // checks that at least one player has passed through the level exit
             else if (gm.getExitedPlayers().size() > 0) {
                 //it is the last level
-                if (isLastLevel()) {
+                if (this.currentLevel.getIsLastLevelOfGame()) {
                     return GameStatus.GAME_WON;
                 }
                 return GameStatus.LEVEL_WON;
@@ -120,8 +120,4 @@ public class RuleCheckerGhost implements IRuleChecker {
                 && destPoint.getCol() >= 0 && destPoint.getCol() < levelNumCols;
     }
 
-    @Override
-    public boolean isLastLevel() {
-        return gm.getAllLevels().indexOf(this.currentLevel) == gm.getAllLevels().size() - 1;
-    }
 }

@@ -14,7 +14,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import Game.Avatars;
 import Game.GameManager;
+import Game.GameStatus;
 import Game.Level;
 import Game.MessageType;
 import Game.Registration;
@@ -116,7 +118,7 @@ public class Server {
       client.sendToClient("1", MessageType.LEVEL_START);
     }
 
-    manager.sendUpdateToUsers(UpdateType.START_ROUND, "", null);
+    manager.sendUpdateToUsers(UpdateType.START_ROUND, GameStatus.NONE, null);
     manager.runGame();
   }
 
@@ -167,10 +169,10 @@ public class Server {
     int numOfGhosts = (int) Math.floor((startLevelNum - 1) / 2);
 
     for (int z=1; z<numOfZombies+1; z++) {
-      manager.registerAdversary("zombie" + z, "zombie", Registration.LOCAL);
+      manager.registerAdversary("zombie" + z, Avatars.ZOMBIE, Registration.LOCAL);
     }
     for (int g=1; g<numOfGhosts+1; g++) {
-      manager.registerAdversary("ghost" + g, "ghost", Registration.LOCAL);
+      manager.registerAdversary("ghost" + g, Avatars.GHOST, Registration.LOCAL);
     }
   }
 

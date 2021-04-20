@@ -19,8 +19,7 @@ public class RuleCheckerZombie implements IRuleChecker{
   String HALLWAY = TileType.HALLWAY.toString();
   String WALL = TileType.WALL.toString();
 
-
-  public RuleCheckerZombie(GameManager gm, Level currentLevel, IAdversary adversary) {
+  public RuleCheckerZombie(Level currentLevel, IAdversary adversary) {
       this.currentLevel = currentLevel;
       this.adversary = adversary;
       this.gm = gm;
@@ -49,13 +48,13 @@ public class RuleCheckerZombie implements IRuleChecker{
     // checks if the player being expelled is the last active player in the level
     if (currentLevel.getActivePlayers().size() == 1) {
       // and everyone else is expelled
-      if (gm.getExpelledPlayers().size() == gm.getAllPlayers().size() - 1) {
+      if (this.currentLevel.getExpelledPlayers().size() == this.currentLevel.getNumOfPlayers() - 1) {
         return GameStatus.GAME_LOST;
       }
       // checks that at least one player has passed through the level exit
       else if (gm.getExitedPlayers().size() > 0) {
         //it is the last level
-        if (isLastLevel()) {
+        if (this.currentLevel.getIsLastLevelOfGame()) {
           return GameStatus.GAME_WON;
         }
         return GameStatus.LEVEL_WON;
@@ -96,11 +95,6 @@ public class RuleCheckerZombie implements IRuleChecker{
     }
 
     return isNotOnDoor;
-  }
-
-  @Override
-  public boolean isLastLevel() {
-    return gm.getAllLevels().indexOf(this.currentLevel) == gm.getAllLevels().size() - 1;
   }
 
   @Override

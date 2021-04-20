@@ -25,31 +25,31 @@ public class LocalUser implements IUser {
   }
 
   @Override
-  public void sendMoveUpdate(String moveStatus, Position destination, ICharacter c){
+  public void sendMoveUpdate(GameStatus moveStatus, Position destination, ICharacter c){
    switch(moveStatus) {
-     case "INVALID":
+     case INVALID:
        System.out.println("Sorry, that is an invalid move. Please enter a different one.");
        break;
-     case "KEY_FOUND":
+     case KEY_FOUND:
        System.out.println("Player " + c.getName() + " found the key.");
        break;
-     case "PLAYER_EXPELLED":
-     case "PLAYER_SELF_ELIMINATES":
+     case PLAYER_EXPELLED:
+     case PLAYER_SELF_ELIMINATES:
        System.out.println("Player " + c.getName() + " was expelled.");
        break;
-     case "PLAYER_EXITED":
+     case PLAYER_EXITED:
        System.out.println("Player " + c.getName() + " exited.");
        break;
-     case "LEVEL_WON":
+     case LEVEL_WON:
        System.out.println("Congrats!! Players have won the level!");
        break;
-     case "GAME_WON":
+     case GAME_WON:
        System.out.print("Congrats! Players have won the game!");
        break;
-     case "GAME_LOST":
+     case GAME_LOST:
        System.out.println("Sorry :( Players have lost the game!");
        break;
-     case "DEFAULT":
+     case NONE:
        System.out.println("Default case: will never get here");
    }
   }

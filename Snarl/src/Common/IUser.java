@@ -15,7 +15,7 @@ public interface IUser {
    */
   String getUserName();
 
-  void sendMoveUpdate(String moveStatus, Position destination, ICharacter c);
+  void sendMoveUpdate(GameStatus moveStatus, Position destination, ICharacter c);
 
   /**
    * Broadcasts to the character that it's their turn and then renders their specific level view
