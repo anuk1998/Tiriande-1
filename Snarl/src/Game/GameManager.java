@@ -65,7 +65,9 @@ public class GameManager {
             }
             // Ask the player for a move and validate/execute that move
             else {
-                currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
+                if (currentUser instanceof LocalUser) {
+                    currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
+                }
                 gameStillGoing = playersMove(character, currentUser, playerIsActive);
             }
             // check if we're on the last character in the list and if so, loop back to the beginning
