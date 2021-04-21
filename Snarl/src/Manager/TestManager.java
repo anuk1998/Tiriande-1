@@ -24,6 +24,19 @@ import Game.*;
 
 public class TestManager {
   private static JSONArray managerUpdates = new JSONArray();
+  static String DOOR = TileType.DOOR.toString();
+  static String WALL = TileType.WALL.toString();
+  static String VOID = TileType.VOID.toString();
+  static String EXIT_LOCKED = TileType.LOCKED_EXIT.toString();
+  static String EXIT_UNLOCKED = TileType.UNLOCKED_EXIT.toString();
+  static String KEY = TileType.UNLOCKED_EXIT.toString();
+  static String PLAYER_1 = Avatars.PLAYER_1.toString();
+  static String PLAYER_2 = Avatars.PLAYER_2.toString();
+  static String PLAYER_3 = Avatars.PLAYER_3.toString();
+  static String PLAYER_4 = Avatars.PLAYER_4.toString();
+  static String GHOST = Avatars.GHOST.toString();
+  static String ZOMBIE = Avatars.ZOMBIE.toString();
+
 
   public void main(String[] args) throws JSONException {
     StringBuilder input_as_string = new StringBuilder();
@@ -289,8 +302,8 @@ public class TestManager {
     for (String[] row : layout) {
       JSONArray rowArray = new JSONArray();
       for (String colTile : row) {
-        if (colTile.equals("|")) rowArray.put(2);
-        else if (colTile.equals("■") || colTile.equals(" ")) rowArray.put(0);
+        if (colTile.equals(DOOR)) rowArray.put(2);
+        else if (colTile.equals(WALL) || colTile.equals(VOID)) rowArray.put(0);
         else rowArray.put(1);
       }
       layoutArray.put(rowArray);
@@ -309,7 +322,7 @@ public class TestManager {
     JSONArray objectsArray = new JSONArray();
     for (String[] row : layout) {
       for (String colTile : row) {
-        if (colTile.equals("●") || colTile.equals("O")) {
+        if (colTile.equals(EXIT_LOCKED) || colTile.equals(EXIT_UNLOCKED)) {
           JSONObject objectObj = new JSONObject();
           objectObj.put("type", "exit");
 
@@ -319,7 +332,7 @@ public class TestManager {
           objectObj.put("position", objectPos);
           objectsArray.put(objectObj);
         }
-        else if (colTile.equals("*")) {
+        else if (colTile.equals(KEY)) {
           JSONObject objectObj = new JSONObject();
           objectObj.put("type", "key");
 
@@ -356,7 +369,7 @@ public class TestManager {
     for (int i=0; i<layout.length; i++) {
       for (int j=0; j<layout[i].length; j++) {
         String colTile = layout[i][j];
-        if (colTile.equals("Z") || colTile.equals("G")) {
+        if (colTile.equals(ZOMBIE) || colTile.equals(GHOST)) {
           Position advPosInLevel = new Position(i + rowDiff, j + colDiff);
           if (!advPosInLevel.toString().equals(playerPos.toString())) {
             IAdversary adv = level.adversaryAtGivenPosition(advPosInLevel);
@@ -373,7 +386,7 @@ public class TestManager {
             actorsArray.put(actorObj);
           }
         }
-        else if ((colTile.equals("@") || colTile.equals("¤") || colTile.equals("$") || colTile.equals("~"))
+        else if ((colTile.equals(PLAYER_1) || colTile.equals(PLAYER_2) || colTile.equals(PLAYER_3) || colTile.equals(PLAYER_4))
                 && !(colTile.equals(player.getAvatar()))) {
           JSONObject actorObj = new JSONObject();
           Player otherPlayer = manager.getPlayerFromAvatar(colTile);
@@ -505,7 +518,7 @@ public class TestManager {
    */
   private static JSONObject updateLevel(Level level, JSONObject levelObj) throws JSONException {
     // Check if key has been found, if so, remove it from level object
-    if (!level.getTileInLevel(level.getKeyPositionInLevel()).equals("*")) {
+    if (!level.getTileInLevel(level.getKeyPositionInLevel()).equals(KEY)) {
       JSONArray objects = levelObj.getJSONArray("objects");
       int keyIndex = 0;
       for (int i=0; i<objects.length(); i++) {

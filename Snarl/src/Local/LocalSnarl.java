@@ -102,7 +102,7 @@ public class LocalSnarl {
       System.out.println("Please enter a username for your player:");
       String playerName = scanner.nextLine();
       Registration registrationStatus = manager.registerPlayer(playerName, Registration.LOCAL);
-      if (registrationStatus.toString().equals("AT_CAPACITY")) {
+      if (registrationStatus.equals(Registration.AT_CAPACITY)) {
         System.out.println("Sorry. You have already registered 4 players.");
         break;
       }

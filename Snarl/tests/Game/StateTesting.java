@@ -26,19 +26,31 @@ public class StateTesting {
     listOfLevels.add(level1);
     createInitialGameBoard();
 
-    //testIsLastLevel();
-    //testParseMoveDoAction();
-    //testRegisterAdversary();
-    //testRegisterPlayer();
+    testIsLastLevel();
+    testIsExitUnlockedBeforeKeyFound();
+    testParseMoveDoAction();
+    testGetPlayerWhoFoundKey();
+    testIsExitUnlockedAfterKeyFound();
+    testRegisterAdversary();
+    testRegisterPlayer();
     testisNCardinalTilesAway();
-    //testisOnLevelPlane();
-    //testIsValidMove();
-    //testRunRuleCheckerPlayer();
-    //testCallRuleCheckerPlayer();
-    //testCheckPlayerActiveStatus();
-    //testIsExitUnlocked();
-    //testKeyTileIsLandedOnAndExitLandedOnAfter();
-    //testEncountersOppositeCharacter();
+    testisOnLevelPlane();
+    testIsValidMove();
+    testRunRuleCheckerPlayer();
+    testCallRuleCheckerPlayer();
+    testCheckPlayerActiveStatus();
+    testRuleCheckerGhost();
+    testPlayerLandsOnOpenExit();
+    testEncountersOppositeCharacter();
+    testRegisterPlayerStatuses();
+    testRegisterAdversariesRemote();
+  }
+
+  @Test
+  public static void testIsLastLevel() {
+    assertFalse(String.valueOf(false), level1.getIsLastLevelOfGame());
+    level1.setIsLastLevelOfGame(true);
+    assertTrue(String.valueOf(true), level1.getIsLastLevelOfGame());
   }
 
 
@@ -48,6 +60,25 @@ public class StateTesting {
     Position ghostPos = level1.getAdversaryObjectFromName("scary").getCharacterPosition();
     gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, ghostPos, level1.getPlayerObjectFromName("Carl"));
     assertEquals(null, level1.getPlayerObjectFromName("Carl"));
+  }
+
+  @Test
+  public static void testGetPlayerWhoFoundKey() {
+    assertEquals("Santiago", gm.getPlayerWhoFoundKey());
+  }
+
+  @Test
+  public static void testRegisterPlayerStatuses() {
+    assertEquals(Registration.DUPLICATE_NAME, gm.registerPlayer("Bob", Registration.LOCAL));
+    assertEquals(Registration.REGISTERED, gm.registerPlayer("4thPlayer", Registration.LOCAL));
+    gm.registerPlayer("Anu", Registration.LOCAL);
+    assertEquals(Registration.AT_CAPACITY, gm.registerPlayer("TooMany", Registration.LOCAL));
+  }
+
+  @Test
+  public static void testRegisterAdversariesRemote() {
+    assertEquals(Registration.DUPLICATE_NAME, gm.registerAdversary("scary", Avatars.GHOST, Registration.LOCAL));
+    assertEquals(Registration.REGISTERED, gm.registerAdversary("anu", Avatars.ZOMBIE, Registration.LOCAL));
   }
 
   @Test
@@ -109,7 +140,6 @@ public class StateTesting {
     Player bob = level1.getPlayerObjectFromName("Bob");
     RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, bob);
     Position bobsPos = bob.getCharacterPosition();
-    System.out.println("Bob's position: " + bobsPos);
     assertEquals(false, ruleCheckerp1.isNCardinalTilesAway(new Position (100,100), 1));
     assertEquals(true, ruleCheckerp1.isNCardinalTilesAway(new Position (bobsPos.getRow() - 1, bobsPos.getCol()), 1));
     assertEquals(true, ruleCheckerp1.isNCardinalTilesAway(new Position (bobsPos.getRow(),bobsPos.getCol() + 2), 2));
@@ -131,19 +161,14 @@ public class StateTesting {
   }
 
   @Test
-  public static void testKeyTileIsLandedOnAndExitLandedOnAfter() {
-    Player keyFinder = new Player("KeyFinder229");
-    RuleCheckerPlayer ruleCheckerKey = new RuleCheckerPlayer(level1, keyFinder);
-    level1.addCharacter(keyFinder, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
-    level1.moveCharacter(keyFinder, level1.getKeyPositionInLevel());
-    //assertEquals(GameStatus.KEY_FOUND, ruleCheckerKey.);
-
+  public static void testPlayerLandsOnOpenExit() {
     Player exitLander = new Player("exitlander777");
-    level1.addCharacter(exitLander, new Position(level1.getKeyPositionInLevel().getRow() - 1, level1.getKeyPositionInLevel().getCol()));
-    level1.moveCharacter(exitLander, level1.getExitPositionInLevel());
+    exitLander.setAvatar("P");
+    level1.addCharacter(exitLander, new Position(level1.getExitPositionInLevel().getRow() - 1, level1.getExitPositionInLevel().getCol()));
+
     RuleCheckerPlayer exitLanderRCP = new RuleCheckerPlayer(level1, exitLander);
-    level1.openExitTile();
-    assertEquals(GameStatus.PLAYER_EXITED, exitLanderRCP.exitTileIsLandedOn());
+    assertEquals(GameStatus.PLAYER_EXITED, exitLanderRCP.runRuleChecker(level1.getExitPositionInLevel()));
+    level1.moveCharacter(exitLander, level1.getExitPositionInLevel());
   }
 
   public static void createInitialGameBoard() {
@@ -245,7 +270,7 @@ public class StateTesting {
     gm.registerPlayer("Bob", Registration.LOCAL);
     gm.registerPlayer("Carl", Registration.LOCAL);
     gm.registerPlayer("Santiago", Registration.LOCAL);
-    gm.registerPlayer("Anu", Registration.LOCAL);
+
 
     //register adversaries and add them to the board
     gm.registerAdversary("scary", Avatars.GHOST, Registration.LOCAL);

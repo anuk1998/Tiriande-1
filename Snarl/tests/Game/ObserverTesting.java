@@ -52,8 +52,8 @@ public class ObserverTesting {
     LocalObserver testObserver = new LocalObserver("foo");
     String output = "Adversaries: ";
     ArrayList<String> outputArray = new ArrayList<>();
-    outputArray.add("supermeanie");
     outputArray.add("meanie");
+    outputArray.add("supermeanie");
     assertEquals(output + outputArray, testObserver.constructListOfAdversariesUpdate(level1));
   }
 

@@ -516,7 +516,7 @@ public class GameManager {
     /**
      * Adds a user to the level -- the tie from the game state to the client/player playing the game.
      */
-    private void addUser(String name, Registration playerType) {
+    public void addUser(String name, Registration playerType) {
         IUser user;
         if (playerType.equals(Registration.LOCAL)) {
             user = new LocalUser(name);

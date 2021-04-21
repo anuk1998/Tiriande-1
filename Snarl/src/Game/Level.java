@@ -220,10 +220,8 @@ public class Level {
 
   // Expels the given player from the level
   public void expelPlayer(Player p) {
-    System.out.println("TO REMOVE: we are in expel player");
     this.activePlayers.remove(p);
     this.expelledPlayers.add(p);
-    System.out.println("TO REMOVE: expelled players so far: " + this.expelledPlayers.toString());
     p.setIsExpelled(true);
   }
 

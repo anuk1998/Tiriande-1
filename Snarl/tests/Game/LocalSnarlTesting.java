@@ -18,31 +18,24 @@ public class LocalSnarlTesting
 
   public static void main(String[] args) {
     createInitialGameBoard();
-    //testChooseZombieMove();
-    //testChooseGhostMove();
+
+    testChooseZombieMove();
+    testChooseGhostMove();
     testGetClosestPositionTo();
-
-    //gm.runGame();
-    //testRenderView();
-
   }
 
   @Test
   public static void testChooseZombieMove() {
-
-    ArrayList<Level> listOfLevels = new ArrayList<>();
-    listOfLevels.add(level1);
-    GameManager gm = new GameManager(listOfLevels, 1);
-    gm.registerAdversary("meanie", Avatars.ZOMBIE, Registration.LOCAL);
+    Zombie zombie = new Zombie("meanie");
+    level1.addCharacter(zombie, new Position(5,6));
 
     ArrayList<Position> playerPositions = new ArrayList<>();
     playerPositions.add(new Position(5,7));
     playerPositions.add(new Position(12,18));
     playerPositions.add(new Position(22,3));
 
-    IAdversary zombie = level1.getAdversaryObjectFromName("meanie");
     AdversaryMovement am = new AdversaryMovement(level1);
-    zombie.setCharacterPosition(new Position(5,6));
+    assertEquals(new Position(5,7), am.getClosestPositionTo(playerPositions, zombie.getCharacterPosition()));
     assertEquals(new Position(5,7), am.chooseZombieMove(zombie, playerPositions));
   }
 
@@ -175,8 +168,8 @@ public class LocalSnarlTesting
     level1.addObject(new Position(5, 27), "*");
     level1.addObject(new Position(6, 27), "●");
 
-    ICharacter newPlayer = new Player("ILoveCoding");
-    level1.addCharacter(newPlayer, new Position(4,5));
+    //ICharacter newPlayer = new Player("ILoveCoding");
+    //level1.addCharacter(newPlayer, new Position(4,5));
   }
 
 }

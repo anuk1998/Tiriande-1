@@ -28,7 +28,8 @@ class LevelTesting {
     testGetDoorPositions();
     testGetKeyPositionInLevel();
     testGetExitPositionInLevel();
-
+    System.out.print(level1.renderLevel());
+    testGetTileInRoom();
     createIntermediateGameState();
     createModifiedAfterObjectGameState();
 
@@ -41,7 +42,7 @@ class LevelTesting {
     testGetRowPosition();
     testGetColPosition();
     testGetDoorPositions();
-    testGetTileInRoom();
+
     testRoomGetNumOfRows();
     testRoomGetNumOfCols();
     testGetRoomOriginInLevel();
@@ -101,7 +102,7 @@ class LevelTesting {
 
     //Room 2
     room2.addDoor(new Position(0, 0));
-    level1.addObject(new Position(2, 3), "●");
+
     room2.addDoor(new Position(6,0));
     room2.addDoor(new Position(8,9));
 
@@ -186,16 +187,24 @@ class LevelTesting {
     level1.addHallway(h7);
     level1.addHallway(h8);
 
+    p1.setAvatar("P");
+    p2.setAvatar("P");
+    p3.setAvatar("P");
+    p4.setAvatar("P");
+
     //add players to level
     level1.addCharacter(p1, new Position(2, 4));
     level1.addCharacter(p2, new Position(6, 1));
     level1.addCharacter(p3, new Position(5, 5));
-    level1.addCharacter(p4, new Position(7, 2));
+    level1.addCharacter(p4, new Position(6, 2));
 
     //add adversaries to the level
     level1.addCharacter(a1, new Position(32,29));
     level1.addCharacter(a2, new Position(34,32));
-    System.out.print(level1.renderLevel());
+
+    level1.addObject(new Position(17, 18), "●");
+    level1.addObject(new Position(5, 27), "*");
+
   }
 
   @Test(expected = ArrayIndexOutOfBoundsException.class)
@@ -227,8 +236,8 @@ class LevelTesting {
   }
 
   @Test
-  public static void testGetIsKeyFound() {
-    assertEquals("■", level1.getTileInLevel(level1.getKeyPositionInLevel()));
+  public static void testGetIsKeyFoundAfter() {
+    assertEquals(".", level1.getTileInLevel(level1.getKeyPositionInLevel()));
   }
 
   @Test

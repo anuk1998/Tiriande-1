@@ -58,7 +58,7 @@ public class RuleCheckerZombie implements IRuleChecker{
         return GameStatus.LEVEL_WON;
       }
     }
-    System.out.println("DEBUG: About to return PLAYER_EXPELLED");
+
     return GameStatus.PLAYER_EXPELLED;
   }
 
