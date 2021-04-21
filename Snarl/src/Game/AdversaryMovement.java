@@ -49,10 +49,9 @@ public class AdversaryMovement {
     Zombie zom = (Zombie) character;
     Position zomPos = zom.getCharacterPosition();
     Room zombiesRoom = zom.getZombiesRoom();
-    ArrayList<Position> playersInRoomWithZombie = new ArrayList<>();
 
     // determines which players are in the same room as the zombie and adds their positions to a list
-    playersInRoomWithZombie = positionsInSameRoom(zombiesRoom, playerPositions);
+    ArrayList<Position> playersInRoomWithZombie = positionsInSameRoom(zombiesRoom, playerPositions);
     // Based on how many players are in the room with the Zombie, choose which player to attack
     // and then subsequently which cardinal move is closest to that chosen player
     ArrayList<Position> cardinalPositions = this.level.getAllAdjacentTiles(zomPos);

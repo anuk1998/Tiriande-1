@@ -106,7 +106,7 @@ public class LocalSnarl {
         System.out.println("Sorry. You have already registered 4 players.");
         break;
       }
-      while (registrationStatus.toString().equals("DUPLICATE_NAME")) {
+      while (registrationStatus.equals(Registration.DUPLICATE_NAME)) {
         System.out.println("Sorry. That name has already been chosen. Please pick again:");
         playerName = scanner.nextLine();
         registrationStatus = manager.registerPlayer(playerName, Registration.LOCAL);

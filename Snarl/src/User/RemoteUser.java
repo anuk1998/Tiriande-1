@@ -13,6 +13,17 @@ import Game.IAdversary;
 import Remote.ClientThread;
 
 public class RemoteUser implements IUser {
+  String MOVE_MESSAGE = "move";
+  String END_LEVEL_MESSAGE = "end-level";
+  String END_GAME_MESSAGE = "end-game";
+  String UPDATE_MESSAGE = "update";
+  String OK_MESSAGE = "OK";
+  String INVALID_MESSAGE = "Invalid";
+  String KEY_MESSAGE = "Key";
+  String EJECT_MESSAGE = "Eject";
+  String KILLED_MESSAGE = "Killed";
+  String EXIT_MESSAGE = "Exit";
+
   String userName;
   ClientThread clientConnection;
 
@@ -35,23 +46,23 @@ public class RemoteUser implements IUser {
       switch (moveStatus) {
         case GHOST_TRANSPORTS:
         case VALID:
-          clientConnection.sendToClient("OK", MessageType.RESULT);
+          clientConnection.sendToClient(OK_MESSAGE, MessageType.RESULT);
           break;
         case INVALID:
-          clientConnection.sendToClient("Invalid", MessageType.RESULT);
+          clientConnection.sendToClient(INVALID_MESSAGE, MessageType.RESULT);
           break;
         case KEY_FOUND:
-          clientConnection.sendToClient("Key", MessageType.RESULT);
+          clientConnection.sendToClient(KEY_MESSAGE, MessageType.RESULT);
           break;
         case PLAYER_EXPELLED:
-          if (c instanceof IAdversary) clientConnection.sendToClient("Killed", MessageType.RESULT);
-          else clientConnection.sendToClient("Eject", MessageType.RESULT);
+          if (c instanceof IAdversary) clientConnection.sendToClient(KILLED_MESSAGE, MessageType.RESULT);
+          else clientConnection.sendToClient(EJECT_MESSAGE, MessageType.RESULT);
           break;
         case PLAYER_SELF_ELIMINATES:
-          clientConnection.sendToClient("Eject", MessageType.RESULT);
+          clientConnection.sendToClient(EJECT_MESSAGE, MessageType.RESULT);
           break;
         case PLAYER_EXITED:
-          clientConnection.sendToClient("Exit", MessageType.RESULT);
+          clientConnection.sendToClient(EXIT_MESSAGE, MessageType.RESULT);
           break;
       }
     }
@@ -60,7 +71,7 @@ public class RemoteUser implements IUser {
   @Override
   public void broadcastUpdate(Level currentLevel, ICharacter character, boolean isPlayerActive) {
     if (clientConnection != null) {
-      clientConnection.sendToClient("update", null);
+      clientConnection.sendToClient(UPDATE_MESSAGE, null);
     }
   }
 
@@ -74,13 +85,13 @@ public class RemoteUser implements IUser {
 
   public void sendEndLevelMessage() {
     if (clientConnection != null) {
-      clientConnection.sendToClient("end-level", MessageType.END_LEVEL);
+      clientConnection.sendToClient(END_LEVEL_MESSAGE, MessageType.END_LEVEL);
     }
   }
 
   public void sendEndGameMessage() {
     if (clientConnection != null) {
-      clientConnection.sendToClient("end-game", MessageType.END_GAME);
+      clientConnection.sendToClient(END_GAME_MESSAGE, MessageType.END_GAME);
     }
   }
 
@@ -173,7 +184,7 @@ public class RemoteUser implements IUser {
       return null;
     }
     try {
-      Position move = clientConnection.getMoveFromClient("move", MessageType.MOVE);
+      Position move = clientConnection.getMoveFromClient(MOVE_MESSAGE, MessageType.MOVE);
       if (move == null) {
         newPos = character.getCharacterPosition();
       }
