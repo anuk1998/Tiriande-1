@@ -35,7 +35,7 @@ public class RuleCheckerZombie implements IRuleChecker{
     return status;
   }
 
-  private boolean landedOnPlayer(Position destination) {
+  public boolean landedOnPlayer(Position destination) {
     String symbol = this.currentLevel.getTileInLevel(destination);
     return symbol.equals(PLAYER_1) || symbol.equals(PLAYER_2) ||
             symbol.equals(PLAYER_3) || symbol.equals(PLAYER_4);
