@@ -270,7 +270,7 @@ public class GameManager {
         p.increaseNumOfTimesExpelled();
         currentLevel.moveCharacter(c, destination);
         IUser playerUser = getUserByName(p.getName());
-        playerUser.sendMoveUpdate(GameStatus.PLAYER_EXPELLED, null, null);
+        playerUser.sendMoveUpdate(GameStatus.PLAYER_EXPELLED, null, c);
         sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_EXPELLED, p);
     }
 
@@ -304,7 +304,7 @@ public class GameManager {
     private void levelWon(Position destination, ICharacter c) {
         addToListOfExitedOrExpelled(destination, c);
         this.currentLevel.restoreCharacterTile(c);
-        sendUpdateToUsers(UpdateType.END_LEVEL, GameStatus.NONE, null);
+        sendUpdateToUsers(UpdateType.END_LEVEL, GameStatus.NONE, c);
         resurrectPlayers();
         int newLevelIndex = getNewLevelNum();
         this.currentLevel = this.allLevels.get(newLevelIndex);
