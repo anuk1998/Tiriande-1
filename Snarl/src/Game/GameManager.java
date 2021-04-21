@@ -123,7 +123,9 @@ public class GameManager {
         }
 
         parseMoveStatusAndDoAction(moveStatus, chosenMove, character);
-        currentUser.sendMoveUpdate(moveStatus, chosenMove, character);
+        if (currentUser instanceof RemoteUser) {
+            currentUser.sendMoveUpdate(moveStatus, chosenMove, character);
+        }
         return checkGameStatus(moveStatus);
     }
 
@@ -173,7 +175,9 @@ public class GameManager {
         currentUser.sendMoveUpdate(moveStatus, requestedMove, character);
         boolean gameStillGoing = checkGameStatus(moveStatus);
         parseMoveStatusAndDoAction(moveStatus, requestedMove, character);
-        sendUpdateToUsers(UpdateType.PLAYER_UPDATE, moveStatus, character);
+        if (currentUser instanceof RemoteUser) {
+            sendUpdateToUsers(UpdateType.PLAYER_UPDATE, moveStatus, character);
+        }
         return gameStillGoing;
     }
 
@@ -271,7 +275,9 @@ public class GameManager {
         currentLevel.moveCharacter(c, destination);
         IUser playerUser = getUserByName(p.getName());
         playerUser.sendMoveUpdate(GameStatus.PLAYER_EXPELLED, null, p);
-        sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_EXPELLED, p);
+        if (playerUser instanceof RemoteUser) {
+            sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_EXPELLED, p);
+        }
     }
 
     /**
