@@ -450,8 +450,8 @@ public class GameManager {
      */
     public void registerAutomatedAdversaries() {
         int levelNum = this.allLevels.indexOf(this.currentLevel) + 1;
-        int numOfZombiesNeeded = (int) (Math.floor((levelNum + 1) / 2) + 1);
-        int numOfGhostsNeeded = (int) Math.floor(levelNum / 2);
+        int numOfZombiesNeeded = (int) (Math.floor(levelNum / 2) + 1);
+        int numOfGhostsNeeded = (int) Math.floor((levelNum - 1) / 2);
         int numOfZombiesToFill = numOfZombiesNeeded;
         int numOfGhostsToFill = numOfGhostsNeeded;
 
