@@ -65,7 +65,7 @@ public class GameManager {
             }
             // Ask the player for a move and validate/execute that move
             else {
-                //currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
+                currentUser.broadcastUpdate(this.currentLevel, character, playerIsActive);
                 gameStillGoing = playersMove(character, currentUser, playerIsActive);
             }
             // check if we're on the last character in the list and if so, loop back to the beginning
@@ -101,7 +101,7 @@ public class GameManager {
         }
 
         GameStatus moveStatus = callRuleChecker(character, chosenMove);
-        System.out.println("DEBUG: moveStatus from adversary's chosen move is: " + moveStatus);
+
         int invalidCount = 0;
         // generate a new move until we get one that's not invalid
         while (moveStatus.equals(GameStatus.INVALID)) {
@@ -121,7 +121,7 @@ public class GameManager {
                 moveStatus = callRuleChecker(character, chosenMove);
             }
         }
-        System.out.println("DEBUG: The moveStatus (after checking invalid move) is " + moveStatus);
+
         parseMoveStatusAndDoAction(moveStatus, chosenMove, character);
         currentUser.sendMoveUpdate(moveStatus, chosenMove, character);
         return checkGameStatus(moveStatus);
@@ -134,7 +134,7 @@ public class GameManager {
      */
     private boolean playersMove(ICharacter character, IUser currentUser, boolean playerIsActive) {
         if (playerIsActive) {
-            System.out.println("DEBUG: It is " + character.getName() + "'s turn.");
+
             if (observerView) {
                 currentUser.renderObserverView(this.currentLevel);
             }
