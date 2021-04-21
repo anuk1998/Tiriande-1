@@ -37,6 +37,13 @@ public class LocalSnarlTesting
     AdversaryMovement am = new AdversaryMovement(level1);
     assertEquals(new Position(5,7), am.getClosestPositionTo(playerPositions, zombie.getCharacterPosition()));
     assertEquals(new Position(5,7), am.chooseZombieMove(zombie, playerPositions));
+
+    ArrayList<Position> playerPositions2 = new ArrayList<>();
+    playerPositions2.add(new Position(5,4));
+    playerPositions2.add(new Position(12,18));
+    playerPositions2.add(new Position(22,3));
+    assertEquals(new Position(5,4), am.getClosestPositionTo(playerPositions2, zombie.getCharacterPosition()));
+    assertEquals(new Position(5,5), am.chooseZombieMove(zombie, playerPositions2));
   }
 
   @Test

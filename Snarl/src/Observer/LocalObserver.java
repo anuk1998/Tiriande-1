@@ -40,7 +40,7 @@ public class LocalObserver implements IObserver {
   @Override
   public String constructListOfActivePlayersUpdate(Level currentLevel) {
     ArrayList<String> activePlayerNames = new ArrayList<>();
-    for(Player p: currentLevel.getActivePlayers()) {
+    for (Player p: currentLevel.getActivePlayers()) {
       activePlayerNames.add(p.getName());
     }
     return "Active Players: " + activePlayerNames;
@@ -70,6 +70,6 @@ public class LocalObserver implements IObserver {
     for(IAdversary a: currentLevel.getAdversaries()) {
       adversaryPlayerNames.add(a.getName());
     }
-    return "Adversaries: " + adversaryPlayerNames;
+    return "Adversaries: " + adversaryPlayerNames.toString();
   }
 }

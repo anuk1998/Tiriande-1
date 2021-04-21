@@ -3,6 +3,8 @@ package Game;
 import java.util.ArrayList;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
+import Common.IUser;
 import User.LocalUser;
 
 public class UserTesting {
@@ -16,18 +18,22 @@ public class UserTesting {
 
   public static void main(String[] args) {
     createInitialGameBoard();
-    //testChooseZombieMove();
-    //testChooseGhostMove();
-
-    //gm.runGame();
-    //testRenderView();
-
+    getUserName();
+    testGetAllAdversaryPositions();
+    testGetAllPlayerPositions();
+    testOutputView();
+    testMakeView();
+    System.out.println(level1.renderLevel());
   }
 
-
+  @Test
+  public static void getUserName() {
+    LocalUser testUser = new LocalUser("User1");
+    assertEquals("User1", testUser.getUserName());
+  }
 
   @Test
-  public static void testRenderView() {
+  public static void testOutputView() {
     LocalUser testUser = new LocalUser("RenderViewCorrectly");
     String [][] testArray = new String[5][4];
     for(int i = 0; i < testArray.length; i++) {
@@ -43,6 +49,91 @@ public class UserTesting {
     testArray[3][2] = "Z";
     assertEquals("■ ■ | ■\n" + ". . . .\n" +
             ". O . .\n" + ". . Z .\n" + ". . . .\n", testUser.outputView(testArray));
+  }
+
+  @Test
+  public static void testMakeView() {
+    ArrayList<Level> levels = new ArrayList<Level>();
+    levels.add(level1);
+    GameManager gm = new GameManager(levels, 1);
+    gm.registerPlayer("Giselle", Registration.LOCAL);
+    IUser user = gm.getUserByName("Giselle");
+    ICharacter player = level1.getPlayerObjectFromName("Giselle");
+    ((Player)player).setAvatar("$");
+    level1.moveCharacter(player, new Position(5, 19));
+
+    String[][] view = new String[5][5];
+    view[0][0] = " ";
+    view[0][1] = " ";
+    view[0][2] = " ";
+    view[0][3] = "x";
+    view[0][4] = " ";
+    view[1][0] = "■";
+    view[1][1] = "■";
+    view[1][2] = "■";
+    view[1][3] = "|";
+    view[1][4] = "■";
+    view[2][0] = "■";
+    view[2][1] = ".";
+    view[2][2] = "$";
+    view[2][3] = ".";
+    view[2][4] = ".";
+    view[3][0] = "■";
+    view[3][1] = ".";
+    view[3][2] = ".";
+    view[3][3] = ".";
+    view[3][4] = ".";
+    view[4][0] = "■";
+    view[4][1] = "■";
+    view[4][2] = "|";
+    view[4][3] = "■";
+    view[4][4] = "■";
+    assertArrayEquals(view, user.makeView(level1, player));
+  }
+
+  @Test
+  public static void testGetAllPlayerPositions() {
+    Player p1 = new Player("Giselle");
+    Player p2 = new Player("Anu");
+    Player p3 = new Player("Ferd");
+    p1.setAvatar("P");
+    p2.setAvatar("P");
+    p3.setAvatar("P");
+    level1.addCharacter(p1, new Position(4, 3));
+    level1.addCharacter(p2, new Position(18, 17));
+    level1.addCharacter(p3, new Position(2,2));
+    ArrayList<Level> levels = new ArrayList<Level>();
+    levels.add(level1);
+    GameManager gm = new GameManager(levels, 1);
+    gm.addUser("Giselle", Registration.LOCAL);
+    gm.addUser("Anu", Registration.LOCAL);
+    gm.addUser("Ferd", Registration.LOCAL);
+    IUser user = gm.getUserByName("Giselle");
+
+    ArrayList<Position> playerPositions = new ArrayList<Position>();
+    playerPositions.add(new Position(4,3));
+    playerPositions.add(new Position(2, 2));
+    playerPositions.add(new Position(18,17));
+    assertEquals(playerPositions, ((LocalUser)user).getAllPlayerLocations(level1));
+  }
+
+  @Test
+  public static void testGetAllAdversaryPositions() {
+    Zombie z = new Zombie("Giselle");
+    Ghost g = new Ghost("Anu");
+    level1.addCharacter(z, new Position(4, 3));
+    level1.addCharacter(g, new Position(18, 17));
+    ArrayList<Level> levels = new ArrayList<Level>();
+    levels.add(level1);
+    GameManager gm = new GameManager(levels, 1);
+    gm.addUser("Giselle", Registration.LOCAL);
+    gm.addUser("Anu", Registration.LOCAL);
+    IUser user = gm.getUserByName("Giselle");
+
+    ArrayList<Position> playerPositions = new ArrayList<Position>();
+    playerPositions.add(new Position(4,3));
+    playerPositions.add(new Position(18,17));
+    assertEquals(playerPositions, ((LocalUser)user).getAllAdversaryLocations(level1));
 
   }
 
@@ -141,8 +232,5 @@ public class UserTesting {
     //adding key and exit
     level1.addObject(new Position(5, 27), "*");
     level1.addObject(new Position(6, 27), "●");
-
-    ICharacter newPlayer = new Player("ILoveCoding");
-    level1.addCharacter(newPlayer, new Position(4,5));
   }
 }

@@ -131,7 +131,6 @@ public class Client {
       case "Invalid":
         System.out.println("~~~MOVE STATUS:~~~");
         System.out.println("Sorry, that is an invalid move.");
-        //invalid = true;
         return false;
     }
     return parsedServerMessageAsJSON(serverMessage);

@@ -24,7 +24,8 @@ class LevelTesting {
 
   public static void main(String[] args) throws Exception {
     createInitialGameState();
-    testGetIsKeyFoundBefore(); // will be false, key hasn't been found yet
+    testGetIsKeyFoundBefore();
+
     testGetDoorPositions();
     testGetKeyPositionInLevel();
     testGetExitPositionInLevel();
@@ -34,9 +35,8 @@ class LevelTesting {
     createModifiedAfterObjectGameState();
 
     // will be true now that the key has been found
-    testGetIsKeyFound();
+    testGetIsKeyFoundAfter();
     testGetExitTileInLevelAfterUnlocked();
-
     invalidRoom();
     invalidDoorPlacement();
     testGetRowPosition();
@@ -53,6 +53,7 @@ class LevelTesting {
   }
 
   private static void testGetExitTileInLevelAfterUnlocked() {
+    level1.openExitTile();
     assertEquals("O", level1.getTileInLevel(level1.getExitPositionInLevel()));
   }
 
@@ -97,8 +98,6 @@ class LevelTesting {
     //Room 1
     room1.addDoor(new Position(2, 9));
     room1.addDoor(new Position(7,6));
-
-    level1.addObject(new Position(3, 2), "*");
 
     //Room 2
     room2.addDoor(new Position(0, 0));
@@ -256,10 +255,9 @@ class LevelTesting {
 
   @Test
   public static void testGetTileInRoom() {
-    assertEquals("■", room1.getTileInRoom(new Position(5, 8)));
-    //assertEquals("O", room2.getTileInRoom(new Position(3, 2)));
-    assertEquals("|", room3.getTileInRoom(new Position(3, 2)));
-    assertEquals("*", room4.getTileInRoom(new Position(3, 2)));
+    assertEquals(".", level1.getTileInLevel(new Position(5, 8)));
+    assertEquals("|", level1.getTileInLevel(new Position(2, 9)));
+    assertEquals("■", level1.getTileInLevel(new Position(7, 0)));
   }
 
   @Test

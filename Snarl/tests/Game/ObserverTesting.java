@@ -18,21 +18,13 @@ public class ObserverTesting {
 
   public static void main(String[]args) {
     createInitialGameBoard();
-    //Testing the whole game with Scanner
-
-    //ArrayList<Level> listOfLevels = new ArrayList<>();
-    //listOfLevels.add(level1);
-    //System.out.println(level1.renderLevel());
-    //GameManager gm = new GameManager(listOfLevels);
-    //gm.runGame()
 
     //Individual method testing
-
-    //testGetActivePlayers();
-    //testGetAdversaries();
-    //testGetExpelledPlayers();
-    //testGetExitedPlayers();
-    //testGetMoveStatusUpdate();
+    testGetActivePlayers();
+    testGetAdversaries();
+    testGetExpelledPlayers();
+    testGetExitedPlayers();
+    testGetMoveStatusUpdate();
   }
 
   @Test
@@ -40,10 +32,10 @@ public class ObserverTesting {
     LocalObserver testObserver = new LocalObserver("foo");
     String output = "Active Players: ";
     ArrayList<String> outputArray = new ArrayList<>();
-    outputArray.add("Hermione Granger");
     outputArray.add("Giselle");
     outputArray.add("Harry Potter");
     outputArray.add("Anu");
+    outputArray.add("Hermione Granger");
     assertEquals(output + outputArray, testObserver.constructListOfActivePlayersUpdate(level1));
   }
 
@@ -195,7 +187,7 @@ public class ObserverTesting {
     //initialize gameManager
     ArrayList<Level> listOfLevels = new ArrayList<>();
     listOfLevels.add(level1);
-    GameManager gm = new GameManager(listOfLevels, 0);
+    GameManager gm = new GameManager(listOfLevels, 1);
 
     //register players for observer testing purposes
     gm.registerPlayer("Anu", Registration.LOCAL);

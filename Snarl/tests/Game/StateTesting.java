@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 public class StateTesting {
   static Level level1 = new Level();
@@ -20,7 +22,7 @@ public class StateTesting {
   //static IAdversary zombie = new Ghost("Weird Zombie");
   static Level[] lev = {level1};
   static ArrayList<Level> listOfLevels = new ArrayList<Level>(Arrays.asList(lev));
-  static GameManager gm = new GameManager(listOfLevels, 0);
+  static GameManager gm = new GameManager(listOfLevels, 1);
 
   public static void main(String[] args) {
     listOfLevels.add(level1);
@@ -60,6 +62,7 @@ public class StateTesting {
     Position ghostPos = level1.getAdversaryObjectFromName("scary").getCharacterPosition();
     gm.parseMoveStatusAndDoAction(GameStatus.PLAYER_SELF_ELIMINATES, ghostPos, level1.getPlayerObjectFromName("Carl"));
     assertEquals(null, level1.getPlayerObjectFromName("Carl"));
+    gm.parseMoveStatusAndDoAction(GameStatus.KEY_FOUND, level1.getKeyPositionInLevel(), level1.getPlayerObjectFromName("Santiago"));
   }
 
   @Test
@@ -82,9 +85,15 @@ public class StateTesting {
   }
 
   @Test
-  public static void testIsExitUnlocked() {
+  public static void testIsExitUnlockedBeforeKeyFound() {
     RuleCheckerPlayer exitUnlocked = new RuleCheckerPlayer(level1, p1);
     assertEquals(false, exitUnlocked.isExitUnlocked() );
+  }
+
+  @Test
+  public static void testIsExitUnlockedAfterKeyFound() {
+    RuleCheckerPlayer exitUnlocked = new RuleCheckerPlayer(level1, p1);
+    assertEquals(true, exitUnlocked.isExitUnlocked() );
   }
 
   @Test 
@@ -112,7 +121,7 @@ public class StateTesting {
 
   @Test
   public static void testRegisterPlayer() {
-    assertEquals(3, level1.activePlayers.size());
+    assertEquals(2, level1.activePlayers.size());
   }
 
   @Test
@@ -125,7 +134,8 @@ public class StateTesting {
     Player bob = level1.getPlayerObjectFromName("Bob");
     bob.setCharacterPosition(new Position(4, 2));
     assertEquals(GameStatus.VALID, gm.callRuleChecker(bob, new Position(4,3)));
-    assertEquals(GameStatus.INVALID, gm.callRuleChecker(level1.getPlayerObjectFromName("Santiago"), new Position(100,100)));
+    assertEquals(GameStatus.INVALID, gm.callRuleChecker(bob, new Position(100,100)));
+
   }
 
   @Test
@@ -136,7 +146,8 @@ public class StateTesting {
     assertEquals(GameStatus.VALID, ruleChecker444.runRuleChecker(new Position(3,4)));
   }
 
-  @Test public static void testisNCardinalTilesAway() {
+  @Test
+  public static void testisNCardinalTilesAway() {
     Player bob = level1.getPlayerObjectFromName("Bob");
     RuleCheckerPlayer ruleCheckerp1 = new RuleCheckerPlayer(level1, bob);
     Position bobsPos = bob.getCharacterPosition();
@@ -147,7 +158,8 @@ public class StateTesting {
 
   }
 
-  @Test public static void testIsValidMove() {
+  @Test
+  public static void testIsValidMove() {
     Player validMover = new Player("ValidMover223");
     RuleCheckerPlayer ruleCheckerValid = new RuleCheckerPlayer(level1, validMover);
     level1.addCharacter(validMover, new Position (5,7));
@@ -155,9 +167,24 @@ public class StateTesting {
     assertEquals(false, ruleCheckerValid.isValidMove(new Position(40,400)));
   }
 
-  @Test public static void testisOnLevelPlane() {
+  @Test
+  public static void testisOnLevelPlane() {
     RuleCheckerPlayer ruleCheckerp3 = new RuleCheckerPlayer(level1, level1.getPlayerObjectFromName("Jane"));
     assertEquals(true, ruleCheckerp3.isOnLevelPlane(new Position(13,13)));
+  }
+
+  @Test
+  public static void testRuleCheckerGhost() {
+    Player selfEliminator = new Player("selfEliminator455");
+    selfEliminator.setAvatar("$");
+    level1.addCharacter(selfEliminator, new Position(4,7));
+    IAdversary boo = new Ghost("boo!");
+    level1.addCharacter(boo, new Position(4,6));
+    RuleCheckerGhost rcGhost = new RuleCheckerGhost(level1, boo);
+    assertTrue(String.valueOf(true), rcGhost.landedOnPlayer(new Position(4, 7)));
+    assertEquals(GameStatus.PLAYER_EXPELLED, rcGhost.encountersOppositeCharacter());
+    assertTrue(String.valueOf(true), rcGhost.landedOnAWallTile(new Position(4, 9)));
+    assertFalse(String.valueOf(false), rcGhost.landedOnAWallTile(new Position(4, 8)));
   }
 
   @Test
