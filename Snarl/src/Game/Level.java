@@ -259,10 +259,8 @@ public class Level {
 
   // Method that handles when a player successfully passes through the exit by removing them from active players list
   public void playerLeavesTheLevel(ICharacter c) {
-    System.out.println("TO REMOVE: we are in expel player");
     this.activePlayers.remove(c);
     this.exitedPlayers.add((Player)c);
-    System.out.println("TO REMOVE: exited players so far: " + this.exitedPlayers.toString());
   }
 
   /**
