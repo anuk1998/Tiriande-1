@@ -270,7 +270,7 @@ public class GameManager {
         p.increaseNumOfTimesExpelled();
         currentLevel.moveCharacter(c, destination);
         IUser playerUser = getUserByName(p.getName());
-        playerUser.sendMoveUpdate(GameStatus.PLAYER_EXPELLED, null, c);
+        playerUser.sendMoveUpdate(GameStatus.PLAYER_EXPELLED, null, p);
         sendUpdateToUsers(UpdateType.PLAYER_UPDATE, GameStatus.PLAYER_EXPELLED, p);
     }
 
